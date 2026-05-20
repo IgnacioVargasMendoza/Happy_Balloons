@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <RootNamespace>HappyTimesBalloons.AccesoADatos</RootNamespace>
+    <AssemblyName>HappyTimesBalloons.AccesoADatos</AssemblyName>
+    <Nullable>disable</Nullable>
+    <LangVersion>7.3</LangVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="EntityFramework" Version="6.4.4" />
+    <PackageReference Include="Microsoft.AspNet.Identity.EntityFramework" Version="2.2.3" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\HappyTimesBalloons.Abstraccion\HappyTimesBalloons.Abstraccion.csproj" />
+  </ItemGroup>
+</Project>

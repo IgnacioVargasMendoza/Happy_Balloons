@@ -1,0 +1,136 @@
+@model HappyTimesBalloons.Web.Models.ViewModels.ProductoFormViewModel
+@{
+    ViewBag.Title = "Nuevo Producto";
+}
+
+<div class="d-flex align-items-center mb-4 gap-2">
+    @Html.ActionLink("", "Index", "Producto", null,
+        new { @class = "btn btn-outline-secondary btn-sm", title = "Volver" })
+    <i class="bi bi-chevron-left" style="pointer-events:none;margin-left:-2rem;"></i>
+    <h2 class="mb-0"><i class="bi bi-plus-circle me-2 text-brand"></i>Nuevo producto</h2>
+</div>
+
+@using (Html.BeginForm("Crear", "Producto", FormMethod.Post,
+    new { enctype = "multipart/form-data", @class = "needs-validation", novalidate = "novalidate" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="row g-4">
+        @* ── Columna izquierda: datos del producto ── *@
+        <div class="col-lg-7">
+            <div class="card shadow-sm">
+                <div class="card-header fw-semibold">Información del producto</div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        @Html.LabelFor(m => m.Nombre, new { @class = "form-label fw-semibold" })
+                        <span class="text-danger ms-1">*</span>
+                        @Html.TextBoxFor(m => m.Nombre,
+                            new { @class = "form-control", placeholder = "Nombre del producto", maxlength = "200" })
+                        @Html.ValidationMessageFor(m => m.Nombre, "", new { @class = "text-danger small" })
+                    </div>
+                    <div class="mb-3">
+                        @Html.LabelFor(m => m.Descripcion, new { @class = "form-label fw-semibold" })
+                        @Html.TextAreaFor(m => m.Descripcion, 4, 0,
+                            new { @class = "form-control", placeholder = "Descripción del producto" })
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            @Html.LabelFor(m => m.Precio, new { @class = "form-label fw-semibold" })
+                            <span class="text-danger ms-1">*</span>
+                            <div class="input-group">
+                                <span class="input-group-text">₡</span>
+                                @Html.TextBoxFor(m => m.Precio,
+                                    new { @class = "form-control", placeholder = "0", type = "number",
+                                          min = "0.01", step = "0.01" })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.Precio, "", new { @class = "text-danger small" })
+                        </div>
+                        <div class="col-md-6">
+                            @Html.LabelFor(m => m.PrecioDescuento, new { @class = "form-label fw-semibold" })
+                            <div class="input-group">
+                                <span class="input-group-text">₡</span>
+                                @Html.TextBoxFor(m => m.PrecioDescuento,
+                                    new { @class = "form-control", placeholder = "Opcional",
+                                          type = "number", min = "0", step = "0.01" })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.PrecioDescuento, "", new { @class = "text-danger small" })
+                        </div>
+                    </div>
+                    <div class="row g-3 mt-1">
+                        <div class="col-md-6">
+                            @Html.LabelFor(m => m.Stock, new { @class = "form-label fw-semibold" })
+                            <span class="text-danger ms-1">*</span>
+                            @Html.TextBoxFor(m => m.Stock,
+                                new { @class = "form-control", type = "number", min = "0" })
+                            @Html.ValidationMessageFor(m => m.Stock, "", new { @class = "text-danger small" })
+                        </div>
+                        <div class="col-md-6">
+                            @Html.LabelFor(m => m.CategoriaId, new { @class = "form-label fw-semibold" })
+                            <span class="text-danger ms-1">*</span>
+                            @Html.DropDownListFor(m => m.CategoriaId, Model.Categorias,
+                                "-- Selecciona --", new { @class = "form-select" })
+                            @Html.ValidationMessageFor(m => m.CategoriaId, "", new { @class = "text-danger small" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* ── Columna derecha: imágenes ── *@
+        <div class="col-lg-5">
+            <div class="card shadow-sm">
+                <div class="card-header fw-semibold">
+                    <i class="bi bi-images me-1"></i>Galería de imágenes
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small">
+                        JPG, PNG o WEBP · máx. 5 MB por imagen.
+                        La primera imagen cargada se marcará como principal.
+                    </p>
+                    <div class="mb-2">
+                        <label class="form-label fw-semibold">Imágenes</label>
+                        <input type="file" name="imagenes" class="form-control"
+                               accept=".jpg,.jpeg,.png,.webp" multiple />
+                    </div>
+                    <div id="previsualizacion" class="d-flex flex-wrap gap-2 mt-3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mt-4">
+        <button type="submit" class="btn btn-brand">
+            <i class="bi bi-check-lg me-1"></i> Crear producto
+        </button>
+        @Html.ActionLink("Cancelar", "Index", "Producto", null, new { @class = "btn btn-outline-secondary" })
+    </div>
+}
+
+@section scripts {
+<script>
+    // Previsualización de imágenes seleccionadas
+    document.querySelector('input[name="imagenes"]').addEventListener('change', function () {
+        var contenedor = document.getElementById('previsualizacion');
+        contenedor.innerHTML = '';
+        Array.from(this.files).forEach(function (file, idx) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                var div = document.createElement('div');
+                div.style.cssText = 'position:relative;width:80px;height:80px;';
+                var img = document.createElement('img');
+                img.src = e.target.result;
+                img.style.cssText = 'width:80px;height:80px;object-fit:cover;border-radius:6px;';
+                if (idx === 0) {
+                    var badge = document.createElement('span');
+                    badge.textContent = 'Principal';
+                    badge.style.cssText = 'position:absolute;bottom:2px;left:2px;font-size:0.6rem;background:#e91e8c;color:#fff;padding:1px 4px;border-radius:3px;';
+                    div.appendChild(badge);
+                }
+                div.appendChild(img);
+                contenedor.appendChild(div);
+            };
+            reader.readAsDataURL(file);
+        });
+    });
+</script>
+}
