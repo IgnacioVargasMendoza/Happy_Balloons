@@ -3,13 +3,20 @@ using HappyTimesBalloons.AccesoADatos.Modelos;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System;
-using System.Data.Entity;
+using System.Data.Entity.Migrations;
 using System.Linq;
 
-namespace HappyTimesBalloons.AccesoADatos.Inicializadores
+namespace HappyTimesBalloons.AccesoADatos.Migraciones
 {
-    public class DatabaseConfig : CreateDatabaseIfNotExists<ApplicationDbContext>
+    public sealed class Configuration : DbMigrationsConfiguration<ApplicationDbContext>
     {
+        public Configuration()
+        {
+            AutomaticMigrationsEnabled = true;
+            AutomaticMigrationDataLossAllowed = true;
+            MigrationsDirectory = "Migraciones";
+        }
+
         protected override void Seed(ApplicationDbContext context)
         {
             var roleStore = new RoleStore<IdentityRole>(context);
@@ -57,6 +64,7 @@ namespace HappyTimesBalloons.AccesoADatos.Inicializadores
                     new ZonaEntrega { Nombre = "Cartago",          Descripcion = "Cartago central y Paraíso",              CostoEnvio = 3000m, EsDisponible = true, FechaCreacion = DateTime.UtcNow },
                 };
                 context.ZonasEntrega.AddRange(zonas);
+                context.SaveChanges();
             }
 
             context.SaveChanges();

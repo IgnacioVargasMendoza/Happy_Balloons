@@ -20,5 +20,8 @@ namespace HappyTimesBalloons.AccesoADatos.Contexto
         public DbSet<Categoria> Categorias { get; set; }
         public DbSet<Producto> Productos { get; set; }
         public DbSet<ImagenProducto> ImagenesProducto { get; set; }
+        public DbSet<Pedido> Pedidos { get; set; }
+        public DbSet<DetallePedido> DetallesPedido { get; set; }
+        public DbSet<ZonaEntrega> ZonasEntrega { get; set; }
     }
 }

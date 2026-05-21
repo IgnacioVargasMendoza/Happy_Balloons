@@ -1,0 +1,143 @@
+@model HappyTimesBalloons.Web.Models.ViewModels.PedidoDetalleViewModel
+@{
+    ViewBag.Title = "Detalle del pedido " + Model.Pedido.Numero;
+    bool esAdmin = User.IsInRole("Administrador") || User.IsInRole("Operador");
+}
+
+@* Header *@
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h2 class="mb-0">
+            <i class="bi bi-receipt me-2 text-brand"></i>@Model.Pedido.Numero
+        </h2>
+        <small class="text-muted">
+            @Model.Pedido.FechaPedido.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+        </small>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        <span class="badge fs-6 @Model.Resumen.EstadoCss">@Model.Resumen.EstadoTexto</span>
+        @if (esAdmin)
+        {
+            @Html.ActionLink("Volver a gestión", "Index", "Pedido", null,
+                new { @class = "btn btn-outline-secondary btn-sm" })
+        }
+        else
+        {
+            @Html.ActionLink("Mis pedidos", "MisPedidos", "Pedido", null,
+                new { @class = "btn btn-outline-secondary btn-sm" })
+        }
+    </div>
+</div>
+
+<div class="row g-4">
+
+    @* Tabla de items *@
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white fw-semibold">
+                <i class="bi bi-box2 me-2 text-brand"></i>Artículos del pedido
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-3" style="width:60px;"></th>
+                            <th>Producto</th>
+                            <th class="text-center">Cant.</th>
+                            <th class="text-end">Precio unit.</th>
+                            <th class="text-end pe-3">Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var d in Model.Pedido.Detalles)
+                        {
+                            <tr>
+                                <td class="ps-3">
+                                    @if (!string.IsNullOrEmpty(d.ImagenUrl))
+                                    {
+                                        <img src="@d.ImagenUrl" alt="@d.NombreProducto"
+                                             class="rounded" style="width:48px;height:48px;object-fit:cover;" />
+                                    }
+                                    else
+                                    {
+                                        <div class="rounded bg-light d-flex align-items-center justify-content-center"
+                                             style="width:48px;height:48px;">
+                                            <i class="bi bi-image text-muted"></i>
+                                        </div>
+                                    }
+                                </td>
+                                <td class="fw-semibold">@d.NombreProducto</td>
+                                <td class="text-center">@d.Cantidad</td>
+                                <td class="text-end text-muted">₡@d.PrecioUnitario.ToString("N0")</td>
+                                <td class="text-end pe-3 fw-semibold">₡@d.Subtotal.ToString("N0")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    @* Resumen lateral *@
+    <div class="col-lg-4">
+        <div class="card shadow-sm border-0 mb-3">
+            <div class="card-header bg-white fw-semibold">
+                <i class="bi bi-truck me-2 text-brand"></i>Entrega
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-5 text-muted fw-normal">Zona</dt>
+                    <dd class="col-sm-7">@Model.Pedido.NombreZona</dd>
+                    <dt class="col-sm-5 text-muted fw-normal">Dirección</dt>
+                    <dd class="col-sm-7">@Model.Pedido.DireccionEntrega</dd>
+                </dl>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0 mb-3">
+            <div class="card-header bg-white fw-semibold">
+                <i class="bi bi-credit-card me-2 text-brand"></i>Pago
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-5 text-muted fw-normal">Método</dt>
+                    <dd class="col-sm-7">@Model.Pedido.MetodoPago</dd>
+                    @if (!string.IsNullOrEmpty(Model.Pedido.NumeroReferencia))
+                    {
+                        <dt class="col-sm-5 text-muted fw-normal">Referencia</dt>
+                        <dd class="col-sm-7">@Model.Pedido.NumeroReferencia</dd>
+                    }
+                </dl>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white fw-semibold">
+                <i class="bi bi-calculator me-2 text-brand"></i>Totales
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-1">
+                    <span class="text-muted">Subtotal</span>
+                    <span>₡@Model.Pedido.Subtotal.ToString("N0")</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Envío</span>
+                    <span>₡@Model.Pedido.CostoEnvio.ToString("N0")</span>
+                </div>
+                <hr class="my-2" />
+                <div class="d-flex justify-content-between">
+                    <span class="fw-bold fs-5">Total</span>
+                    <span class="fw-bold fs-5 text-brand">₡@Model.Pedido.Total.ToString("N0")</span>
+                </div>
+                @if (!string.IsNullOrEmpty(Model.Pedido.Notas))
+                {
+                    <hr class="my-2" />
+                    <div class="text-muted small">
+                        <i class="bi bi-chat-left-text me-1"></i><strong>Notas:</strong> @Model.Pedido.Notas
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+</div>

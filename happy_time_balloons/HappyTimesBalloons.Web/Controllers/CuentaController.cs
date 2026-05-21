@@ -145,12 +145,12 @@ namespace HappyTimesBalloons.Web.Controllers
 
         // POST /Cuenta/Logout
         [HttpPost]
-        [Authorize]
         [ValidateAntiForgeryToken]
         public ActionResult Logout()
         {
             AuthManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
-            return RedirectToAction("Login");
+            Session.Abandon();
+            return RedirectToAction("Index", "Home");
         }
 
         private ActionResult RedirectToLocal(string returnUrl)

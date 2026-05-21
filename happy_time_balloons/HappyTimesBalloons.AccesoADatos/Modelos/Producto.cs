@@ -16,10 +16,8 @@ namespace HappyTimesBalloons.AccesoADatos.Modelos
 
         public string Descripcion { get; set; }
 
-       // [Column(TypeName = "decimal(18,2)")]
         public decimal Precio { get; set; }
 
-        //[Column(TypeName = "decimal(18,2)")]
         public decimal? PrecioDescuento { get; set; }
 
         public int Stock { get; set; }

@@ -26,9 +26,7 @@
     </style>
 </head>
 <body>
-   <!-- @Html.Partial("_NavBar")-->
-    @Html.ActionLink("", "Index", "Home", null,
-    new { @class = "navbar-brand d-flex align-items-center gap-2" })
+    @Html.Partial("_NavBar")
 
     <main class="container py-4">
         @Html.Partial("_Mensajes")

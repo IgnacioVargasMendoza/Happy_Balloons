@@ -1,9 +1,5 @@
 <nav class="navbar navbar-expand-md navbar-light bg-white border-bottom shadow-sm sticky-top">
     <div class="container">
-        @Html.ActionLink("", "Index", "Home", null,
-            new { @class = "navbar-brand d-flex align-items-center gap-2" },
-            new object[] { })
-        @* Workaround: usamos Html.ActionLink con contenido personalizado *@
         <a class="navbar-brand d-flex align-items-center gap-2" href="@Url.Action("Index", "Home")">
             <i class="bi bi-balloon-heart-fill fs-4" style="color:#e91e8c;"></i>
             <div class="lh-sm">
@@ -44,15 +40,21 @@
                 @if (Request.IsAuthenticated && User.IsInRole("Cliente"))
                 {
                     <li class="nav-item">
-                        @Html.ActionLink("Mis pedidos", "Index", "Pedido",
+                        @Html.ActionLink("Mis pedidos", "MisPedidos", "Pedido",
                             new { area = "" }, new { @class = "nav-link" })
                     </li>
                 }
 
-                @* Carrito — se implementará en módulo Pedidos *@
                 <li class="nav-item position-relative">
-                    <a class="nav-link" href="#">
+                    <a class="nav-link" href="@Url.Action("Carrito", "Pedido")">
                         <i class="bi bi-cart3 fs-5"></i>
+                        @{
+                            var carritoCount = Session["CarritoCount"] as int?;
+                        }
+                        @if (carritoCount.HasValue && carritoCount > 0)
+                        {
+                            <span class="badge bg-danger rounded-pill badge-cart">@carritoCount</span>
+                        }
                     </a>
                 </li>
 

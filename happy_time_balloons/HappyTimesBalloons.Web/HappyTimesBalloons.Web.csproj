@@ -83,18 +83,36 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="App_Start\ApplicationUserManager.cs" />
+    <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\CategoriaController.cs" />
     <Compile Include="Controllers\CuentaController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\PedidoController.cs" />
+    <Compile Include="Controllers\ProductoController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\ViewModels\CarritoItemViewModel.cs" />
+    <Compile Include="Models\ViewModels\CarritoViewModel.cs" />
+    <Compile Include="Models\ViewModels\CatalogoIndexViewModel.cs" />
     <Compile Include="Models\ViewModels\CategoriaFormViewModel.cs" />
     <Compile Include="Models\ViewModels\CategoriaIndexViewModel.cs" />
     <Compile Include="Models\ViewModels\CategoriaViewModel.cs" />
+    <Compile Include="Models\ViewModels\CheckoutViewModel.cs" />
+    <Compile Include="Models\ViewModels\GestionPedidosViewModel.cs" />
+    <Compile Include="Models\ViewModels\ImagenProductoViewModel.cs" />
     <Compile Include="Models\ViewModels\LoginViewModel.cs" />
+    <Compile Include="Models\ViewModels\MisPedidosViewModel.cs" />
     <Compile Include="Models\ViewModels\PaginacionViewModel.cs" />
+    <Compile Include="Models\ViewModels\PedidoDetalleViewModel.cs" />
+    <Compile Include="Models\ViewModels\PedidoResumenViewModel.cs" />
+    <Compile Include="Models\ViewModels\ProductoDetalleViewModel.cs" />
+    <Compile Include="Models\ViewModels\ProductoFormViewModel.cs" />
+    <Compile Include="Models\ViewModels\ProductoIndexViewModel.cs" />
+    <Compile Include="Models\ViewModels\ProductoViewModel.cs" />
     <Compile Include="Models\ViewModels\RegistroViewModel.cs" />
+    <Compile Include="Models\ViewModels\AdminDashboardViewModel.cs" />
+    <Compile Include="Models\ViewModels\ZonaEntregaViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
@@ -113,10 +131,22 @@
     <Content Include="Views\Shared\_Mensajes.cshtml" />
     <Content Include="Views\Shared\_Paginacion.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
+    <Content Include="Views\Admin\Index.cshtml" />
     <Content Include="Views\Categoria\Index.cshtml" />
     <Content Include="Views\Cuenta\Login.cshtml" />
     <Content Include="Views\Cuenta\Registro.cshtml" />
+    <Content Include="Views\Home\Detalle.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\Pedido\Carrito.cshtml" />
+    <Content Include="Views\Pedido\Checkout.cshtml" />
+    <Content Include="Views\Pedido\Detalle.cshtml" />
+    <Content Include="Views\Pedido\Index.cshtml" />
+    <Content Include="Views\Pedido\MisPedidos.cshtml" />
+    <Content Include="Views\Producto\Crear.cshtml" />
+    <Content Include="Views\Producto\Editar.cshtml" />
+    <Content Include="Views\Producto\Index.cshtml" />
+    <Content Include="Views\Shared\_NavBar.cshtml" />
+    <Content Include="Views\Shared\_TarjetaProducto.cshtml" />
     <Content Include="Views\Web.config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
