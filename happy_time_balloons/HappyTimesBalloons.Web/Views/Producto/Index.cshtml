@@ -1,0 +1,189 @@
+@model HappyTimesBalloons.Web.Models.ViewModels.ProductoIndexViewModel
+@{
+    ViewBag.Title = "Productos";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-0"><i class="bi bi-box-seam me-2 text-brand"></i>Productos</h2>
+        <p class="text-muted small mb-0">Gestión del catálogo de productos</p>
+    </div>
+    @Html.ActionLink("Nuevo producto", "Crear", "Producto",
+        null, new { @class = "btn btn-brand" })
+</div>
+
+@* Filtros *@
+@using (Html.BeginForm("Index", "Producto", FormMethod.Get))
+{
+    <div class="row g-2 mb-4">
+        <div class="col-md-5">
+            <div class="input-group">
+                <span class="input-group-text bg-white"><i class="bi bi-search text-muted"></i></span>
+                <input type="text" name="busqueda" class="form-control border-start-0"
+                       placeholder="Buscar productos..." value="@Model.Busqueda" />
+            </div>
+        </div>
+        <div class="col-md-3">
+            <select name="categoriaId" class="form-select">
+                <option value="">Todas las categorías</option>
+                @foreach (var c in Model.Categorias)
+                {
+                    <option value="@c.Value"
+                            @(c.Selected ? "selected" : "")>@c.Text</option>
+                }
+            </select>
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-outline-secondary">
+                <i class="bi bi-funnel me-1"></i>Filtrar
+            </button>
+            @if (!string.IsNullOrEmpty(Model.Busqueda) || Model.CategoriaId.HasValue)
+            {
+                @Html.ActionLink("Limpiar", "Index", "Producto", null,
+                    new { @class = "btn btn-outline-danger ms-1" })
+            }
+        </div>
+    </div>
+}
+
+@* Tabla *@
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th class="ps-4" style="width:60px"></th>
+                    <th>Nombre</th>
+                    <th>Categoría</th>
+                    <th class="text-end">Precio</th>
+                    <th class="text-center">Stock</th>
+                    <th>Estado</th>
+                    <th class="text-end pe-4">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Productos.Any())
+                {
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-5">
+                            <i class="bi bi-box-seam fs-3 d-block mb-2 opacity-25"></i>
+                            @if (!string.IsNullOrEmpty(Model.Busqueda) || Model.CategoriaId.HasValue)
+                            {
+                                <span>Sin resultados para los filtros aplicados</span>
+                            }
+                            else
+                            {
+                                <span>No hay productos registrados</span>
+                            }
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var p in Model.Productos)
+                    {
+                        <tr>
+                            <td class="ps-4">
+                                @if (!string.IsNullOrEmpty(p.ImagenPrincipal))
+                                {
+                                    <img src="@p.ImagenPrincipal" alt="@p.Nombre"
+                                         class="rounded" style="width:48px;height:48px;object-fit:cover;" />
+                                }
+                                else
+                                {
+                                    <div class="rounded bg-light d-flex align-items-center justify-content-center"
+                                         style="width:48px;height:48px;">
+                                        <i class="bi bi-image text-muted"></i>
+                                    </div>
+                                }
+                            </td>
+                            <td>
+                                <div class="fw-semibold">@p.Nombre</div>
+                                @if (!string.IsNullOrEmpty(p.Descripcion))
+                                {
+                                    <div class="text-muted small">
+                                        @(p.Descripcion.Length > 60
+                                            ? p.Descripcion.Substring(0, 60) + "…"
+                                            : p.Descripcion)
+                                    </div>
+                                }
+                            </td>
+                            <td><span class="badge bg-light text-dark border">@p.CategoriaNombre</span></td>
+                            <td class="text-end">
+                                @if (p.TieneDescuento)
+                                {
+                                    <div class="text-muted text-decoration-line-through small">₡@p.Precio.ToString("N0")</div>
+                                    <div class="fw-semibold text-success">₡@p.PrecioDescuento.Value.ToString("N0")</div>
+                                }
+                                else
+                                {
+                                    <div class="fw-semibold">₡@p.Precio.ToString("N0")</div>
+                                }
+                            </td>
+                            <td class="text-center">
+                                <span class="@(p.Stock < 5 ? "text-danger fw-semibold" : "")">
+                                    @p.Stock
+                                </span>
+                            </td>
+                            <td>
+                                @if (p.EsActivo)
+                                {
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle">
+                                        <i class="bi bi-check-circle me-1"></i>Activo
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">
+                                        <i class="bi bi-dash-circle me-1"></i>Inactivo
+                                    </span>
+                                }
+                            </td>
+                            <td class="text-end pe-4">
+                                @Html.ActionLink("", "Editar", "Producto",
+                                    new { id = p.Id },
+                                    new { @class = "btn btn-sm btn-outline-primary me-1",
+                                          title = "Editar",
+                                          @data_bs_toggle = "tooltip" })
+                                <i class="bi bi-pencil" style="pointer-events:none;"></i>
+
+                                @using (Html.BeginForm("ToggleEstado", "Producto",
+                                    new { id = p.Id }, FormMethod.Post,
+                                    new { @class = "d-inline", id = "fToggle_" + p.Id }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <button type="button"
+                                            class="btn btn-sm @(p.EsActivo ? "btn-outline-warning" : "btn-outline-success") btn-toggle"
+                                            data-form-id="fToggle_@p.Id"
+                                            data-accion="@(p.EsActivo ? "desactivar" : "activar")"
+                                            data-nombre="@Html.AttributeEncode(p.Nombre)"
+                                            title="@(p.EsActivo ? "Desactivar" : "Activar")">
+                                        <i class="bi @(p.EsActivo ? "bi-eye-slash" : "bi-eye")"></i>
+                                    </button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+    @if (Model.Productos.Any())
+    {
+        <div class="card-footer text-muted small">
+            @Model.Productos.Count producto(s) encontrado(s)
+        </div>
+    }
+</div>
+
+@section scripts {
+<script>
+    document.querySelectorAll('.btn-toggle').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            if (confirm('¿Deseas ' + this.dataset.accion + ' el producto "' + this.dataset.nombre + '"?')) {
+                document.getElementById(this.dataset.formId).submit();
+            }
+        });
+    });
+</script>
+}

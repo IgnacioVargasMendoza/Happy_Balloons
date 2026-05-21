@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="HappyTimesBalloons.Abstraccion/HappyTimesBalloons.Abstraccion.csproj" />
+  <Project Path="HappyTimesBalloons.AccesoADatos/HappyTimesBalloons.AccesoADatos.csproj" />
+  <Project Path="HappyTimesBalloons.LogicaNegocio/HappyTimesBalloons.LogicaNegocio.csproj" />
+  <Project Path="HappyTimesBalloons.Web/HappyTimesBalloons.Web.csproj" Id="e4f5a6b7-c8d9-0e1f-2a3b-4c5d6e7f8a9b" />
+</Solution>

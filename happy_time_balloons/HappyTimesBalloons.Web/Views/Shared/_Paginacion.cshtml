@@ -1,0 +1,43 @@
+@model HappyTimesBalloons.Web.Models.ViewModels.PaginacionViewModel
+
+@if (Model != null && Model.TotalPaginas > 1)
+{
+    <nav aria-label="Paginación">
+        <ul class="pagination justify-content-center">
+            <li class="page-item @(!Model.TienePaginaAnterior ? "disabled" : "")">
+                @{
+                    var prevRoute = Model.RouteValues != null
+                        ? new RouteValueDictionary(Model.RouteValues)
+                        : new RouteValueDictionary();
+                    prevRoute["pagina"] = Model.PaginaActual - 1;
+                }
+                <a class="page-link" href="@Url.Action(Model.Accion, Model.Controlador, prevRoute)">
+                    <i class="bi bi-chevron-left"></i>
+                </a>
+            </li>
+
+            @for (int i = 1; i <= Model.TotalPaginas; i++)
+            {
+                var pageRoute = Model.RouteValues != null
+                    ? new RouteValueDictionary(Model.RouteValues)
+                    : new RouteValueDictionary();
+                pageRoute["pagina"] = i;
+                <li class="page-item @(i == Model.PaginaActual ? "active" : "")">
+                    <a class="page-link" href="@Url.Action(Model.Accion, Model.Controlador, pageRoute)">@i</a>
+                </li>
+            }
+
+            <li class="page-item @(!Model.TienePaginaSiguiente ? "disabled" : "")">
+                @{
+                    var nextRoute = Model.RouteValues != null
+                        ? new RouteValueDictionary(Model.RouteValues)
+                        : new RouteValueDictionary();
+                    nextRoute["pagina"] = Model.PaginaActual + 1;
+                }
+                <a class="page-link" href="@Url.Action(Model.Accion, Model.Controlador, nextRoute)">
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+}

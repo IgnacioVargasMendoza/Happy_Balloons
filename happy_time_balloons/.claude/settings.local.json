@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet sln *)",
+      "Bash(dotnet list *)",
+      "Bash(Get-ChildItem -Recurse \"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\" -Name)",
+      "Bash(Select-Object -First 100)",
+      "PowerShell(dotnet build *)",
+      "PowerShell(Test-Path *)",
+      "PowerShell($msbuild = \"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\18\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\MSBuild.exe\"; & $msbuild \"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\\\\HappyTimesBalloons.Web\\\\HappyTimesBalloons.Web.csproj\" /t:Build /p:Configuration=Debug /verbosity:minimal 2>&1 | Select-Object -Last 20)",
+      "PowerShell(dotnet restore *)",
+      "PowerShell($msbuild = \"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\18\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\MSBuild.exe\"; & $msbuild \"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\\\\HappyTimesBalloons.Web\\\\HappyTimesBalloons.Web.csproj\" /t:Build /p:Configuration=Debug /p:RuntimeIdentifier=win /verbosity:minimal 2>&1 | Select-Object -Last 25)",
+      "PowerShell($msbuild = \"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\18\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\MSBuild.exe\"; & $msbuild \"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\\\\HappyTimesBalloons.Web\\\\HappyTimesBalloons.Web.csproj\" /t:Build /p:Configuration=Debug /p:RestorePackages=false /verbosity:minimal 2>&1 | Select-Object -Last 30)",
+      "Bash(Get-ChildItem -Recurse -Filter \"*.cs\" \"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\")",
+      "Bash(Select-Object FullName)",
+      "Bash(Format-Table -HideTableHeaders)",
+      "PowerShell(Get-Command *)",
+      "PowerShell(& \"C:\\\\Program Files \\(x86\\)\\\\Microsoft Visual Studio\\\\2022\\\\BuildTools\\\\MSBuild\\\\Current\\\\Bin\\\\MSBuild.exe\" \"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\\\\HappyTimesBalloons.slnx\" /p:Configuration=Debug /p:Platform=\"Any CPU\" /v:minimal 2>&1)",
+      "PowerShell(New-Item *)",
+      "Bash(git *)",
+      "PowerShell(& \"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\2022\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\amd64\\\\MSBuild.exe\" \"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\\\\HappyTimesBalloons.AccesoADatos\\\\HappyTimesBalloons.AccesoADatos.csproj\" /p:Configuration=Debug /v:minimal 2>&1 | Select-Object -Last 20)",
+      "PowerShell(& \"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\18\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\amd64\\\\MSBuild.exe\" \"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\\\\HappyTimesBalloons.AccesoADatos\\\\HappyTimesBalloons.AccesoADatos.csproj\" /p:Configuration=Debug /v:minimal 2>&1 | Select-Object -Last 15)",
+      "PowerShell(& \"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\18\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\amd64\\\\MSBuild.exe\" \"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\\\\HappyTimesBalloons.AccesoADatos\\\\HappyTimesBalloons.AccesoADatos.csproj\" /p:Configuration=Debug /v:minimal 2>&1 | Select-Object -Last 5)",
+      "PowerShell(& \"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\18\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\amd64\\\\MSBuild.exe\" \"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\\\\HappyTimesBalloons.Web\\\\HappyTimesBalloons.Web.csproj\" /p:Configuration=Debug /v:minimal 2>&1)",
+      "PowerShell(Get-Process *)",
+      "PowerShell(netstat *)"
+    ]
+  }
+}

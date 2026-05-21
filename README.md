@@ -1,13 +1,11 @@
-# Happy Balloons
 
-Proyecto universitario desarrollado para la gestión de pedidos, productos, pagos y entregas de Happy Balloons.
+  # Diseño interfaz Happy Times Balloons
 
-## Tecnologías
-- ASP.NET Core MVC
-- SQL Server
-- Azure DevOps
-- GitHub
+  This is a code bundle for Diseño interfaz Happy Times Balloons. The original project is available at https://www.figma.com/design/WbW1yj0Qy2IU7REKbl0wAi/Dise%C3%B1o-interfaz-Happy-Times-Balloons.
 
-## Metodología
-- Scrum
-- Azure Boards
+  ## Running the code
+
+  Run `npm i` to install the dependencies.
+
+  Run `npm run dev` to start the development server.
+  

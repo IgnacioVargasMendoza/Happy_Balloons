@@ -1,0 +1,65 @@
+@model HappyTimesBalloons.Web.Models.ViewModels.MisPedidosViewModel
+@{
+    ViewBag.Title = "Mis pedidos";
+}
+
+<div class="d-flex align-items-center mb-4">
+    <h2 class="mb-0">
+        <i class="bi bi-bag me-2 text-brand"></i>Mis pedidos
+    </h2>
+</div>
+
+@if (!Model.Pedidos.Any())
+{
+    <div class="text-center py-5">
+        <i class="bi bi-bag-x fs-1 text-muted opacity-25 d-block mb-3"></i>
+        <p class="text-muted mb-1">Aún no tienes pedidos.</p>
+        <p class="text-muted small mb-4">Explora nuestro catálogo y agrega productos al carrito.</p>
+        @Html.ActionLink("Ver catálogo", "Index", "Home", null, new { @class = "btn btn-brand" })
+    </div>
+}
+else
+{
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">Número</th>
+                        <th>Fecha</th>
+                        <th>Artículos</th>
+                        <th>Estado</th>
+                        <th class="text-end">Total</th>
+                        <th class="text-end pe-4">Detalle</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var p in Model.Pedidos)
+                    {
+                        <tr>
+                            <td class="ps-4">
+                                <span class="fw-semibold">@p.Numero</span>
+                            </td>
+                            <td class="text-muted small">
+                                @p.FechaPedido.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                            </td>
+                            <td class="text-muted small">@p.CantidadItems artículo(s)</td>
+                            <td>
+                                <span class="badge @p.EstadoCss">@p.EstadoTexto</span>
+                            </td>
+                            <td class="text-end fw-semibold">₡@p.Total.ToString("N0")</td>
+                            <td class="text-end pe-4">
+                                @Html.ActionLink("Ver", "Detalle", "Pedido",
+                                    new { id = p.Id },
+                                    new { @class = "btn btn-sm btn-outline-primary" })
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer text-muted small">
+            @Model.Pedidos.Count pedido(s) en total
+        </div>
+    </div>
+}
