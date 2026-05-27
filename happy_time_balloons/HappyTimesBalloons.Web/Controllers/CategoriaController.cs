@@ -1,5 +1,6 @@
 using HappyTimesBalloons.Abstraccion.DTOs;
 using HappyTimesBalloons.Abstraccion.Enums;
+using HappyTimesBalloons.Abstraccion.Interfaces.Servicios;
 using HappyTimesBalloons.AccesoADatos.Contexto;
 using HappyTimesBalloons.AccesoADatos.Repositorios;
 using HappyTimesBalloons.LogicaNegocio.Servicios;
@@ -14,29 +15,38 @@ namespace HappyTimesBalloons.Web.Controllers
     [Authorize(Roles = "Administrador")]
     public class CategoriaController : Controller
     {
+        private readonly ICategoriaServicio _categoriaServicio;
+
+        public CategoriaController()
+            : this(new CategoriaServicio(
+                new CategoriaRepositorio(new ApplicationDbContext())))
+        {
+        }
+
+        public CategoriaController(ICategoriaServicio categoriaServicio)
+        {
+            _categoriaServicio = categoriaServicio;
+        }
+
         [HttpGet]
         public async Task<ActionResult> Index(string busqueda)
         {
-            using (var ctx = new ApplicationDbContext())
+            var categorias = await _categoriaServicio.ObtenerTodasAsync(busqueda);
+
+            var modelo = new CategoriaIndexViewModel
             {
-                var servicio = new CategoriaServicio(new CategoriaRepositorio(ctx));
-                var categorias = await servicio.ObtenerTodasAsync(busqueda);
-
-                var modelo = new CategoriaIndexViewModel
+                Busqueda = busqueda,
+                Categorias = categorias.Select(c => new CategoriaViewModel
                 {
-                    Busqueda = busqueda,
-                    Categorias = categorias.Select(c => new CategoriaViewModel
-                    {
-                        Id = c.Id,
-                        Nombre = c.Nombre,
-                        Descripcion = c.Descripcion,
-                        EsActiva = c.EsActiva,
-                        FechaCreacion = c.FechaCreacion
-                    }).ToList()
-                };
+                    Id = c.Id,
+                    Nombre = c.Nombre,
+                    Descripcion = c.Descripcion,
+                    EsActiva = c.EsActiva,
+                    FechaCreacion = c.FechaCreacion
+                }).ToList()
+            };
 
-                return View(modelo);
-            }
+            return View(modelo);
         }
 
         [HttpPost]
@@ -49,30 +59,25 @@ namespace HappyTimesBalloons.Web.Controllers
                 return RedirectToAction("Index");
             }
 
-            using (var ctx = new ApplicationDbContext())
+            var resultado = await _categoriaServicio.CrearAsync(new CategoriaDTO
             {
-                var servicio = new CategoriaServicio(new CategoriaRepositorio(ctx));
+                Nombre = model.Nombre,
+                Descripcion = model.Descripcion
+            });
 
-                var resultado = await servicio.CrearAsync(new CategoriaDTO
-                {
-                    Nombre = model.Nombre,
-                    Descripcion = model.Descripcion
-                });
+            if (resultado.Exito)
+            {
+                await AuditoriaHelper.RegistrarAsync(
+                    HttpContext,
+                    TipoOperacion.Crear,
+                    "Categorias",
+                    detalle: model.Nombre);
 
-                if (resultado.Exito)
-                {
-                    await AuditoriaHelper.RegistrarAsync(
-                        HttpContext,
-                        TipoOperacion.Crear,
-                        "Categorias",
-                        detalle: model.Nombre);
-
-                    TempData["Exito"] = resultado.Mensaje;
-                }
-                else
-                {
-                    TempData["Error"] = resultado.Mensaje;
-                }
+                TempData["Exito"] = resultado.Mensaje;
+            }
+            else
+            {
+                TempData["Error"] = resultado.Mensaje;
             }
 
             return RedirectToAction("Index");
@@ -88,32 +93,27 @@ namespace HappyTimesBalloons.Web.Controllers
                 return RedirectToAction("Index");
             }
 
-            using (var ctx = new ApplicationDbContext())
+            var resultado = await _categoriaServicio.ActualizarAsync(new CategoriaDTO
             {
-                var servicio = new CategoriaServicio(new CategoriaRepositorio(ctx));
+                Id = model.Id,
+                Nombre = model.Nombre,
+                Descripcion = model.Descripcion
+            });
 
-                var resultado = await servicio.ActualizarAsync(new CategoriaDTO
-                {
-                    Id = model.Id,
-                    Nombre = model.Nombre,
-                    Descripcion = model.Descripcion
-                });
+            if (resultado.Exito)
+            {
+                await AuditoriaHelper.RegistrarAsync(
+                    HttpContext,
+                    TipoOperacion.Actualizar,
+                    "Categorias",
+                    model.Id,
+                    model.Nombre);
 
-                if (resultado.Exito)
-                {
-                    await AuditoriaHelper.RegistrarAsync(
-                        HttpContext,
-                        TipoOperacion.Actualizar,
-                        "Categorias",
-                        model.Id,
-                        model.Nombre);
-
-                    TempData["Exito"] = resultado.Mensaje;
-                }
-                else
-                {
-                    TempData["Error"] = resultado.Mensaje;
-                }
+                TempData["Exito"] = resultado.Mensaje;
+            }
+            else
+            {
+                TempData["Error"] = resultado.Mensaje;
             }
 
             return RedirectToAction("Index");
@@ -123,27 +123,22 @@ namespace HappyTimesBalloons.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> ToggleEstado(int id)
         {
-            using (var ctx = new ApplicationDbContext())
+            var resultado = await _categoriaServicio.ToggleEstadoAsync(id);
+
+            if (resultado.Exito)
             {
-                var servicio = new CategoriaServicio(new CategoriaRepositorio(ctx));
+                await AuditoriaHelper.RegistrarAsync(
+                    HttpContext,
+                    TipoOperacion.Actualizar,
+                    "Categorias",
+                    id,
+                    "Cambio de estado");
 
-                var resultado = await servicio.ToggleEstadoAsync(id);
-
-                if (resultado.Exito)
-                {
-                    await AuditoriaHelper.RegistrarAsync(
-                        HttpContext,
-                        TipoOperacion.Actualizar,
-                        "Categorias",
-                        id,
-                        "Cambio de estado");
-
-                    TempData["Exito"] = resultado.Mensaje;
-                }
-                else
-                {
-                    TempData["Error"] = resultado.Mensaje;
-                }
+                TempData["Exito"] = resultado.Mensaje;
+            }
+            else
+            {
+                TempData["Error"] = resultado.Mensaje;
             }
 
             return RedirectToAction("Index");
