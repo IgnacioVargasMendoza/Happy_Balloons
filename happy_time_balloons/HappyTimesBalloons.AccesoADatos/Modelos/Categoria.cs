@@ -10,10 +10,11 @@ namespace HappyTimesBalloons.AccesoADatos.Modelos
         [Key]
         public int Id { get; set; }
 
-        [Required, MaxLength(100)]
+        [Required]
+        [MaxLength(200)]
         public string Nombre { get; set; }
 
-        [MaxLength(500)]
+        [MaxLength(1000)]
         public string Descripcion { get; set; }
 
         public bool EsActiva { get; set; }

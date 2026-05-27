@@ -1,7 +1,7 @@
-using HappyTimesBalloons.AccesoADatos.Contexto;
-using HappyTimesBalloons.AccesoADatos.Repositorios;
 using HappyTimesBalloons.Abstraccion.DTOs;
 using HappyTimesBalloons.Abstraccion.Enums;
+using HappyTimesBalloons.AccesoADatos.Contexto;
+using HappyTimesBalloons.AccesoADatos.Repositorios;
 using HappyTimesBalloons.LogicaNegocio.Servicios;
 using HappyTimesBalloons.Web.Helpers;
 using HappyTimesBalloons.Web.Models.ViewModels;
@@ -14,7 +14,6 @@ namespace HappyTimesBalloons.Web.Controllers
     [Authorize(Roles = "Administrador")]
     public class CategoriaController : Controller
     {
-        // GET /Categoria
         [HttpGet]
         public async Task<ActionResult> Index(string busqueda)
         {
@@ -23,8 +22,9 @@ namespace HappyTimesBalloons.Web.Controllers
                 var servicio = new CategoriaServicio(new CategoriaRepositorio(ctx));
                 var categorias = await servicio.ObtenerTodasAsync(busqueda);
 
-                var vm = new CategoriaIndexViewModel
+                var modelo = new CategoriaIndexViewModel
                 {
+                    Busqueda = busqueda,
                     Categorias = categorias.Select(c => new CategoriaViewModel
                     {
                         Id = c.Id,
@@ -32,15 +32,13 @@ namespace HappyTimesBalloons.Web.Controllers
                         Descripcion = c.Descripcion,
                         EsActiva = c.EsActiva,
                         FechaCreacion = c.FechaCreacion
-                    }).ToList(),
-                    Busqueda = busqueda
+                    }).ToList()
                 };
 
-                return View(vm);
+                return View(modelo);
             }
         }
 
-        // POST /Categoria/Crear — HU-CAT-002
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Crear(CategoriaFormViewModel model)
@@ -54,6 +52,7 @@ namespace HappyTimesBalloons.Web.Controllers
             using (var ctx = new ApplicationDbContext())
             {
                 var servicio = new CategoriaServicio(new CategoriaRepositorio(ctx));
+
                 var resultado = await servicio.CrearAsync(new CategoriaDTO
                 {
                     Nombre = model.Nombre,
@@ -63,7 +62,11 @@ namespace HappyTimesBalloons.Web.Controllers
                 if (resultado.Exito)
                 {
                     await AuditoriaHelper.RegistrarAsync(
-                        HttpContext, TipoOperacion.Crear, "Categorias", detalle: model.Nombre);
+                        HttpContext,
+                        TipoOperacion.Crear,
+                        "Categorias",
+                        detalle: model.Nombre);
+
                     TempData["Exito"] = resultado.Mensaje;
                 }
                 else
@@ -75,7 +78,6 @@ namespace HappyTimesBalloons.Web.Controllers
             return RedirectToAction("Index");
         }
 
-        // POST /Categoria/Editar — HU-CAT-003
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Editar(CategoriaFormViewModel model)
@@ -89,6 +91,7 @@ namespace HappyTimesBalloons.Web.Controllers
             using (var ctx = new ApplicationDbContext())
             {
                 var servicio = new CategoriaServicio(new CategoriaRepositorio(ctx));
+
                 var resultado = await servicio.ActualizarAsync(new CategoriaDTO
                 {
                     Id = model.Id,
@@ -99,7 +102,12 @@ namespace HappyTimesBalloons.Web.Controllers
                 if (resultado.Exito)
                 {
                     await AuditoriaHelper.RegistrarAsync(
-                        HttpContext, TipoOperacion.Actualizar, "Categorias", model.Id, model.Nombre);
+                        HttpContext,
+                        TipoOperacion.Actualizar,
+                        "Categorias",
+                        model.Id,
+                        model.Nombre);
+
                     TempData["Exito"] = resultado.Mensaje;
                 }
                 else
@@ -111,7 +119,6 @@ namespace HappyTimesBalloons.Web.Controllers
             return RedirectToAction("Index");
         }
 
-        // POST /Categoria/ToggleEstado/5 — HU-CAT-004
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> ToggleEstado(int id)
@@ -119,12 +126,18 @@ namespace HappyTimesBalloons.Web.Controllers
             using (var ctx = new ApplicationDbContext())
             {
                 var servicio = new CategoriaServicio(new CategoriaRepositorio(ctx));
+
                 var resultado = await servicio.ToggleEstadoAsync(id);
 
                 if (resultado.Exito)
                 {
                     await AuditoriaHelper.RegistrarAsync(
-                        HttpContext, TipoOperacion.Actualizar, "Categorias", id, "ToggleEstado");
+                        HttpContext,
+                        TipoOperacion.Actualizar,
+                        "Categorias",
+                        id,
+                        "Cambio de estado");
+
                     TempData["Exito"] = resultado.Mensaje;
                 }
                 else
