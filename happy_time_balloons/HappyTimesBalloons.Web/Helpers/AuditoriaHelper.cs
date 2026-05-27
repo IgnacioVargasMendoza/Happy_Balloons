@@ -1,6 +1,6 @@
+using HappyTimesBalloons.Abstraccion.Enums;
 using HappyTimesBalloons.AccesoADatos.Contexto;
 using HappyTimesBalloons.AccesoADatos.Repositorios;
-using HappyTimesBalloons.Abstraccion.Enums;
 using HappyTimesBalloons.LogicaNegocio.Servicios;
 using System.Threading.Tasks;
 using System.Web;
@@ -24,7 +24,15 @@ namespace HappyTimesBalloons.Web.Helpers
             {
                 var repo = new BitacoraRepositorio(ctx);
                 var servicio = new AuditoriaServicio(repo);
-                await servicio.RegistrarAsync(usuarioId, nombreUsuario, accion, tabla, registroId, detalle, ip);
+
+                await servicio.RegistrarAsync(
+                    usuarioId,
+                    nombreUsuario,
+                    accion,
+                    tabla,
+                    registroId,
+                    detalle,
+                    ip);
             }
         }
     }
