@@ -19,11 +19,7 @@ namespace HappyTimesBalloons.Web.Controllers
         private const string SessionCarrito = "Carrito";
         private const string SessionCarritoCount = "CarritoCount";
 
-        // ═══════════════════════════════════════════════════════════════════
-        // CARRITO
-        // ═══════════════════════════════════════════════════════════════════
 
-        // GET /Pedido/Carrito
         [HttpGet]
         [AllowAnonymous]
         public ActionResult Carrito()
@@ -32,7 +28,7 @@ namespace HappyTimesBalloons.Web.Controllers
             return View(vm);
         }
 
-        // POST /Pedido/AgregarAlCarrito
+     
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -82,7 +78,6 @@ namespace HappyTimesBalloons.Web.Controllers
             return RedirectToAction("Carrito");
         }
 
-        // POST /Pedido/ActualizarCantidad
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -99,7 +94,7 @@ namespace HappyTimesBalloons.Web.Controllers
             return RedirectToAction("Carrito");
         }
 
-        // POST /Pedido/QuitarDelCarrito
+
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -112,11 +107,7 @@ namespace HappyTimesBalloons.Web.Controllers
             return RedirectToAction("Carrito");
         }
 
-        // ═══════════════════════════════════════════════════════════════════
-        // CHECKOUT
-        // ═══════════════════════════════════════════════════════════════════
-
-        // GET /Pedido/Checkout
+       
         [HttpGet]
         [Authorize]
         public async Task<ActionResult> Checkout()
@@ -146,7 +137,7 @@ namespace HappyTimesBalloons.Web.Controllers
                     }).ToList()
                 };
 
-                // Pre-seleccionar primera zona
+                
                 if (vm.ZonasEntrega.Any())
                 {
                     vm.ZonaEntregaId = vm.ZonasEntrega.First().Id;
@@ -157,7 +148,6 @@ namespace HappyTimesBalloons.Web.Controllers
             }
         }
 
-        // POST /Pedido/ConfirmarPedido
         [HttpPost]
         [Authorize]
         [ValidateAntiForgeryToken]
@@ -170,7 +160,7 @@ namespace HappyTimesBalloons.Web.Controllers
                 return RedirectToAction("Carrito");
             }
 
-            // Volver a cargar zonas si el modelo no es válido
+           
             if (!ModelState.IsValid)
             {
                 using (var ctx = new ApplicationDbContext())
@@ -218,7 +208,7 @@ namespace HappyTimesBalloons.Web.Controllers
                 if (!resultado.Exito)
                 {
                     TempData["Error"] = resultado.Mensaje;
-                    // Recargar zonas
+                    
                     var zonaRepo = new ZonaEntregaRepositorio(ctx);
                     var zonas = await zonaRepo.ObtenerTodasAsync();
                     model.ItemsCarrito = carrito;
@@ -233,11 +223,9 @@ namespace HappyTimesBalloons.Web.Controllers
                     return View("Checkout", model);
                 }
 
-                // Auditoría
                 await AuditoriaHelper.RegistrarAsync(
                     HttpContext, TipoOperacion.Crear, "Pedidos", resultado.Datos, $"Pedido creado por {userId}");
 
-                // Limpiar carrito
                 LimpiarCarrito();
 
                 TempData["Exito"] = "¡Tu pedido fue confirmado exitosamente!";
@@ -245,11 +233,7 @@ namespace HappyTimesBalloons.Web.Controllers
             }
         }
 
-        // ═══════════════════════════════════════════════════════════════════
-        // MIS PEDIDOS (Cliente)
-        // ═══════════════════════════════════════════════════════════════════
-
-        // GET /Pedido/MisPedidos
+       
         [HttpGet]
         [Authorize]
         public async Task<ActionResult> MisPedidos()
@@ -283,7 +267,7 @@ namespace HappyTimesBalloons.Web.Controllers
             }
         }
 
-        // GET /Pedido/Detalle/5
+        
         [HttpGet]
         [Authorize]
         public async Task<ActionResult> Detalle(int id)
@@ -298,7 +282,7 @@ namespace HappyTimesBalloons.Web.Controllers
                 var pedido = await servicio.ObtenerPorIdAsync(id);
                 if (pedido == null) return HttpNotFound();
 
-                // Verificar que el pedido pertenezca al usuario actual o sea admin/operador
+                
                 var userId = User.Identity.GetUserId();
                 bool esAdminOOperador = User.IsInRole("Administrador") || User.IsInRole("Operador");
 
@@ -324,11 +308,7 @@ namespace HappyTimesBalloons.Web.Controllers
             }
         }
 
-        // ═══════════════════════════════════════════════════════════════════
-        // GESTIÓN ADMIN / OPERADOR
-        // ═══════════════════════════════════════════════════════════════════
-
-        // GET /Pedido/Index
+      
         [HttpGet]
         [Authorize(Roles = "Administrador,Operador")]
         public async Task<ActionResult> Index(string filtroEstado, string filtroBusqueda)
@@ -346,7 +326,7 @@ namespace HappyTimesBalloons.Web.Controllers
 
                 var pedidos = await servicio.ObtenerTodosAsync(estadoFiltro, filtroBusqueda);
 
-                // SelectList de estados
+             
                 var estadosItems = new List<SelectListItem>
                 {
                     new SelectListItem { Value = "", Text = "Todos los estados" }
@@ -382,7 +362,6 @@ namespace HappyTimesBalloons.Web.Controllers
             }
         }
 
-        // POST /Pedido/ActualizarEstado
         [HttpPost]
         [Authorize(Roles = "Administrador,Operador")]
         [ValidateAntiForgeryToken]
@@ -412,10 +391,6 @@ namespace HappyTimesBalloons.Web.Controllers
 
             return RedirectToAction("Index");
         }
-
-        // ═══════════════════════════════════════════════════════════════════
-        // Helpers privados
-        // ═══════════════════════════════════════════════════════════════════
 
         private List<CarritoItemViewModel> ObtenerCarrito()
         {

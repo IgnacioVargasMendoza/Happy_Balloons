@@ -26,7 +26,7 @@ namespace HappyTimesBalloons.LogicaNegocio.Servicios
 
         public async Task<ResultadoOperacionDTO<int>> CrearPedidoAsync(string userId, CheckoutDTO checkout)
         {
-            // Validaciones básicas
+            
             if (string.IsNullOrWhiteSpace(userId))
                 return ResultadoOperacionDTO<int>.Fallo("Usuario no identificado.", CodigoResultado.DatosInvalidos);
 
@@ -39,12 +39,11 @@ namespace HappyTimesBalloons.LogicaNegocio.Servicios
             if (string.IsNullOrWhiteSpace(checkout.MetodoPago))
                 return ResultadoOperacionDTO<int>.Fallo("El método de pago es obligatorio.", CodigoResultado.DatosInvalidos);
 
-            // Verificar zona de entrega
+            
             var zona = await _zonaRepo.ObtenerPorIdAsync(checkout.ZonaEntregaId);
             if (zona == null || !zona.EsDisponible)
                 return ResultadoOperacionDTO<int>.Fallo("La zona de entrega seleccionada no está disponible.", CodigoResultado.DatosInvalidos);
 
-            // Verificar stock de cada producto y calcular subtotales
             decimal subtotal = 0m;
             foreach (var item in checkout.Items)
             {

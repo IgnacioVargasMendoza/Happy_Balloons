@@ -1,7 +1,7 @@
 @model HappyTimesBalloons.Web.Models.ViewModels.RegistroViewModel
 @{
     ViewBag.Title = "Crear cuenta";
-    Layout = null; // Página standalone con fondo degradado
+    Layout = null; 
 }
 <!DOCTYPE html>
 <html lang="es">
@@ -27,7 +27,7 @@
 <body>
     <div class="w-100" style="max-width:460px; padding: 1rem;">
 
-        <!-- Logo -->
+       
         <div class="text-center mb-4">
             <i class="bi bi-balloon-heart-fill" style="font-size:3rem; color:#e91e8c;"></i>
             <div>
@@ -41,7 +41,7 @@
                 <h5 class="card-title fw-bold mb-1">Crear cuenta</h5>
                 <p class="text-muted small mb-4">Completa todos los campos para registrarte</p>
 
-                @* HU-CLI-001 Escenario 2: email duplicado u otros errores *@
+                @*  *@
                 @Html.ValidationSummary(false, "", new { @class = "alert alert-danger py-2 small" })
 
                 @using (Html.BeginForm("Registro", "Cuenta", FormMethod.Post,
@@ -49,42 +49,42 @@
                 {
                     @Html.AntiForgeryToken()
 
-                    @* Nombre *@
+                    @*  *@
                     <div class="col-12">
                         @Html.LabelFor(m => m.Nombre, new { @class = "form-label fw-semibold" })
                         @Html.TextBoxFor(m => m.Nombre, new { @class = "form-control", placeholder = "Juan Pérez" })
                         @Html.ValidationMessageFor(m => m.Nombre, "", new { @class = "text-danger small" })
                     </div>
 
-                    @* Email *@
+                    @*  *@
                     <div class="col-12">
                         @Html.LabelFor(m => m.Email, new { @class = "form-label fw-semibold" })
                         @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "ejemplo@correo.com", autocomplete = "email" })
                         @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger small" })
                     </div>
 
-                    @* Contraseña *@
+                    @*  *@
                     <div class="col-md-6">
                         @Html.LabelFor(m => m.Contrasena, new { @class = "form-label fw-semibold" })
                         @Html.PasswordFor(m => m.Contrasena, new { @class = "form-control", placeholder = "••••••••" })
                         @Html.ValidationMessageFor(m => m.Contrasena, "", new { @class = "text-danger small" })
                     </div>
 
-                    @* Confirmar contraseña *@
+                    @*  *@
                     <div class="col-md-6">
                         @Html.LabelFor(m => m.ConfirmarContrasena, new { @class = "form-label fw-semibold" })
                         @Html.PasswordFor(m => m.ConfirmarContrasena, new { @class = "form-control", placeholder = "••••••••" })
                         @Html.ValidationMessageFor(m => m.ConfirmarContrasena, "", new { @class = "text-danger small" })
                     </div>
 
-                    @* Teléfono *@
+                    @*  *@
                     <div class="col-md-6">
                         @Html.LabelFor(m => m.Telefono, new { @class = "form-label fw-semibold" })
                         @Html.TextBoxFor(m => m.Telefono, new { @class = "form-control", placeholder = "8888-8888", type = "tel" })
                         @Html.ValidationMessageFor(m => m.Telefono, "", new { @class = "text-danger small" })
                     </div>
 
-                    @* Dirección (opcional) *@
+                    @*  *@
                     <div class="col-md-6">
                         @Html.LabelFor(m => m.Direccion, new { @class = "form-label fw-semibold" })
                         @Html.TextBoxFor(m => m.Direccion, new { @class = "form-control", placeholder = "San José, Costa Rica" })
