@@ -101,5 +101,8 @@ namespace HappyTimesBalloons.LogicaNegocio.Servicios
 
             return ResultadoOperacionDTO.Ok("Estado del pedido actualizado.");
         }
+
+        public Task<PedidoEstadisticasDTO> ObtenerEstadisticasAsync()
+            => _pedidoRepo.ObtenerEstadisticasAsync();
     }
 }

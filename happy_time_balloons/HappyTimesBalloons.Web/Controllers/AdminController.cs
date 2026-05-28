@@ -31,9 +31,8 @@ namespace HappyTimesBalloons.Web.Controllers
         {
             var productoStats = await _productoServicio.ObtenerEstadisticasAsync();
             var categoriaStats = await _categoriaServicio.ObtenerEstadisticasAsync();
+            var pedidoStats = await _pedidoServicio.ObtenerEstadisticasAsync();
             var actividad = await _auditoriaServicio.ObtenerActividadRecienteAsync(10);
-            var pedidos = await _pedidoServicio.ObtenerTodosAsync();
-            var hoy = System.DateTime.UtcNow.Date;
 
             var vm = new AdminDashboardViewModel
             {
@@ -44,9 +43,9 @@ namespace HappyTimesBalloons.Web.Controllers
                 TotalCategorias = categoriaStats.Total,
                 CategoriasActivas = categoriaStats.Activas,
 
-                TotalPedidos = pedidos.Count,
-                PedidosHoy = pedidos.Count(p => p.FechaPedido.Date == hoy),
-                VentasTotales = pedidos.Sum(p => p.Total),
+                TotalPedidos = pedidoStats.Total,
+                PedidosHoy = pedidoStats.PedidosHoy,
+                VentasTotales = pedidoStats.VentasTotales,
 
                 ActividadReciente = actividad.Select(b => new BitacoraResumenViewModel
                 {

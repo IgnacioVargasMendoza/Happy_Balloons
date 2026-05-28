@@ -12,7 +12,6 @@ namespace HappyTimesBalloons.Web.Models.ViewModels
         public int TotalCategorias { get; set; }
         public int CategoriasActivas { get; set; }
 
-        // TODO: usar IPedidoServicio cuando esté disponible
         public int TotalPedidos { get; set; }
         public int PedidosHoy { get; set; }
         public decimal VentasTotales { get; set; }

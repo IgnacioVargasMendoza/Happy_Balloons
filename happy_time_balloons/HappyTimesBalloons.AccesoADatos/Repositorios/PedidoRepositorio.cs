@@ -197,6 +197,23 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
             return await _ctx.Pedidos.CountAsync(x => x.EstadoPedido == estado);
         }
 
+        public async Task<PedidoEstadisticasDTO> ObtenerEstadisticasAsync()
+        {
+            var hoy = DateTime.UtcNow.Date;
+            var manana = hoy.AddDays(1);
+
+            var total = await _ctx.Pedidos.CountAsync();
+            var pedidosHoy = await _ctx.Pedidos.CountAsync(p => p.FechaPedido >= hoy && p.FechaPedido < manana);
+            var ventasTotales = await _ctx.Pedidos.SumAsync(p => (decimal?)p.Total) ?? 0m;
+
+            return new PedidoEstadisticasDTO
+            {
+                Total = total,
+                PedidosHoy = pedidosHoy,
+                VentasTotales = ventasTotales
+            };
+        }
+
         // ── Helpers privados ─────────────────────────────────────────────────
 
         private static PedidoDTO MapearDTO(Pedido p)

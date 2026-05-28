@@ -13,5 +13,6 @@ namespace HappyTimesBalloons.Abstraccion.Interfaces.Repositorios
         Task<List<PedidoDTO>> ObtenerTodosAsync(EstadoPedido? filtroEstado = null, string busqueda = null);
         Task<bool> ActualizarEstadoAsync(int id, EstadoPedido nuevoEstado);
         Task<int> ContarPorEstadoAsync(EstadoPedido estado);
+        Task<PedidoEstadisticasDTO> ObtenerEstadisticasAsync();
     }
 }
