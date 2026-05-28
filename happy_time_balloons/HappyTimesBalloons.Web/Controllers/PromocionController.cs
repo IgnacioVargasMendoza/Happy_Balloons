@@ -48,7 +48,7 @@ namespace HappyTimesBalloons.Web.Controllers
 
             var resultado = await _promoServicio.CrearAsync(dto);
 
-            if (resultado.Exitoso)
+            if (resultado.Exito)
                 TempData["Exito"] = resultado.Mensaje;
             else
                 TempData["Error"] = resultado.Mensaje;
@@ -62,7 +62,7 @@ namespace HappyTimesBalloons.Web.Controllers
         {
             var resultado = await _promoServicio.EliminarAsync(id);
 
-            if (resultado.Exitoso)
+            if (resultado.Exito)
                 TempData["Exito"] = resultado.Mensaje;
             else
                 TempData["Error"] = resultado.Mensaje;
