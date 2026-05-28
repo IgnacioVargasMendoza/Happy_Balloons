@@ -1,7 +1,6 @@
 using HappyTimesBalloons.Abstraccion.DTOs;
 using HappyTimesBalloons.Abstraccion.Enums;
 using HappyTimesBalloons.Abstraccion.Interfaces.Servicios;
-using HappyTimesBalloons.Web.Helpers;
 using HappyTimesBalloons.Web.Models.ViewModels;
 using System;
 using System.IO;
@@ -21,13 +20,16 @@ namespace HappyTimesBalloons.Web.Controllers
 
         private readonly IProductoServicio _productoServicio;
         private readonly ICategoriaServicio _categoriaServicio;
+        private readonly IAuditoriaServicio _auditoriaServicio;
 
         public ProductoController(
             IProductoServicio productoServicio,
-            ICategoriaServicio categoriaServicio)
+            ICategoriaServicio categoriaServicio,
+            IAuditoriaServicio auditoriaServicio)
         {
-            _productoServicio  = productoServicio;
+            _productoServicio = productoServicio;
             _categoriaServicio = categoriaServicio;
+            _auditoriaServicio = auditoriaServicio;
         }
 
         [HttpGet]
@@ -98,8 +100,10 @@ namespace HappyTimesBalloons.Web.Controllers
             }
 
             await ProcesarImagenes(dto.Id, imagenes);
-            await AuditoriaHelper.RegistrarAsync(
-                HttpContext, TipoOperacion.Crear, "Productos", dto.Id, model.Nombre);
+            await _auditoriaServicio.RegistrarAsync(
+                User.Identity.Name, User.Identity.Name,
+                TipoOperacion.Crear, "Productos",
+                registroId: dto.Id, detalle: model.Nombre, ip: Request.UserHostAddress);
             TempData["Exito"] = resultado.Mensaje;
 
             return RedirectToAction("Index");
@@ -156,8 +160,10 @@ namespace HappyTimesBalloons.Web.Controllers
             }
 
             await ProcesarImagenes(model.Id, imagenes);
-            await AuditoriaHelper.RegistrarAsync(
-                HttpContext, TipoOperacion.Actualizar, "Productos", model.Id, model.Nombre);
+            await _auditoriaServicio.RegistrarAsync(
+                User.Identity.Name, User.Identity.Name,
+                TipoOperacion.Actualizar, "Productos",
+                registroId: model.Id, detalle: model.Nombre, ip: Request.UserHostAddress);
             TempData["Exito"] = resultado.Mensaje;
 
             return RedirectToAction("Index");
@@ -171,8 +177,10 @@ namespace HappyTimesBalloons.Web.Controllers
 
             if (resultado.Exito)
             {
-                await AuditoriaHelper.RegistrarAsync(
-                    HttpContext, TipoOperacion.Actualizar, "Productos", id, "ToggleEstado");
+                await _auditoriaServicio.RegistrarAsync(
+                    User.Identity.Name, User.Identity.Name,
+                    TipoOperacion.Actualizar, "Productos",
+                    registroId: id, detalle: "ToggleEstado", ip: Request.UserHostAddress);
                 TempData["Exito"] = resultado.Mensaje;
             }
             else
@@ -196,8 +204,10 @@ namespace HappyTimesBalloons.Web.Controllers
             }
 
             await _productoServicio.EliminarImagenAsync(imagenId);
-            await AuditoriaHelper.RegistrarAsync(
-                HttpContext, TipoOperacion.Eliminar, "ImagenesProducto", imagenId);
+            await _auditoriaServicio.RegistrarAsync(
+                User.Identity.Name, User.Identity.Name,
+                TipoOperacion.Eliminar, "ImagenesProducto",
+                registroId: imagenId, ip: Request.UserHostAddress);
 
             TempData["Exito"] = "Imagen eliminada.";
             return RedirectToAction("Editar", new { id = productoId });

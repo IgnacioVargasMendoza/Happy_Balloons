@@ -1,24 +1,19 @@
 using HappyTimesBalloons.Abstraccion.DTOs;
+using HappyTimesBalloons.Abstraccion.Interfaces.Repositorios;
 using HappyTimesBalloons.Abstraccion.Interfaces.Servicios;
-using HappyTimesBalloons.AccesoADatos.Contexto;
-using HappyTimesBalloons.AccesoADatos.Modelos;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
-using System;
 using System.Threading.Tasks;
 
 namespace HappyTimesBalloons.LogicaNegocio.Servicios
 {
     public class AuthServicio : IAuthServicio
     {
-        private readonly ApplicationDbContext _ctx;
+        private readonly IAuthRepositorio _authRepo;
 
-        public AuthServicio(ApplicationDbContext ctx)
+        public AuthServicio(IAuthRepositorio authRepo)
         {
-            _ctx = ctx;
+            _authRepo = authRepo;
         }
 
-        // HU-CLI-001: Registro de cliente con validación de email duplicado y datos incompletos
         public async Task<ResultadoOperacionDTO> RegistrarAsync(RegistroDTO registro)
         {
             if (string.IsNullOrWhiteSpace(registro.Nombre) ||
@@ -31,64 +26,87 @@ namespace HappyTimesBalloons.LogicaNegocio.Servicios
                     CodigoResultado.DatosInvalidos);
             }
 
-            var userManager = CrearUserManager();
-
-            if (await userManager.FindByEmailAsync(registro.Email) != null)
+            if (await _authRepo.BuscarPorEmailAsync(registro.Email) != null)
             {
                 return ResultadoOperacionDTO.Fallo(
                     "Este correo electrónico ya está registrado.",
                     CodigoResultado.EmailDuplicado);
             }
 
-            var nuevoUsuario = new ApplicationUser
-            {
-                UserName = registro.Email,
-                Email = registro.Email,
-                Nombre = registro.Nombre.Trim(),
-                PhoneNumber = registro.Telefono,
-                Direccion = registro.Direccion,
-                EmailConfirmed = true,
-                LockoutEnabled = true
-            };
+            var resultado = await _authRepo.CrearCuentaAsync(registro);
 
-            var resultado = await userManager.CreateAsync(nuevoUsuario, registro.Contrasena);
+            if (resultado.Exito)
+                await _authRepo.AsignarRolAsync(resultado.Usuario.Id, "Cliente");
 
-            if (!resultado.Succeeded)
-            {
-                string errores = string.Join(" ", resultado.Errors);
-                return ResultadoOperacionDTO.Fallo(errores, CodigoResultado.DatosInvalidos);
-            }
-
-            await userManager.AddToRoleAsync(nuevoUsuario.Id, "Cliente");
-
-            var dto = new UsuarioDTO
-            {
-                Id = nuevoUsuario.Id,
-                Nombre = nuevoUsuario.Nombre,
-                Email = nuevoUsuario.Email,
-                Telefono = nuevoUsuario.PhoneNumber,
-                Direccion = nuevoUsuario.Direccion,
-                Rol = "Cliente"
-            };
-
-            return ResultadoOperacionDTO.Ok("Cuenta creada exitosamente.", dto);
+            return resultado;
         }
 
-        private UserManager<ApplicationUser> CrearUserManager()
+        public async Task<ResultadoLoginDTO> ValidarCredencialesAsync(string email, string password)
         {
-            var store = new UserStore<ApplicationUser>(_ctx);
-            var mgr = new UserManager<ApplicationUser>(store);
-            mgr.UserValidator = new UserValidator<ApplicationUser>(mgr)
+            var usuario = await _authRepo.BuscarPorEmailAsync(email);
+
+            if (usuario == null)
+                return new ResultadoLoginDTO
+                {
+                    Exito = false,
+                    Mensaje = "Usuario no encontrado",
+                    Email = email,
+                    NombreUsuario = email
+                };
+
+            if (await _authRepo.EstaBloquedoAsync(usuario.Id))
+                return new ResultadoLoginDTO
+                {
+                    Exito = false,
+                    CuentaBloqueada = true,
+                    Mensaje = "Cuenta bloqueada temporalmente por múltiples intentos fallidos.",
+                    UsuarioId = usuario.Id,
+                    NombreUsuario = usuario.Nombre ?? usuario.Email,
+                    Email = usuario.Email
+                };
+
+            bool passwordValida = await _authRepo.VerificarPasswordAsync(usuario.Id, password);
+            if (!passwordValida)
             {
-                AllowOnlyAlphanumericUserNames = false,
-                RequireUniqueEmail = true
+                await _authRepo.RegistrarIntentoFallidoAsync(usuario.Id);
+
+                if (await _authRepo.SeBloqueoAsync(usuario.Id))
+                    return new ResultadoLoginDTO
+                    {
+                        Exito = false,
+                        CuentaBloqueada = true,
+                        Mensaje = "Cuenta bloqueada por múltiples intentos fallidos.",
+                        UsuarioId = usuario.Id,
+                        NombreUsuario = usuario.Nombre ?? usuario.Email,
+                        Email = usuario.Email
+                    };
+
+                int restantes = await _authRepo.ObtenerIntentosRestantesAsync(usuario.Id);
+                return new ResultadoLoginDTO
+                {
+                    Exito = false,
+                    IntentosRestantes = restantes,
+                    Mensaje = restantes > 0
+                        ? $"Contraseña incorrecta. Te quedan {restantes} intento(s)."
+                        : "Credenciales incorrectas.",
+                    UsuarioId = usuario.Id,
+                    NombreUsuario = usuario.Nombre ?? usuario.Email,
+                    Email = usuario.Email
+                };
+            }
+
+            await _authRepo.ResetearIntentosAsync(usuario.Id);
+
+            bool esAdmin = await _authRepo.EsEnRolAsync(usuario.Id, "Administrador");
+            return new ResultadoLoginDTO
+            {
+                Exito = true,
+                Mensaje = "Login exitoso",
+                UsuarioId = usuario.Id,
+                NombreUsuario = usuario.Nombre ?? usuario.Email,
+                Email = usuario.Email,
+                EsAdmin = esAdmin
             };
-            mgr.PasswordValidator = new PasswordValidator { RequiredLength = 6 };
-            mgr.UserLockoutEnabledByDefault = true;
-            // TODO: leer MaxFailedAccessAttemptsBeforeLockout desde ConfiguracionSistema (módulo CFG)
-            mgr.MaxFailedAccessAttemptsBeforeLockout = 3;
-            mgr.DefaultAccountLockoutTimeSpan = TimeSpan.FromMinutes(30);
-            return mgr;
         }
     }
 }
