@@ -1,7 +1,6 @@
 using HappyTimesBalloons.Abstraccion.DTOs;
 using HappyTimesBalloons.Abstraccion.Interfaces.Servicios;
 using HappyTimesBalloons.AccesoADatos.Contexto;
-using HappyTimesBalloons.LogicaNegocio.Servicios;
 using HappyTimesBalloons.Web.Models.ViewModels;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Security;
@@ -17,16 +16,21 @@ namespace HappyTimesBalloons.Web.Controllers
     [AllowAnonymous]
     public class CuentaController : Controller
     {
+        private readonly IAuthServicio _authServicio;
+
         private IAuthenticationManager AuthManager
             => HttpContext.GetOwinContext().Authentication;
 
+        // ApplicationUserManager requiere el contexto OWIN en runtime,
+        // por lo que se instancia por demanda en lugar de inyectarse por constructor.
         private ApplicationUserManager GetUserManager()
             => ApplicationUserManager.Create(new ApplicationDbContext());
 
-        private IAuthServicio GetAuthServicio()
-            => new AuthServicio(new ApplicationDbContext());
+        public CuentaController(IAuthServicio authServicio)
+        {
+            _authServicio = authServicio;
+        }
 
-        // GET /Cuenta/Login
         [HttpGet]
         public ActionResult Login(string returnUrl)
         {
@@ -34,7 +38,6 @@ namespace HappyTimesBalloons.Web.Controllers
             return View();
         }
 
-        // POST /Cuenta/Login — HU-AUT-001: todos los escenarios
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Login(LoginViewModel model, string returnUrl)
@@ -46,35 +49,31 @@ namespace HappyTimesBalloons.Web.Controllers
             {
                 var usuario = await userManager.FindByEmailAsync(model.Email);
 
-                // Escenario 2: usuario no existe → misma respuesta que contraseña incorrecta
                 if (usuario == null)
                 {
                     ModelState.AddModelError("", "Credenciales incorrectas.");
                     return View(model);
                 }
 
-                // Escenario 3: cuenta bloqueada
                 if (await userManager.IsLockedOutAsync(usuario.Id))
                 {
                     ModelState.AddModelError("", "Cuenta bloqueada temporalmente por múltiples intentos fallidos.");
                     return View(model);
                 }
 
-                // Verificar contraseña
                 bool passwordValida = await userManager.CheckPasswordAsync(usuario, model.Contrasena);
                 if (!passwordValida)
                 {
                     await userManager.AccessFailedAsync(usuario.Id);
 
-                    // Re-leer estado tras incremento
                     if (await userManager.IsLockedOutAsync(usuario.Id))
                     {
                         ModelState.AddModelError("", "Cuenta bloqueada por múltiples intentos fallidos.");
                     }
                     else
                     {
-                        int intentos = await userManager.GetAccessFailedCountAsync(usuario.Id);
-                        int restantes = userManager.MaxFailedAccessAttemptsBeforeLockout - intentos;
+                        int intentos   = await userManager.GetAccessFailedCountAsync(usuario.Id);
+                        int restantes  = userManager.MaxFailedAccessAttemptsBeforeLockout - intentos;
                         ModelState.AddModelError("",
                             restantes > 0
                                 ? $"Contraseña incorrecta. Te quedan {restantes} intento(s)."
@@ -83,7 +82,6 @@ namespace HappyTimesBalloons.Web.Controllers
                     return View(model);
                 }
 
-                // Escenario 1: login exitoso
                 await userManager.ResetAccessFailedCountAsync(usuario.Id);
 
                 var identidad = await userManager.CreateIdentityAsync(
@@ -97,14 +95,12 @@ namespace HappyTimesBalloons.Web.Controllers
             }
         }
 
-        // GET /Cuenta/Registro
         [HttpGet]
         public ActionResult Registro()
         {
             return View();
         }
 
-        // POST /Cuenta/Registro — HU-CLI-001: registro de cliente
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Registro(RegistroViewModel model)
@@ -112,16 +108,14 @@ namespace HappyTimesBalloons.Web.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            var dto = new RegistroDTO
+            var resultado = await _authServicio.RegistrarAsync(new RegistroDTO
             {
-                Nombre = model.Nombre,
-                Email = model.Email,
+                Nombre    = model.Nombre,
+                Email     = model.Email,
                 Contrasena = model.Contrasena,
-                Telefono = model.Telefono,
+                Telefono  = model.Telefono,
                 Direccion = model.Direccion
-            };
-
-            var resultado = await GetAuthServicio().RegistrarAsync(dto);
+            });
 
             if (!resultado.Exito)
             {
@@ -129,10 +123,9 @@ namespace HappyTimesBalloons.Web.Controllers
                 return View(model);
             }
 
-            // Autenticar automáticamente al nuevo usuario
             using (var userManager = GetUserManager())
             {
-                var usuario = await userManager.FindByEmailAsync(model.Email);
+                var usuario  = await userManager.FindByEmailAsync(model.Email);
                 var identidad = await userManager.CreateIdentityAsync(
                     usuario, DefaultAuthenticationTypes.ApplicationCookie);
                 AuthManager.SignIn(
@@ -143,7 +136,6 @@ namespace HappyTimesBalloons.Web.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        // POST /Cuenta/Logout
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Logout()

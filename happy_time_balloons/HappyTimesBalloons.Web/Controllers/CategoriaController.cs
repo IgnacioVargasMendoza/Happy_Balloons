@@ -1,9 +1,6 @@
 using HappyTimesBalloons.Abstraccion.DTOs;
 using HappyTimesBalloons.Abstraccion.Enums;
 using HappyTimesBalloons.Abstraccion.Interfaces.Servicios;
-using HappyTimesBalloons.AccesoADatos.Contexto;
-using HappyTimesBalloons.AccesoADatos.Repositorios;
-using HappyTimesBalloons.LogicaNegocio.Servicios;
 using HappyTimesBalloons.Web.Helpers;
 using HappyTimesBalloons.Web.Models.ViewModels;
 using System.Linq;
@@ -16,12 +13,6 @@ namespace HappyTimesBalloons.Web.Controllers
     public class CategoriaController : Controller
     {
         private readonly ICategoriaServicio _categoriaServicio;
-
-        public CategoriaController()
-            : this(new CategoriaServicio(
-                new CategoriaRepositorio(new ApplicationDbContext())))
-        {
-        }
 
         public CategoriaController(ICategoriaServicio categoriaServicio)
         {
@@ -68,11 +59,7 @@ namespace HappyTimesBalloons.Web.Controllers
             if (resultado.Exito)
             {
                 await AuditoriaHelper.RegistrarAsync(
-                    HttpContext,
-                    TipoOperacion.Crear,
-                    "Categorias",
-                    detalle: model.Nombre);
-
+                    HttpContext, TipoOperacion.Crear, "Categorias", detalle: model.Nombre);
                 TempData["Exito"] = resultado.Mensaje;
             }
             else
@@ -103,12 +90,7 @@ namespace HappyTimesBalloons.Web.Controllers
             if (resultado.Exito)
             {
                 await AuditoriaHelper.RegistrarAsync(
-                    HttpContext,
-                    TipoOperacion.Actualizar,
-                    "Categorias",
-                    model.Id,
-                    model.Nombre);
-
+                    HttpContext, TipoOperacion.Actualizar, "Categorias", model.Id, model.Nombre);
                 TempData["Exito"] = resultado.Mensaje;
             }
             else
@@ -128,12 +110,7 @@ namespace HappyTimesBalloons.Web.Controllers
             if (resultado.Exito)
             {
                 await AuditoriaHelper.RegistrarAsync(
-                    HttpContext,
-                    TipoOperacion.Actualizar,
-                    "Categorias",
-                    id,
-                    "Cambio de estado");
-
+                    HttpContext, TipoOperacion.Actualizar, "Categorias", id, "Cambio de estado");
                 TempData["Exito"] = resultado.Mensaje;
             }
             else
