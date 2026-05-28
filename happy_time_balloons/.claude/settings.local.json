@@ -3,27 +3,47 @@
     "allow": [
       "Bash(dotnet sln *)",
       "Bash(dotnet list *)",
-      "Bash(Get-ChildItem -Recurse \"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\" -Name)",
-      "Bash(Select-Object -First 100)",
-      "PowerShell(dotnet build *)",
-      "PowerShell(Test-Path *)",
-      "PowerShell($msbuild = \"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\18\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\MSBuild.exe\"; & $msbuild \"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\\\\HappyTimesBalloons.Web\\\\HappyTimesBalloons.Web.csproj\" /t:Build /p:Configuration=Debug /verbosity:minimal 2>&1 | Select-Object -Last 20)",
-      "PowerShell(dotnet restore *)",
-      "PowerShell($msbuild = \"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\18\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\MSBuild.exe\"; & $msbuild \"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\\\\HappyTimesBalloons.Web\\\\HappyTimesBalloons.Web.csproj\" /t:Build /p:Configuration=Debug /p:RuntimeIdentifier=win /verbosity:minimal 2>&1 | Select-Object -Last 25)",
-      "PowerShell($msbuild = \"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\18\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\MSBuild.exe\"; & $msbuild \"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\\\\HappyTimesBalloons.Web\\\\HappyTimesBalloons.Web.csproj\" /t:Build /p:Configuration=Debug /p:RestorePackages=false /verbosity:minimal 2>&1 | Select-Object -Last 30)",
-      "Bash(Get-ChildItem -Recurse -Filter \"*.cs\" \"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\")",
-      "Bash(Select-Object FullName)",
-      "Bash(Format-Table -HideTableHeaders)",
-      "PowerShell(Get-Command *)",
-      "PowerShell(& \"C:\\\\Program Files \\(x86\\)\\\\Microsoft Visual Studio\\\\2022\\\\BuildTools\\\\MSBuild\\\\Current\\\\Bin\\\\MSBuild.exe\" \"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\\\\HappyTimesBalloons.slnx\" /p:Configuration=Debug /p:Platform=\"Any CPU\" /v:minimal 2>&1)",
-      "PowerShell(New-Item *)",
       "Bash(git *)",
-      "PowerShell(& \"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\2022\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\amd64\\\\MSBuild.exe\" \"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\\\\HappyTimesBalloons.AccesoADatos\\\\HappyTimesBalloons.AccesoADatos.csproj\" /p:Configuration=Debug /v:minimal 2>&1 | Select-Object -Last 20)",
-      "PowerShell(& \"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\18\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\amd64\\\\MSBuild.exe\" \"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\\\\HappyTimesBalloons.AccesoADatos\\\\HappyTimesBalloons.AccesoADatos.csproj\" /p:Configuration=Debug /v:minimal 2>&1 | Select-Object -Last 15)",
-      "PowerShell(& \"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\18\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\amd64\\\\MSBuild.exe\" \"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\\\\HappyTimesBalloons.AccesoADatos\\\\HappyTimesBalloons.AccesoADatos.csproj\" /p:Configuration=Debug /v:minimal 2>&1 | Select-Object -Last 5)",
-      "PowerShell(& \"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\18\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\amd64\\\\MSBuild.exe\" \"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\\\\HappyTimesBalloons.Web\\\\HappyTimesBalloons.Web.csproj\" /p:Configuration=Debug /v:minimal 2>&1)",
+      "PowerShell(git *)",
+      "PowerShell(dotnet build *)",
+      "PowerShell(dotnet restore *)",
+      "PowerShell(Test-Path *)",
+      "PowerShell(Get-ChildItem *)",
+      "PowerShell(New-Item *)",
+      "PowerShell(Get-Command *)",
       "PowerShell(Get-Process *)",
-      "PowerShell(netstat *)"
+      "PowerShell(netstat *)",
+      "PowerShell(& *MSBuild.exe*)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "agent",
+            "if": "Bash(git commit*)",
+            "model": "claude-sonnet-4-6",
+            "timeout": 120,
+            "statusMessage": "Revisando si CLAUDE.md necesita actualizarse...",
+            "prompt": "Acabas de ejecutarse después de un git commit en el proyecto Happy Times Balloons. Tu tarea es determinar si CLAUDE.md necesita actualizarse.\n\nARCHIVOS CLAVE:\n- CLAUDE.md está en: C:\\GitHub\\Happy Balloons\\RepoCodigoProd\\CLAUDE.md\n- Directorio del proyecto: C:\\GitHub\\Happy Balloons\\RepoCodigoProd\\happy_time_balloons\n\nPASOS A SEGUIR:\n1. Ejecuta `git -C \"C:\\GitHub\\Happy Balloons\\RepoCodigoProd\\happy_time_balloons\" log -1 --format=\"%H %s\"` para ver el último commit.\n2. Ejecuta `git -C \"C:\\GitHub\\Happy Balloons\\RepoCodigoProd\\happy_time_balloons\" show HEAD` para ver el diff completo.\n3. Lee el archivo CLAUDE.md en C:\\GitHub\\Happy Balloons\\RepoCodigoProd\\CLAUDE.md.\n4. Analiza si el commit introduce algo que CLAUDE.md debería documentar.\n\nQUÉ SÍ JUSTIFICA ACTUALIZAR CLAUDE.md:\n- Nuevos patrones arquitecturales o decisiones de diseño que afectan cómo se construyen módulos futuros.\n- Nuevas convenciones de nombres no documentadas (nuevos sufijos, prefijos, estructuras de DTOs).\n- Nuevos paquetes NuGet o decisiones tecnológicas que cambian el stack.\n- Cambios en la configuración de DI (Autofac) que generalizan un patrón nuevo.\n- Nuevas convenciones en controladores, vistas o rutas.\n- Reglas de acceso a datos o patrones de repositorio que no estaban documentados.\n- Correcciones a información incorrecta que ya está en CLAUDE.md.\n\nQUÉ NO JUSTIFICA ACTUALIZAR CLAUDE.md:\n- Implementaciones CRUD que simplemente siguen el ciclo de 9 pasos ya documentado.\n- Correcciones de bugs que no cambian convenciones.\n- Nuevos módulos que usan los mismos patrones existentes.\n- Cambios de UI dentro de las convenciones Bootstrap/Razor ya documentadas.\n- Refactorizaciones que no introducen ningún patrón nuevo.\n\nREGLA CRÍTICA — NUNCA modifiques CLAUDE.md sin aprobación explícita:\n- Si NADA justifica un cambio: termina en silencio sin hacer nada ni notificar al usuario.\n- Si ALGO justifica un cambio: usa la herramienta AskUserQuestion para mostrar al usuario EXACTAMENTE qué sección modificarías, el texto actual y el texto propuesto, y por qué. Espera confirmación. Solo edita si el usuario aprueba. Haz únicamente los cambios aprobados."
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "prompt",
+            "if": "Edit(*Controller*)|Write(*Controller*)",
+            "model": "claude-haiku-4-5-20251001",
+            "continueOnBlock": true,
+            "statusMessage": "Verificando arquitectura del controlador...",
+            "prompt": "Estás revisando un archivo de controlador (.NET MVC 5) del proyecto Happy Times Balloons que acaba de ser editado. El archivo está en: $ARGUMENTS\n\nLee el contenido del archivo y busca este anti-patrón específico:\nQue el controlador llame a un método que retorne List<T> (como ObtenerTodosAsync(), ObtenerPorUsuarioAsync(), etc.) y luego realice agregaciones en memoria usando .Count(), .Sum(), .Where(), .GroupBy() o .OrderBy() sobre esa lista.\n\nEjemplo del anti-patrón prohibido:\n  var pedidos = await _servicio.ObtenerTodosAsync();\n  var total = pedidos.Count;                    // MAL: COUNT en memoria\n  var suma = pedidos.Sum(p => p.Total);         // MAL: SUM en memoria\n\nEjemplo correcto:\n  var stats = await _servicio.ObtenerEstadisticasAsync(); // agrega en SQL\n\nResponde con la palabra 'ok' si NO hay anti-patrones. Si SÍ encuentras el anti-patrón, responde con una descripción breve de cuál es y en qué línea aproximada, para que el desarrollador sea informado."
+          }
+        ]
+      }
     ]
   }
 }
