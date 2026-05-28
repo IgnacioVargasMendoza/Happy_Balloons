@@ -2,6 +2,7 @@ using HappyTimesBalloons.Abstraccion.DTOs;
 using HappyTimesBalloons.Abstraccion.Enums;
 using HappyTimesBalloons.Abstraccion.Interfaces.Repositorios;
 using HappyTimesBalloons.Abstraccion.Interfaces.Servicios;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace HappyTimesBalloons.LogicaNegocio.Servicios
@@ -36,5 +37,8 @@ namespace HappyTimesBalloons.LogicaNegocio.Servicios
             };
             await _repo.GuardarAsync(entrada);
         }
+
+        public Task<List<BitacoraResumenDTO>> ObtenerActividadRecienteAsync(int cantidad)
+            => _repo.ObtenerActividadRecienteAsync(cantidad);
     }
 }

@@ -68,11 +68,31 @@ Todas las operaciones CRUD en tablas críticas deben registrar:
 - ViewModels: `ProductoViewModel`, `PedidoViewModel`
 - DTOs (capa Abstraccion): `ProductoDTO`, `PedidoDTO`
 
+### Espaciado y formato
+- Siempre exactamente **un espacio** entre el nombre de la variable/propiedad y el signo `=`: `var x = 5;`, `Nombre = valor`
+- **Prohibido** alinear `=` con espacios extra para que queden en columna: nunca `var corto   = 1;` junto a `var muyLargo = 2;`
+- Las llamadas a métodos no llevan espacio antes del paréntesis: `Metodo()`, no `Metodo ()`
+- Los operadores de control de flujo sí llevan espacio: `if (`, `foreach (`, `while (`
+
 ### Razor Views
 - Una carpeta por controlador dentro de `/Views`
 - Layouts compartidos en `/Views/Shared`
 - Vistas parciales con prefijo `_`: `_NavBar.cshtml`, `_ProductoCard.cshtml`
 - Bootstrap 5 para todos los estilos y responsividad
+
+#### Enlaces y botones con iconos
+- `Html.ActionLink` requiere texto visible no vacío — pasar `""` lanza `ArgumentException`
+- Para enlaces con solo icono (o con icono + contenido personalizado), usar siempre `<a>` con `@Url.Action()`:
+  ```html
+  <%-- CORRECTO --%>
+  <a href="@Url.Action("Index", "Producto")" class="btn btn-outline-secondary" title="Volver">
+      <i class="bi bi-chevron-left"></i>
+  </a>
+
+  <%-- INCORRECTO — lanza ArgumentException --%>
+  @Html.ActionLink("", "Index", "Producto", null, new { @class = "btn" })
+  ```
+- Reservar `Html.ActionLink` únicamente para enlaces con texto visible plano (sin HTML interno)
 
 ### Base de datos
 - Nombre de la base de datos: `HappyTimesBalloons`
@@ -106,7 +126,7 @@ El proyecto usa **Autofac 6.5.0** + **Autofac.Mvc5 6.1.0** como contenedor DI.
 ### Reglas para controladores
 - NUNCA instanciar servicios o repositorios con `new` dentro de acciones
 - SIEMPRE declarar dependencias en el constructor
-- Si un controlador necesita acceso directo al `ApplicationDbContext` (ej. queries que no están cubiertas por un servicio), inyectarlo también en el constructor
+- NUNCA inyectar `ApplicationDbContext` directamente en un controlador — si hace falta una query que ningún servicio cubre, agregar el método al repositorio e interfaz correspondientes
 
 ## Comportamiento esperado al implementar cada módulo
 Cuando trabajes en una pantalla o módulo, SIEMPRE completa el ciclo completo:

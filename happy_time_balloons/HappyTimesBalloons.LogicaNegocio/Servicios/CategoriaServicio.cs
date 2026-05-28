@@ -25,6 +25,11 @@ namespace HappyTimesBalloons.LogicaNegocio.Servicios
             return _repo.ObtenerPorIdAsync(id);
         }
 
+        public Task<CategoriaEstadisticasDTO> ObtenerEstadisticasAsync()
+        {
+            return _repo.ObtenerEstadisticasAsync();
+        }
+
         public async Task<ResultadoOperacionDTO> CrearAsync(CategoriaDTO dto)
         {
             if (dto == null)
@@ -36,6 +41,7 @@ namespace HappyTimesBalloons.LogicaNegocio.Servicios
 
             if (string.IsNullOrWhiteSpace(dto.Nombre))
             {
+                dto.Nombre = string.Empty; // Para evitar problemas de validación posteriores
                 return ResultadoOperacionDTO.Fallo(
                     "El nombre de la categoría es obligatorio.",
                     CodigoResultado.DatosInvalidos);

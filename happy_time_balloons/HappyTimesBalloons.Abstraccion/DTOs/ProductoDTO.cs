@@ -16,5 +16,8 @@ namespace HappyTimesBalloons.Abstraccion.DTOs
         public bool EsActivo { get; set; }
         public DateTime FechaCreacion { get; set; }
         public List<ImagenProductoDTO> Imagenes { get; set; } = new List<ImagenProductoDTO>();
+
+        public bool TienePromocion { get; set; }
+        public DateTime? PromocionFin { get; set; }
     }
 }

@@ -8,6 +8,8 @@ namespace HappyTimesBalloons.Abstraccion.Interfaces.Servicios
     {
         Task<List<ProductoDTO>> ObtenerTodosAsync(string busqueda = null, int? categoriaId = null);
         Task<ProductoDTO> ObtenerPorIdAsync(int id);
+        Task<ProductoEstadisticasDTO> ObtenerEstadisticasAsync();
+        Task<ImagenProductoDTO> ObtenerImagenPorIdAsync(int imagenId);
         Task<ResultadoOperacionDTO> CrearAsync(ProductoDTO dto);
         Task<ResultadoOperacionDTO> ActualizarAsync(ProductoDTO dto);
         Task<ResultadoOperacionDTO> ToggleEstadoAsync(int id);

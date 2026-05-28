@@ -79,9 +79,23 @@
                 <div class="text-muted text-decoration-line-through small">
                     ₡@Model.Producto.Precio.ToString("N0")
                 </div>
-                <div class="fs-3 fw-bold text-success">
-                    ₡@Model.Producto.PrecioDescuento.Value.ToString("N0")
+                <div class="d-flex align-items-center gap-2">
+                    <div class="fs-3 fw-bold text-success">
+                        ₡@Model.Producto.PrecioDescuento.Value.ToString("N0")
+                    </div>
+                    @if (Model.Producto.TienePromocion)
+                    {
+                        var pct = Math.Round((1 - Model.Producto.PrecioDescuento.Value / Model.Producto.Precio) * 100);
+                        <span class="badge bg-danger fs-6">@pct% OFF</span>
+                    }
                 </div>
+                @if (Model.Producto.TienePromocion && Model.Producto.PromocionFin.HasValue)
+                {
+                    <div class="alert alert-success py-2 px-3 mt-2 mb-0 small">
+                        <i class="bi bi-calendar-check me-1"></i>
+                        Promoción válida hasta el <strong>@Model.Producto.PromocionFin.Value.ToString("dd 'de' MMMM 'de' yyyy", new System.Globalization.CultureInfo("es-CR"))</strong>
+                    </div>
+                }
             }
             else
             {

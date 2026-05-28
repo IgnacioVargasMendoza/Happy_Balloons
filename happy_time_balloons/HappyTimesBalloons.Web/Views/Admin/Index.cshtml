@@ -109,12 +109,11 @@
                                     <td>@entrada.NombreUsuario</td>
                                     <td>
                                         @{
-                                            string badgeCss = entrada.Accion switch {
-                                                "Crear"     => "bg-success",
-                                                "Actualizar"=> "bg-primary",
-                                                "Eliminar"  => "bg-danger",
-                                                _           => "bg-secondary"
-                                            };
+                                            string badgeCss;
+                                            if (entrada.Accion == "Crear") { badgeCss = "bg-success"; }
+                                            else if (entrada.Accion == "Actualizar") { badgeCss = "bg-primary"; }
+                                            else if (entrada.Accion == "Eliminar") { badgeCss = "bg-danger"; }
+                                            else { badgeCss = "bg-secondary"; }                                 
                                         }
                                         <span class="badge @badgeCss">@entrada.Accion</span>
                                     </td>
@@ -153,6 +152,9 @@
                         <span class="badge bg-secondary">Próximamente</span>
                     }
                 </a>
+
+                @Html.ActionLink("Promociones y descuentos", "Index", "Promocion",
+                    null, new { @class = "btn btn-outline-danger text-start w-100 d-flex align-items-center gap-2" })
             </div>
         </div>
     </div>

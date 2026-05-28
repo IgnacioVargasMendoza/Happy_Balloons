@@ -77,6 +77,8 @@ namespace HappyTimesBalloons.Web.Controllers
                 CategoriaNombre = p.CategoriaNombre,
                 EsActivo = p.EsActivo,
                 FechaCreacion = p.FechaCreacion,
+                TienePromocion = p.TienePromocion,
+                PromocionFin = p.PromocionFin,
                 Imagenes = p.Imagenes.Select(i => new ImagenProductoViewModel
                 {
                     Id = i.Id,

@@ -10,6 +10,8 @@ namespace HappyTimesBalloons.Abstraccion.Interfaces.Servicios
 
         Task<CategoriaDTO> ObtenerPorIdAsync(int id);
 
+        Task<CategoriaEstadisticasDTO> ObtenerEstadisticasAsync();
+
         Task<ResultadoOperacionDTO> CrearAsync(CategoriaDTO dto);
 
         Task<ResultadoOperacionDTO> ActualizarAsync(CategoriaDTO dto);

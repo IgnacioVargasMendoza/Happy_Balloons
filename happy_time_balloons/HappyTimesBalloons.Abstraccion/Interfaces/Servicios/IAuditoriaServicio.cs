@@ -1,4 +1,6 @@
+using HappyTimesBalloons.Abstraccion.DTOs;
 using HappyTimesBalloons.Abstraccion.Enums;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace HappyTimesBalloons.Abstraccion.Interfaces.Servicios
@@ -13,5 +15,7 @@ namespace HappyTimesBalloons.Abstraccion.Interfaces.Servicios
             int? registroId = null,
             string detalle = null,
             string ip = null);
+
+        Task<List<BitacoraResumenDTO>> ObtenerActividadRecienteAsync(int cantidad);
     }
 }

@@ -33,20 +33,29 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
             if (categoriaId.HasValue)
                 query = query.Where(p => p.CategoriaId == categoriaId.Value);
 
-            return await query
-                .OrderBy(p => p.Nombre)
-                .Select(p => new ProductoDTO
+            var productos = await query.OrderBy(p => p.Nombre).ToListAsync();
+            var promoDict = await ObtenerPromosActivasAsync();
+
+            return productos.Select(p =>
+            {
+                Promocion promo;
+                promoDict.TryGetValue(p.Id, out promo);
+                return new ProductoDTO
                 {
                     Id = p.Id,
                     Nombre = p.Nombre,
                     Descripcion = p.Descripcion,
                     Precio = p.Precio,
-                    PrecioDescuento = p.PrecioDescuento,
+                    PrecioDescuento = promo != null
+                        ? Math.Round(p.Precio * (1 - promo.DescuentoPorcentaje / 100m), 0)
+                        : p.PrecioDescuento,
                     Stock = p.Stock,
                     CategoriaId = p.CategoriaId,
-                    CategoriaNombre = p.Categoria.Nombre,
+                    CategoriaNombre = p.Categoria?.Nombre,
                     EsActivo = p.EsActivo,
                     FechaCreacion = p.FechaCreacion,
+                    TienePromocion = promo != null,
+                    PromocionFin = promo?.FechaFin,
                     Imagenes = p.Imagenes.OrderBy(i => i.Orden)
                         .Select(i => new ImagenProductoDTO
                         {
@@ -56,8 +65,37 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
                             EsPrincipal = i.EsPrincipal,
                             Orden = i.Orden
                         }).ToList()
-                })
+                };
+            }).ToList();
+        }
+
+        public async Task<ProductoEstadisticasDTO> ObtenerEstadisticasAsync()
+        {
+            var productos = await _ctx.Productos
+                .Select(p => new { p.EsActivo, p.Stock })
                 .ToListAsync();
+
+            return new ProductoEstadisticasDTO
+            {
+                Total        = productos.Count,
+                Activos      = productos.Count(p => p.EsActivo),
+                ConBajoStock = productos.Count(p => p.Stock <= 5 && p.EsActivo)
+            };
+        }
+
+        public async Task<ImagenProductoDTO> ObtenerImagenPorIdAsync(int imagenId)
+        {
+            var imagen = await _ctx.ImagenesProducto.FindAsync(imagenId);
+            if (imagen == null) return null;
+
+            return new ImagenProductoDTO
+            {
+                Id         = imagen.Id,
+                ProductoId = imagen.ProductoId,
+                RutaImagen = imagen.RutaImagen,
+                EsPrincipal = imagen.EsPrincipal,
+                Orden      = imagen.Orden
+            };
         }
 
         public async Task<ProductoDTO> ObtenerPorIdAsync(int id)
@@ -69,18 +107,27 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
 
             if (p == null) return null;
 
+            var now = DateTime.UtcNow;
+            var promo = await _ctx.Promociones
+                .Where(x => x.ProductoId == id && x.Activa && x.FechaInicio <= now && x.FechaFin >= now)
+                .FirstOrDefaultAsync();
+
             return new ProductoDTO
             {
                 Id = p.Id,
                 Nombre = p.Nombre,
                 Descripcion = p.Descripcion,
                 Precio = p.Precio,
-                PrecioDescuento = p.PrecioDescuento,
+                PrecioDescuento = promo != null
+                    ? Math.Round(p.Precio * (1 - promo.DescuentoPorcentaje / 100m), 0)
+                    : p.PrecioDescuento,
                 Stock = p.Stock,
                 CategoriaId = p.CategoriaId,
                 CategoriaNombre = p.Categoria?.Nombre,
                 EsActivo = p.EsActivo,
                 FechaCreacion = p.FechaCreacion,
+                TienePromocion = promo != null,
+                PromocionFin = promo?.FechaFin,
                 Imagenes = p.Imagenes.OrderBy(i => i.Orden)
                     .Select(i => new ImagenProductoDTO
                     {
@@ -210,6 +257,18 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
 
             await _ctx.SaveChangesAsync();
             return true;
+        }
+
+        private async Task<Dictionary<int, Promocion>> ObtenerPromosActivasAsync()
+        {
+            var now = DateTime.UtcNow;
+            var promos = await _ctx.Promociones
+                .Where(p => p.Activa && p.FechaInicio <= now && p.FechaFin >= now)
+                .ToListAsync();
+
+            return promos
+                .GroupBy(p => p.ProductoId)
+                .ToDictionary(g => g.Key, g => g.First());
         }
     }
 }

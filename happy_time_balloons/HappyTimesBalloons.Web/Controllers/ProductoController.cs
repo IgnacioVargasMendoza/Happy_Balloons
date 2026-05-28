@@ -1,4 +1,3 @@
-using HappyTimesBalloons.AccesoADatos.Contexto;
 using HappyTimesBalloons.Abstraccion.DTOs;
 using HappyTimesBalloons.Abstraccion.Enums;
 using HappyTimesBalloons.Abstraccion.Interfaces.Servicios;
@@ -22,16 +21,13 @@ namespace HappyTimesBalloons.Web.Controllers
 
         private readonly IProductoServicio _productoServicio;
         private readonly ICategoriaServicio _categoriaServicio;
-        private readonly ApplicationDbContext _ctx;
 
         public ProductoController(
             IProductoServicio productoServicio,
-            ICategoriaServicio categoriaServicio,
-            ApplicationDbContext ctx)
+            ICategoriaServicio categoriaServicio)
         {
-            _productoServicio = productoServicio;
+            _productoServicio  = productoServicio;
             _categoriaServicio = categoriaServicio;
-            _ctx = ctx;
         }
 
         [HttpGet]
@@ -191,7 +187,7 @@ namespace HappyTimesBalloons.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> EliminarImagen(int imagenId, int productoId)
         {
-            var imagen = await _ctx.ImagenesProducto.FindAsync(imagenId);
+            var imagen = await _productoServicio.ObtenerImagenPorIdAsync(imagenId);
             if (imagen != null)
             {
                 string rutaFisica = Server.MapPath(imagen.RutaImagen);

@@ -4,9 +4,9 @@
 }
 
 <div class="d-flex align-items-center mb-4 gap-2">
-    @Html.ActionLink("", "Index", "Producto", null,
-        new { @class = "btn btn-outline-secondary btn-sm", title = "Volver" })
-    <i class="bi bi-chevron-left" style="pointer-events:none;margin-left:-2rem;"></i>
+    <a href="@Url.Action("Index", "Producto")" class="btn btn-outline-secondary btn-sm" title="Volver">
+        <i class="bi bi-chevron-left"></i>
+    </a>
     <h2 class="mb-0"><i class="bi bi-pencil-square me-2 text-brand"></i>Editar producto</h2>
 </div>
 

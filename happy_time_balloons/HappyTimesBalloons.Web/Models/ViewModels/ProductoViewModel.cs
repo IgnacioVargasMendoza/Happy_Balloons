@@ -18,6 +18,9 @@ namespace HappyTimesBalloons.Web.Models.ViewModels
         public DateTime FechaCreacion { get; set; }
         public List<ImagenProductoViewModel> Imagenes { get; set; } = new List<ImagenProductoViewModel>();
 
+        public bool TienePromocion { get; set; }
+        public DateTime? PromocionFin { get; set; }
+
         public string ImagenPrincipal =>
             Imagenes.FirstOrDefault(i => i.EsPrincipal)?.RutaImagen
             ?? Imagenes.FirstOrDefault()?.RutaImagen;

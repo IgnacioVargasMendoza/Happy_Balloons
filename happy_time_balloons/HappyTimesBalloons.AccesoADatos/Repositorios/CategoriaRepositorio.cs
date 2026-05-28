@@ -44,6 +44,19 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
                 .ToListAsync();
         }
 
+        public async Task<CategoriaEstadisticasDTO> ObtenerEstadisticasAsync()
+        {
+            var categorias = await _ctx.Categorias
+                .Select(c => new { c.EsActiva })
+                .ToListAsync();
+
+            return new CategoriaEstadisticasDTO
+            {
+                Total   = categorias.Count,
+                Activas = categorias.Count(c => c.EsActiva)
+            };
+        }
+
         public async Task<CategoriaDTO> ObtenerPorIdAsync(int id)
         {
             var categoria = await _ctx.Categorias.FindAsync(id);

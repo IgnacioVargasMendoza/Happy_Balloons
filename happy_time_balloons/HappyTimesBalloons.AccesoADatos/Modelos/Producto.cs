@@ -33,5 +33,8 @@ namespace HappyTimesBalloons.AccesoADatos.Modelos
 
         public virtual ICollection<ImagenProducto> Imagenes { get; set; }
             = new List<ImagenProducto>();
+
+        public virtual ICollection<Promocion> Promociones { get; set; }
+            = new List<Promocion>();
     }
 }

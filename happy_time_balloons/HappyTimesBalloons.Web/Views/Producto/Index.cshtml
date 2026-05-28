@@ -140,12 +140,11 @@
                                 }
                             </td>
                             <td class="text-end pe-4">
-                                @Html.ActionLink("", "Editar", "Producto",
-                                    new { id = p.Id },
-                                    new { @class = "btn btn-sm btn-outline-primary me-1",
-                                          title = "Editar",
-                                          @data_bs_toggle = "tooltip" })
-                                <i class="bi bi-pencil" style="pointer-events:none;"></i>
+                                <a href="@Url.Action("Editar", "Producto", new { id = p.Id })"
+                                   class="btn btn-sm btn-outline-primary me-1"
+                                   title="Editar" data-bs-toggle="tooltip">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
 
                                 @using (Html.BeginForm("ToggleEstado", "Producto",
                                     new { id = p.Id }, FormMethod.Post,

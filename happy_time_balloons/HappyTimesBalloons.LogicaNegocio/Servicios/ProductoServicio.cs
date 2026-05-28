@@ -21,6 +21,12 @@ namespace HappyTimesBalloons.LogicaNegocio.Servicios
         public Task<ProductoDTO> ObtenerPorIdAsync(int id)
             => _repo.ObtenerPorIdAsync(id);
 
+        public Task<ProductoEstadisticasDTO> ObtenerEstadisticasAsync()
+            => _repo.ObtenerEstadisticasAsync();
+
+        public Task<ImagenProductoDTO> ObtenerImagenPorIdAsync(int imagenId)
+            => _repo.ObtenerImagenPorIdAsync(imagenId);
+
         public async Task<ResultadoOperacionDTO> CrearAsync(ProductoDTO dto)
         {
             if (string.IsNullOrWhiteSpace(dto.Nombre))
