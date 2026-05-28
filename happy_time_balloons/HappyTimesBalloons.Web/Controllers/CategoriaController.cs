@@ -1,8 +1,6 @@
-using HappyTimesBalloons.AccesoADatos.Contexto;
-using HappyTimesBalloons.AccesoADatos.Repositorios;
 using HappyTimesBalloons.Abstraccion.DTOs;
 using HappyTimesBalloons.Abstraccion.Enums;
-using HappyTimesBalloons.LogicaNegocio.Servicios;
+using HappyTimesBalloons.Abstraccion.Interfaces.Servicios;
 using HappyTimesBalloons.Web.Helpers;
 using HappyTimesBalloons.Web.Models.ViewModels;
 using System.Linq;
@@ -14,33 +12,34 @@ namespace HappyTimesBalloons.Web.Controllers
     [Authorize(Roles = "Administrador")]
     public class CategoriaController : Controller
     {
-        // GET /Categoria
+        private readonly ICategoriaServicio _categoriaServicio;
+
+        public CategoriaController(ICategoriaServicio categoriaServicio)
+        {
+            _categoriaServicio = categoriaServicio;
+        }
+
         [HttpGet]
         public async Task<ActionResult> Index(string busqueda)
         {
-            using (var ctx = new ApplicationDbContext())
+            var categorias = await _categoriaServicio.ObtenerTodasAsync(busqueda);
+
+            var modelo = new CategoriaIndexViewModel
             {
-                var servicio = new CategoriaServicio(new CategoriaRepositorio(ctx));
-                var categorias = await servicio.ObtenerTodasAsync(busqueda);
-
-                var vm = new CategoriaIndexViewModel
+                Busqueda = busqueda,
+                Categorias = categorias.Select(c => new CategoriaViewModel
                 {
-                    Categorias = categorias.Select(c => new CategoriaViewModel
-                    {
-                        Id = c.Id,
-                        Nombre = c.Nombre,
-                        Descripcion = c.Descripcion,
-                        EsActiva = c.EsActiva,
-                        FechaCreacion = c.FechaCreacion
-                    }).ToList(),
-                    Busqueda = busqueda
-                };
+                    Id = c.Id,
+                    Nombre = c.Nombre,
+                    Descripcion = c.Descripcion,
+                    EsActiva = c.EsActiva,
+                    FechaCreacion = c.FechaCreacion
+                }).ToList()
+            };
 
-                return View(vm);
-            }
+            return View(modelo);
         }
 
-        // POST /Categoria/Crear — HU-CAT-002
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Crear(CategoriaFormViewModel model)
@@ -51,31 +50,26 @@ namespace HappyTimesBalloons.Web.Controllers
                 return RedirectToAction("Index");
             }
 
-            using (var ctx = new ApplicationDbContext())
+            var resultado = await _categoriaServicio.CrearAsync(new CategoriaDTO
             {
-                var servicio = new CategoriaServicio(new CategoriaRepositorio(ctx));
-                var resultado = await servicio.CrearAsync(new CategoriaDTO
-                {
-                    Nombre = model.Nombre,
-                    Descripcion = model.Descripcion
-                });
+                Nombre = model.Nombre,
+                Descripcion = model.Descripcion
+            });
 
-                if (resultado.Exito)
-                {
-                    await AuditoriaHelper.RegistrarAsync(
-                        HttpContext, TipoOperacion.Crear, "Categorias", detalle: model.Nombre);
-                    TempData["Exito"] = resultado.Mensaje;
-                }
-                else
-                {
-                    TempData["Error"] = resultado.Mensaje;
-                }
+            if (resultado.Exito)
+            {
+                await AuditoriaHelper.RegistrarAsync(
+                    HttpContext, TipoOperacion.Crear, "Categorias", detalle: model.Nombre);
+                TempData["Exito"] = resultado.Mensaje;
+            }
+            else
+            {
+                TempData["Error"] = resultado.Mensaje;
             }
 
             return RedirectToAction("Index");
         }
 
-        // POST /Categoria/Editar — HU-CAT-003
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Editar(CategoriaFormViewModel model)
@@ -86,51 +80,42 @@ namespace HappyTimesBalloons.Web.Controllers
                 return RedirectToAction("Index");
             }
 
-            using (var ctx = new ApplicationDbContext())
+            var resultado = await _categoriaServicio.ActualizarAsync(new CategoriaDTO
             {
-                var servicio = new CategoriaServicio(new CategoriaRepositorio(ctx));
-                var resultado = await servicio.ActualizarAsync(new CategoriaDTO
-                {
-                    Id = model.Id,
-                    Nombre = model.Nombre,
-                    Descripcion = model.Descripcion
-                });
+                Id = model.Id,
+                Nombre = model.Nombre,
+                Descripcion = model.Descripcion
+            });
 
-                if (resultado.Exito)
-                {
-                    await AuditoriaHelper.RegistrarAsync(
-                        HttpContext, TipoOperacion.Actualizar, "Categorias", model.Id, model.Nombre);
-                    TempData["Exito"] = resultado.Mensaje;
-                }
-                else
-                {
-                    TempData["Error"] = resultado.Mensaje;
-                }
+            if (resultado.Exito)
+            {
+                await AuditoriaHelper.RegistrarAsync(
+                    HttpContext, TipoOperacion.Actualizar, "Categorias", model.Id, model.Nombre);
+                TempData["Exito"] = resultado.Mensaje;
+            }
+            else
+            {
+                TempData["Error"] = resultado.Mensaje;
             }
 
             return RedirectToAction("Index");
         }
 
-        // POST /Categoria/ToggleEstado/5 — HU-CAT-004
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> ToggleEstado(int id)
         {
-            using (var ctx = new ApplicationDbContext())
-            {
-                var servicio = new CategoriaServicio(new CategoriaRepositorio(ctx));
-                var resultado = await servicio.ToggleEstadoAsync(id);
+            var resultado = await _categoriaServicio.ToggleEstadoAsync(id);
 
-                if (resultado.Exito)
-                {
-                    await AuditoriaHelper.RegistrarAsync(
-                        HttpContext, TipoOperacion.Actualizar, "Categorias", id, "ToggleEstado");
-                    TempData["Exito"] = resultado.Mensaje;
-                }
-                else
-                {
-                    TempData["Error"] = resultado.Mensaje;
-                }
+            if (resultado.Exito)
+            {
+                await AuditoriaHelper.RegistrarAsync(
+                    HttpContext, TipoOperacion.Actualizar, "Categorias", id, "Cambio de estado");
+                TempData["Exito"] = resultado.Mensaje;
+            }
+            else
+            {
+                TempData["Error"] = resultado.Mensaje;
             }
 
             return RedirectToAction("Index");

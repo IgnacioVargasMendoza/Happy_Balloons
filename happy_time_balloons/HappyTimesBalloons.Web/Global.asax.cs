@@ -1,5 +1,6 @@
 using HappyTimesBalloons.AccesoADatos.Contexto;
 using HappyTimesBalloons.AccesoADatos.Migraciones;
+using HappyTimesBalloons.Web.App_Start;
 using System.Data.Entity;
 using System.Web.Mvc;
 using System.Web.Routing;
@@ -16,6 +17,8 @@ namespace HappyTimesBalloons.Web
 
         protected void Application_Start()
         {
+            AutofacConfig.Register();
+
             AreaRegistration.RegisterAllAreas();
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);

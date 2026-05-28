@@ -92,6 +92,22 @@ Todas las operaciones CRUD en tablas críticas deben registrar:
 - fetch / axios → Controller Actions (POST/GET)
 - Componentes reutilizables → Vistas parciales (_Partial.cshtml)
 
+## Inyección de dependencias (Autofac)
+
+El proyecto usa **Autofac 6.5.0** + **Autofac.Mvc5 6.1.0** como contenedor DI.
+
+- Archivo de configuración: `HappyTimesBalloons.Web/App_Start/AutofacConfig.cs`
+- Se inicializa en `Global.asax.cs → Application_Start()` con `AutofacConfig.Register()` **antes** que `RouteConfig` y `FilterConfig`
+- Todos los repositorios y servicios se registran con `InstancePerRequest`
+- `ApplicationDbContext` se registra `AsSelf().InstancePerRequest()` — una sola instancia compartida por request
+- Los controladores se auto-registran con `RegisterControllers(typeof(MvcApplication).Assembly)`
+- **`ApplicationUserManager` NO se registra en Autofac** — es OWIN-bound, se crea con `ApplicationUserManager.Create()`
+
+### Reglas para controladores
+- NUNCA instanciar servicios o repositorios con `new` dentro de acciones
+- SIEMPRE declarar dependencias en el constructor
+- Si un controlador necesita acceso directo al `ApplicationDbContext` (ej. queries que no están cubiertas por un servicio), inyectarlo también en el constructor
+
 ## Comportamiento esperado al implementar cada módulo
 Cuando trabajes en una pantalla o módulo, SIEMPRE completa el ciclo completo:
 1. DTO en Abstraccion/DTOs
@@ -101,8 +117,9 @@ Cuando trabajes en una pantalla o módulo, SIEMPRE completa el ciclo completo:
 5. Implementación de repositorio en AccesoADatos/Repositorios
 6. Implementación de servicio en LogicaNegocio/Servicios
 7. ViewModel en Web/Models/ViewModels
-8. Controlador en Web/Controllers
+8. Controlador en Web/Controllers con constructor injection
 9. Vista Razor con Bootstrap 5 en Web/Views/{Modulo}/
+10. **Registrar** el nuevo repositorio e interfaz de servicio en `AutofacConfig.cs`
 
 No dejes capas incompletas. Si una pantalla requiere datos de otra entidad,
 crea también esos DTOs e interfaces aunque sea mínimamente.

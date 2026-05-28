@@ -24,11 +24,15 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
             var query = _ctx.Categorias.AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(busqueda))
-                query = query.Where(c => c.Nombre.Contains(busqueda) ||
-                                         c.Descripcion.Contains(busqueda));
+            {
+                query = query.Where(c =>
+                    c.Nombre.Contains(busqueda) ||
+                    c.Descripcion.Contains(busqueda));
+            }
 
             return await query
-                .OrderBy(c => c.Nombre)
+                .OrderByDescending(c => c.EsActiva)
+                .ThenBy(c => c.Nombre)
                 .Select(c => new CategoriaDTO
                 {
                     Id = c.Id,
@@ -42,67 +46,84 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
 
         public async Task<CategoriaDTO> ObtenerPorIdAsync(int id)
         {
-            var c = await _ctx.Categorias.FindAsync(id);
-            if (c == null) return null;
+            var categoria = await _ctx.Categorias.FindAsync(id);
+
+            if (categoria == null)
+                return null;
 
             return new CategoriaDTO
             {
-                Id = c.Id,
-                Nombre = c.Nombre,
-                Descripcion = c.Descripcion,
-                EsActiva = c.EsActiva,
-                FechaCreacion = c.FechaCreacion
+                Id = categoria.Id,
+                Nombre = categoria.Nombre,
+                Descripcion = categoria.Descripcion,
+                EsActiva = categoria.EsActiva,
+                FechaCreacion = categoria.FechaCreacion
             };
         }
 
         public async Task<CategoriaDTO> CrearAsync(CategoriaDTO dto)
         {
-            var entidad = new Categoria
+            var categoria = new Categoria
             {
                 Nombre = dto.Nombre.Trim(),
-                Descripcion = dto.Descripcion?.Trim(),
+                Descripcion = string.IsNullOrWhiteSpace(dto.Descripcion) ? null : dto.Descripcion.Trim(),
                 EsActiva = true,
-                FechaCreacion = DateTime.UtcNow
+                FechaCreacion = DateTime.Now
             };
 
-            _ctx.Categorias.Add(entidad);
+            _ctx.Categorias.Add(categoria);
             await _ctx.SaveChangesAsync();
 
-            dto.Id = entidad.Id;
-            dto.EsActiva = entidad.EsActiva;
-            dto.FechaCreacion = entidad.FechaCreacion;
+            dto.Id = categoria.Id;
+            dto.EsActiva = categoria.EsActiva;
+            dto.FechaCreacion = categoria.FechaCreacion;
+
             return dto;
         }
 
         public async Task<CategoriaDTO> ActualizarAsync(CategoriaDTO dto)
         {
-            var entidad = await _ctx.Categorias.FindAsync(dto.Id);
-            if (entidad == null) return null;
+            var categoria = await _ctx.Categorias.FindAsync(dto.Id);
 
-            entidad.Nombre = dto.Nombre.Trim();
-            entidad.Descripcion = dto.Descripcion?.Trim();
+            if (categoria == null)
+                return null;
+
+            categoria.Nombre = dto.Nombre.Trim();
+            categoria.Descripcion = string.IsNullOrWhiteSpace(dto.Descripcion) ? null : dto.Descripcion.Trim();
+
             await _ctx.SaveChangesAsync();
+
+            dto.EsActiva = categoria.EsActiva;
+            dto.FechaCreacion = categoria.FechaCreacion;
+
             return dto;
         }
 
         public async Task<bool> ToggleEstadoAsync(int id)
         {
-            var entidad = await _ctx.Categorias.FindAsync(id);
-            if (entidad == null) return false;
+            var categoria = await _ctx.Categorias.FindAsync(id);
 
-            entidad.EsActiva = !entidad.EsActiva;
+            if (categoria == null)
+                return false;
+
+            categoria.EsActiva = !categoria.EsActiva;
+
             await _ctx.SaveChangesAsync();
+
             return true;
         }
 
         public async Task<bool> ExisteNombreAsync(string nombre, int? excluirId = null)
         {
-            var normalizado = nombre.Trim().ToLower();
+            var nombreNormalizado = nombre.Trim().ToLower();
+
             var query = _ctx.Categorias
-                .Where(c => c.Nombre.ToLower() == normalizado);
+                .Where(c => c.Nombre.ToLower() == nombreNormalizado);
 
             if (excluirId.HasValue)
+            {
                 query = query.Where(c => c.Id != excluirId.Value);
+            }
 
             return await query.AnyAsync();
         }

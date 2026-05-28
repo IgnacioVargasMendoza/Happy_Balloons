@@ -1,9 +1,6 @@
-using HappyTimesBalloons.AccesoADatos.Contexto;
-using HappyTimesBalloons.AccesoADatos.Repositorios;
 using HappyTimesBalloons.Abstraccion.DTOs;
-using HappyTimesBalloons.LogicaNegocio.Servicios;
+using HappyTimesBalloons.Abstraccion.Interfaces.Servicios;
 using HappyTimesBalloons.Web.Models.ViewModels;
-using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
@@ -12,59 +9,58 @@ namespace HappyTimesBalloons.Web.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly IProductoServicio _productoServicio;
+        private readonly ICategoriaServicio _categoriaServicio;
+
+        public HomeController(IProductoServicio productoServicio, ICategoriaServicio categoriaServicio)
+        {
+            _productoServicio = productoServicio;
+            _categoriaServicio = categoriaServicio;
+        }
+
         [HttpGet]
         public async Task<ActionResult> Index(string busqueda, int? categoriaId)
         {
-            using (var ctx = new ApplicationDbContext())
+            var dtos = await _productoServicio.ObtenerTodosAsync(busqueda, categoriaId);
+            var categoriasDtos = await _categoriaServicio.ObtenerTodasAsync();
+
+            var vm = new CatalogoIndexViewModel
             {
-                var servicio = new ProductoServicio(new ProductoRepositorio(ctx));
-                var dtos = await servicio.ObtenerTodosAsync(busqueda, categoriaId);
+                Busqueda = busqueda,
+                CategoriaId = categoriaId,
+                Categorias = new SelectList(
+                    categoriasDtos.Where(c => c.EsActiva).OrderBy(c => c.Nombre).ToList(),
+                    "Id", "Nombre", categoriaId),
+                Productos = dtos
+                    .Where(p => p.EsActivo)
+                    .Select(p => MapearProducto(p))
+                    .ToList()
+            };
 
-                var categorias = await ctx.Categorias
-                    .Where(c => c.EsActiva)
-                    .OrderBy(c => c.Nombre)
-                    .ToListAsync();
-
-                var vm = new CatalogoIndexViewModel
-                {
-                    Busqueda = busqueda,
-                    CategoriaId = categoriaId,
-                    Categorias = new SelectList(categorias, "Id", "Nombre", categoriaId),
-                    Productos = dtos
-                        .Where(p => p.EsActivo)
-                        .Select(p => MapearProducto(p))
-                        .ToList()
-                };
-
-                return View(vm);
-            }
+            return View(vm);
         }
 
         [HttpGet]
         public async Task<ActionResult> Detalle(int id)
         {
-            using (var ctx = new ApplicationDbContext())
+            var dto = await _productoServicio.ObtenerPorIdAsync(id);
+
+            if (dto == null || !dto.EsActivo)
+                return HttpNotFound();
+
+            var relacionados = await _productoServicio.ObtenerTodosAsync(null, dto.CategoriaId);
+
+            var vm = new ProductoDetalleViewModel
             {
-                var servicio = new ProductoServicio(new ProductoRepositorio(ctx));
-                var dto = await servicio.ObtenerPorIdAsync(id);
+                Producto = MapearProducto(dto),
+                ProductosRelacionados = relacionados
+                    .Where(p => p.EsActivo && p.Id != id)
+                    .Take(4)
+                    .Select(p => MapearProducto(p))
+                    .ToList()
+            };
 
-                if (dto == null || !dto.EsActivo)
-                    return HttpNotFound();
-
-                var relacionados = await servicio.ObtenerTodosAsync(null, dto.CategoriaId);
-
-                var vm = new ProductoDetalleViewModel
-                {
-                    Producto = MapearProducto(dto),
-                    ProductosRelacionados = relacionados
-                        .Where(p => p.EsActivo && p.Id != id)
-                        .Take(4)
-                        .Select(p => MapearProducto(p))
-                        .ToList()
-                };
-
-                return View(vm);
-            }
+            return View(vm);
         }
 
         private static ProductoViewModel MapearProducto(ProductoDTO p)
