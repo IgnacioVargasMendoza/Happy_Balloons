@@ -282,6 +282,9 @@ ServiceFabricBackup/
 *.ldf
 *.ndf
 
+# Configuracion de entorno local — cada desarrollador tiene la suya
+**/connectionStrings.config
+
 # Business Intelligence projects
 *.rdl.data
 *.bim.layout

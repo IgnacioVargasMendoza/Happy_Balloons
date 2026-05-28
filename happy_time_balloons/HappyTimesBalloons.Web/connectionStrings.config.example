@@ -1,0 +1,5 @@
+<connectionStrings>
+  <add name="HappyTimesBallooonsContext"
+       connectionString="Data Source=TU_SERVIDOR\SQLEXPRESS;Initial Catalog=HappyTimesBalloons;Integrated Security=True;MultipleActiveResultSets=True"
+       providerName="System.Data.SqlClient" />
+</connectionStrings>
