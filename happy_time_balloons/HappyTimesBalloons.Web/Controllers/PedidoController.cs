@@ -2,7 +2,6 @@ using HappyTimesBalloons.Abstraccion.DTOs;
 using HappyTimesBalloons.Abstraccion.Enums;
 using HappyTimesBalloons.Abstraccion.Interfaces.Repositorios;
 using HappyTimesBalloons.Abstraccion.Interfaces.Servicios;
-using HappyTimesBalloons.Web.Helpers;
 using HappyTimesBalloons.Web.Models.ViewModels;
 using Microsoft.AspNet.Identity;
 using System;
@@ -21,15 +20,18 @@ namespace HappyTimesBalloons.Web.Controllers
         private readonly IPedidoServicio _pedidoServicio;
         private readonly IProductoServicio _productoServicio;
         private readonly IZonaEntregaRepositorio _zonaRepo;
+        private readonly IAuditoriaServicio _auditoriaServicio;
 
         public PedidoController(
             IPedidoServicio pedidoServicio,
             IProductoServicio productoServicio,
-            IZonaEntregaRepositorio zonaRepo)
+            IZonaEntregaRepositorio zonaRepo,
+            IAuditoriaServicio auditoriaServicio)
         {
             _pedidoServicio = pedidoServicio;
             _productoServicio = productoServicio;
             _zonaRepo = zonaRepo;
+            _auditoriaServicio = auditoriaServicio;
         }
 
         // ═══════════════════════════════════════════════════════════════════
@@ -192,9 +194,12 @@ namespace HappyTimesBalloons.Web.Controllers
                 return View("Checkout", model);
             }
 
-            await AuditoriaHelper.RegistrarAsync(
-                HttpContext, TipoOperacion.Crear, "Pedidos", resultado.Datos,
-                $"Pedido creado por {User.Identity.GetUserId()}");
+            await _auditoriaServicio.RegistrarAsync(
+                User.Identity.Name, User.Identity.Name,
+                TipoOperacion.Crear, "Pedidos",
+                registroId: resultado.Datos,
+                detalle: $"Pedido creado por {User.Identity.GetUserId()}",
+                ip: Request.UserHostAddress);
 
             LimpiarCarrito();
             TempData["Exito"] = "¡Tu pedido fue confirmado exitosamente!";
@@ -317,9 +322,11 @@ namespace HappyTimesBalloons.Web.Controllers
 
             if (resultado.Exito)
             {
-                await AuditoriaHelper.RegistrarAsync(
-                    HttpContext, TipoOperacion.Actualizar, "Pedidos", id,
-                    $"Estado cambiado a {estado}");
+                await _auditoriaServicio.RegistrarAsync(
+                    User.Identity.Name, User.Identity.Name,
+                    TipoOperacion.Actualizar, "Pedidos",
+                    registroId: id, detalle: $"Estado cambiado a {estado}",
+                    ip: Request.UserHostAddress);
                 TempData["Exito"] = resultado.Mensaje;
             }
             else

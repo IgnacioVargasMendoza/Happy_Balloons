@@ -5,6 +5,9 @@ namespace HappyTimesBalloons.Abstraccion.Enums
         Crear,
         Leer,
         Actualizar,
-        Eliminar
+        Eliminar,
+        IniciarSesion,
+        CerrarSesion,
+        AccesoFallido
     }
 }
