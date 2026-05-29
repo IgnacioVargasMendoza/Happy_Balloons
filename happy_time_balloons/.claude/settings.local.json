@@ -15,7 +15,11 @@
       "PowerShell(netstat *)",
       "PowerShell(& *MSBuild.exe*)",
       "PowerShell(ls *)",
-      "PowerShell(& \"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\18\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\MSBuild.exe\" \"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\\\\HappyTimesBalloons.slnx\" /p:Configuration=Debug /t:Build /m /nologo /v:minimal 2>&1 | Select-Object -Last 20)"
+      "PowerShell(& \"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\18\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\MSBuild.exe\" \"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\\\\HappyTimesBalloons.slnx\" /p:Configuration=Debug /t:Build /m /nologo /v:minimal 2>&1 | Select-Object -Last 20)",
+      "PowerShell(& \"C:\\\\Users\\\\Ignac\\\\.nuget\\\\packages\\\\entityframework\\\\6.4.4\\\\tools\\\\net40\\\\any\\\\ef6.exe\" database --help 2>&1)",
+      "PowerShell(& \"C:\\\\Users\\\\Ignac\\\\.nuget\\\\packages\\\\entityframework\\\\6.4.4\\\\tools\\\\net40\\\\any\\\\ef6.exe\" database update --help 2>&1)",
+      "PowerShell(Invoke-Sqlcmd *)",
+      "PowerShell(sqlcmd *)"
     ]
   },
   "hooks": {
