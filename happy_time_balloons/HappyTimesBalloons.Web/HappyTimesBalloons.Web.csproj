@@ -113,7 +113,9 @@
     <Compile Include="Models\ViewModels\ProductoFormViewModel.cs" />
     <Compile Include="Models\ViewModels\ProductoIndexViewModel.cs" />
     <Compile Include="Models\ViewModels\ProductoViewModel.cs" />
+    <Compile Include="Models\ViewModels\OlvideContrasenaViewModel.cs" />
     <Compile Include="Models\ViewModels\RegistroViewModel.cs" />
+    <Compile Include="Models\ViewModels\RestablecerContrasenaViewModel.cs" />
     <Compile Include="Models\ViewModels\AdminDashboardViewModel.cs" />
     <Compile Include="Models\ViewModels\AdminPromocionesViewModel.cs" />
     <Compile Include="Models\ViewModels\PromocionFormViewModel.cs" />
@@ -139,8 +141,12 @@
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Admin\Index.cshtml" />
     <Content Include="Views\Categoria\Index.cshtml" />
+    <Content Include="Views\Cuenta\ConfirmacionEnvio.cshtml" />
+    <Content Include="Views\Cuenta\ConfirmacionReset.cshtml" />
     <Content Include="Views\Cuenta\Login.cshtml" />
+    <Content Include="Views\Cuenta\OlvideContrasena.cshtml" />
     <Content Include="Views\Cuenta\Registro.cshtml" />
+    <Content Include="Views\Cuenta\RestablecerContrasena.cshtml" />
     <Content Include="Views\Home\Detalle.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Pedido\Carrito.cshtml" />

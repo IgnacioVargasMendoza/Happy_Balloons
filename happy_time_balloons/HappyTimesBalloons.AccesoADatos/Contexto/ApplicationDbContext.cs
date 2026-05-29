@@ -31,5 +31,7 @@ namespace HappyTimesBalloons.AccesoADatos.Contexto
         public DbSet<ZonaEntrega> ZonasEntrega { get; set; }
 
         public DbSet<Promocion> Promociones { get; set; }
+
+        public DbSet<RecuperacionToken> RecuperacionTokens { get; set; }
     }
 }
