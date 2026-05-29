@@ -125,6 +125,48 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
             return await _userManager.IsInRoleAsync(userId, rol);
         }
 
+        public async Task<UsuarioDTO> ObtenerPorIdAsync(string userId)
+        {
+            var usuario = await _userManager.FindByIdAsync(userId);
+            if (usuario == null) return null;
+            return new UsuarioDTO
+            {
+                Id = usuario.Id,
+                Nombre = usuario.Nombre,
+                Email = usuario.Email,
+                Telefono = usuario.PhoneNumber,
+                Direccion = usuario.Direccion,
+                TieneDobleFactor = usuario.TwoFactorEnabled
+            };
+        }
+
+        public async Task<ResultadoOperacionDTO> EditarPerfilAsync(EditarPerfilDTO dto)
+        {
+            var usuario = await _userManager.FindByIdAsync(dto.UsuarioId);
+            if (usuario == null)
+                return ResultadoOperacionDTO.Fallo("Usuario no encontrado.", CodigoResultado.DatosInvalidos);
+
+            usuario.Nombre = dto.Nombre;
+            usuario.Direccion = dto.Direccion;
+            usuario.PhoneNumber = dto.Telefono;
+
+            var resultado = await _userManager.UpdateAsync(usuario);
+            if (!resultado.Succeeded)
+                return ResultadoOperacionDTO.Fallo(string.Join(" ", resultado.Errors), CodigoResultado.Error);
+
+            return ResultadoOperacionDTO.Ok("Perfil actualizado correctamente.");
+        }
+
+        public async Task<ResultadoOperacionDTO> CambiarContrasenaAsync(
+            string userId, string contrasenaActual, string nuevaContrasena)
+        {
+            var resultado = await _userManager.ChangePasswordAsync(userId, contrasenaActual, nuevaContrasena);
+            if (!resultado.Succeeded)
+                return ResultadoOperacionDTO.Fallo(string.Join(" ", resultado.Errors), CodigoResultado.DatosInvalidos);
+
+            return ResultadoOperacionDTO.Ok("Contraseña cambiada correctamente.");
+        }
+
         public void Dispose()
         {
             _userManager?.Dispose();

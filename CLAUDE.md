@@ -94,6 +94,29 @@ Todas las operaciones CRUD en tablas críticas deben registrar:
   ```
 - Reservar `Html.ActionLink` únicamente para enlaces con texto visible plano (sin HTML interno)
 
+#### Formularios dentro de bucles — usar `<form>` HTML, nunca `@using (Html.BeginForm(...))`
+Dentro de bloques de código Razor (`@foreach`, `@if`, `@while`, etc.) el parser ya está en contexto C#. Usar `@using` dentro de esos bloques provoca **"Unexpected 'using' keyword after '@' character"**.
+
+```html
+<%-- CORRECTO — <form> con @Url.Action() funciona en cualquier contexto --%>
+@foreach (var item in Model.Items)
+{
+    <form action="@Url.Action("Eliminar", "Entidad")" method="post" class="d-inline">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="id" value="@item.Id" />
+        <button type="submit" class="btn btn-danger">Eliminar</button>
+    </form>
+}
+
+<%-- INCORRECTO — @using dentro de @foreach está en contexto código; rompe el parser --%>
+@foreach (var item in Model.Items)
+{
+    @using (Html.BeginForm("Eliminar", "Entidad", FormMethod.Post)) { ... }
+}
+```
+
+`@using (Html.BeginForm(...))` **solo** es válido en contexto HTML (nivel raíz de la vista o dentro de bloques `<div>/<td>` que no estén a su vez dentro de un bloque `@foreach/@if`). Ante la duda, preferir siempre `<form>`.
+
 #### TextAreaFor — siempre usar el overload de 4 argumentos
 `Html.TextAreaFor` solo tiene dos overloads válidos. No existe `(expr, rows, htmlAttributes)`:
 ```html
