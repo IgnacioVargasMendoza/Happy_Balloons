@@ -19,7 +19,8 @@
       "PowerShell(& \"C:\\\\Users\\\\Ignac\\\\.nuget\\\\packages\\\\entityframework\\\\6.4.4\\\\tools\\\\net40\\\\any\\\\ef6.exe\" database --help 2>&1)",
       "PowerShell(& \"C:\\\\Users\\\\Ignac\\\\.nuget\\\\packages\\\\entityframework\\\\6.4.4\\\\tools\\\\net40\\\\any\\\\ef6.exe\" database update --help 2>&1)",
       "PowerShell(Invoke-Sqlcmd *)",
-      "PowerShell(sqlcmd *)"
+      "PowerShell(sqlcmd *)",
+      "Bash(msbuild HappyTimesBalloons.slnx /p:Configuration=Debug /v:minimal /nologo)"
     ]
   },
   "hooks": {
