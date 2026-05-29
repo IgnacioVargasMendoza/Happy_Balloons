@@ -92,6 +92,29 @@
                                     new { @class = "dropdown-item" })
                             </li>
 
+                            @if (User.IsInRole("Administrador"))
+                            {
+                                <li><hr class="dropdown-divider" /></li>
+
+                                <li>
+                                    @Html.ActionLink(
+                                        "Roles",
+                                        "Index",
+                                        "Rol",
+                                        null,
+                                        new { @class = "dropdown-item" })
+                                </li>
+
+                                <li>
+                                    @Html.ActionLink(
+                                        "Usuarios",
+                                        "Usuarios",
+                                        "Rol",
+                                        null,
+                                        new { @class = "dropdown-item" })
+                                </li>
+                            }
+
                         </ul>
                     </li>
                 }
@@ -160,8 +183,8 @@
                             </li>
 
                             <li>
-                                <a class="dropdown-item" href="@Url.Action("ConfigurarDobleFactor", "Cuenta")">
-                                    <i class="bi bi-shield-lock me-1"></i>Verificación en dos pasos
+                                <a class="dropdown-item" href="@Url.Action("Index", "Configuracion")">
+                                    <i class="bi bi-gear me-1"></i>Configuración de cuenta
                                 </a>
                             </li>
 
