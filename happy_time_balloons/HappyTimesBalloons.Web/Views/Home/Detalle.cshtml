@@ -1,0 +1,191 @@
+@model HappyTimesBalloons.Web.Models.ViewModels.ProductoDetalleViewModel
+@{
+    ViewBag.Title = Model.Producto.Nombre;
+}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">@Html.ActionLink("Inicio", "Index", "Home")</li>
+        <li class="breadcrumb-item">@Html.ActionLink("Catálogo", "Index", "Home")</li>
+        <li class="breadcrumb-item active" aria-current="page">@Model.Producto.Nombre</li>
+    </ol>
+</nav>
+
+<div class="row g-4">
+    @* Columna imágenes *@
+    <div class="col-lg-6">
+        @if (Model.Producto.Imagenes.Any())
+        {
+            <div id="galeriaProducto" class="carousel slide" data-bs-ride="false">
+                <div class="carousel-inner rounded-3 overflow-hidden">
+                    @for (int i = 0; i < Model.Producto.Imagenes.Count; i++)
+                    {
+                        <div class="carousel-item @(i == 0 ? "active" : "")">
+                            <img src="@Model.Producto.Imagenes[i].RutaImagen"
+                                 alt="@Model.Producto.Nombre"
+                                 class="d-block w-100"
+                                 style="height:380px;object-fit:cover;" />
+                        </div>
+                    }
+                </div>
+                @if (Model.Producto.Imagenes.Count > 1)
+                {
+                    <button class="carousel-control-prev" type="button"
+                            data-bs-target="#galeriaProducto" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon"></span>
+                    </button>
+                    <button class="carousel-control-next" type="button"
+                            data-bs-target="#galeriaProducto" data-bs-slide="next">
+                        <span class="carousel-control-next-icon"></span>
+                    </button>
+                }
+            </div>
+            @if (Model.Producto.Imagenes.Count > 1)
+            {
+                <div class="d-flex gap-2 overflow-auto mt-2">
+                    @for (int i = 0; i < Model.Producto.Imagenes.Count; i++)
+                    {
+                        <img src="@Model.Producto.Imagenes[i].RutaImagen"
+                             alt="Miniatura @(i + 1)"
+                             class="rounded border img-thumbnail"
+                             style="width:64px;height:64px;object-fit:cover;cursor:pointer;"
+                             data-bs-target="#galeriaProducto"
+                             data-bs-slide-to="@i" />
+                    }
+                </div>
+            }
+        }
+        else
+        {
+            <div class="bg-light rounded-3 d-flex align-items-center justify-content-center"
+                 style="height:380px;">
+                <i class="bi bi-image fs-1 text-muted opacity-25"></i>
+            </div>
+        }
+    </div>
+
+    @* Columna información *@
+    <div class="col-lg-6">
+        @if (!string.IsNullOrEmpty(Model.Producto.CategoriaNombre))
+        {
+            <span class="badge bg-light text-dark border mb-2">@Model.Producto.CategoriaNombre</span>
+        }
+
+        <h2 class="fw-bold mb-3">@Model.Producto.Nombre</h2>
+
+        <div class="mb-3">
+            @if (Model.Producto.TieneDescuento)
+            {
+                <div class="text-muted text-decoration-line-through small">
+                    ₡@Model.Producto.Precio.ToString("N0")
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <div class="fs-3 fw-bold text-success">
+                        ₡@Model.Producto.PrecioDescuento.Value.ToString("N0")
+                    </div>
+                    @if (Model.Producto.TienePromocion)
+                    {
+                        var pct = Math.Round((1 - Model.Producto.PrecioDescuento.Value / Model.Producto.Precio) * 100);
+                        <span class="badge bg-danger fs-6">@pct% OFF</span>
+                    }
+                </div>
+                @if (Model.Producto.TienePromocion && Model.Producto.PromocionFin.HasValue)
+                {
+                    <div class="alert alert-success py-2 px-3 mt-2 mb-0 small">
+                        <i class="bi bi-calendar-check me-1"></i>
+                        Promoción válida hasta el <strong>@Model.Producto.PromocionFin.Value.ToString("dd 'de' MMMM 'de' yyyy", new System.Globalization.CultureInfo("es-CR"))</strong>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="fs-3 fw-bold">₡@Model.Producto.Precio.ToString("N0")</div>
+            }
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.Producto.Descripcion))
+        {
+            <p class="text-muted mb-4">@Model.Producto.Descripcion</p>
+        }
+
+        @if (Model.Producto.Stock > 0 && Model.Producto.Stock < 5)
+        {
+            <small class="text-danger d-block mb-3">
+                <i class="bi bi-exclamation-triangle me-1"></i>¡Solo quedan @Model.Producto.Stock unidades!
+            </small>
+        }
+
+        @if (Model.Producto.Stock > 0)
+        {
+            using (Html.BeginForm("AgregarAlCarrito", "Pedido", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="productoId" value="@Model.Producto.Id" />
+
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="input-group" style="max-width:140px;">
+                        <button type="button" class="btn btn-outline-secondary btn-qty" data-dir="-1">
+                            <i class="bi bi-dash"></i>
+                        </button>
+                        <input type="number" id="cantidadInput" name="cantidad"
+                               class="form-control text-center"
+                               value="1" min="1" max="@Model.Producto.Stock" />
+                        <button type="button" class="btn btn-outline-secondary btn-qty" data-dir="1">
+                            <i class="bi bi-plus"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-brand w-100">
+                    <i class="bi bi-cart-plus me-2"></i>Agregar al carrito
+                </button>
+            }
+        }
+        else
+        {
+            <button class="btn btn-secondary w-100" disabled>
+                <i class="bi bi-cart-x me-2"></i>Producto agotado
+            </button>
+        }
+
+        <div class="mt-3">
+            @Html.ActionLink("← Seguir comprando", "Index", "Home", null,
+                new { @class = "text-brand text-decoration-none small" })
+        </div>
+    </div>
+</div>
+
+@if (Model.ProductosRelacionados.Any())
+{
+    <div class="mt-5">
+        <h5 class="fw-semibold mb-3">También te puede interesar</h5>
+        <div class="row row-cols-2 row-cols-md-4 g-3">
+            @foreach (var p in Model.ProductosRelacionados)
+            {
+                <div class="col">
+                    @Html.Partial("_TarjetaProducto", p)
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@section scripts {
+<script>
+    document.querySelectorAll('.btn-qty').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var input = document.getElementById('cantidadInput');
+            var val = parseInt(input.value) + parseInt(this.dataset.dir);
+            input.value = Math.max(parseInt(input.min), Math.min(parseInt(input.max), val));
+        });
+    });
+
+    document.querySelectorAll('[data-bs-slide-to]').forEach(function (thumb) {
+        thumb.addEventListener('click', function () {
+            var carousel = bootstrap.Carousel.getOrCreateInstance(
+                document.getElementById('galeriaProducto'));
+            carousel.to(parseInt(this.dataset.bsSlideTo));
+        });
+    });
+</script>
+}

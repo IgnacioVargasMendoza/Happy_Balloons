@@ -1,0 +1,371 @@
+@model HappyTimesBalloons.Web.Models.ViewModels.CategoriaIndexViewModel
+
+@{
+    ViewBag.Title = "Categorías";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-0">
+            <i class="bi bi-tags me-2 text-brand"></i>Categorías
+        </h2>
+        <p class="text-muted small mb-0">Gestión de categorías de productos</p>
+    </div>
+
+    <button type="button"
+            class="btn btn-brand"
+            data-bs-toggle="modal"
+            data-bs-target="#modalCrear">
+        <i class="bi bi-plus-lg me-1"></i> Nueva categoría
+    </button>
+</div>
+
+@using (Html.BeginForm("Index", "Categoria", FormMethod.Get))
+{
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="input-group">
+                <span class="input-group-text bg-white">
+                    <i class="bi bi-search text-muted"></i>
+                </span>
+
+                <input type="text"
+                       name="busqueda"
+                       class="form-control border-start-0"
+                       placeholder="Buscar por nombre o descripción..."
+                       value="@Model.Busqueda" />
+
+                <button type="submit" class="btn btn-outline-secondary">
+                    Buscar
+                </button>
+
+                @if (!string.IsNullOrWhiteSpace(Model.Busqueda))
+                {
+                    @Html.ActionLink(
+                        "Limpiar",
+                        "Index",
+                        "Categoria",
+                        null,
+                        new { @class = "btn btn-outline-danger" }
+                    )
+                }
+            </div>
+        </div>
+    </div>
+}
+
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th class="ps-4">Nombre</th>
+                    <th>Descripción</th>
+                    <th>Estado</th>
+                    <th>Creada</th>
+                    <th class="text-end pe-4">Acciones</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (Model.Categorias == null || !Model.Categorias.Any())
+                {
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-5">
+                            <i class="bi bi-tags fs-3 d-block mb-2 opacity-25"></i>
+
+                            @if (!string.IsNullOrWhiteSpace(Model.Busqueda))
+                            {
+                                <span>
+                                    Sin resultados para
+                                    <strong>"@Model.Busqueda"</strong>
+                                </span>
+                            }
+                            else
+                            {
+                                <span>No hay categorías registradas</span>
+                            }
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var cat in Model.Categorias)
+                    {
+                        <tr>
+                            <td class="ps-4 fw-semibold">
+                                @cat.Nombre
+                            </td>
+
+                            <td class="text-muted">
+                                @(string.IsNullOrWhiteSpace(cat.Descripcion)
+                                    ? "—"
+                                    : cat.Descripcion)
+                            </td>
+
+                            <td>
+                                @if (cat.EsActiva)
+                                {
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle">
+                                        <i class="bi bi-check-circle me-1"></i>Activa
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">
+                                        <i class="bi bi-dash-circle me-1"></i>Inactiva
+                                    </span>
+                                }
+                            </td>
+
+                            <td class="small text-muted">
+                                @cat.FechaCreacion.ToString("dd/MM/yyyy")
+                            </td>
+
+                            <td class="text-end pe-4">
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-primary me-1 btn-editar"
+                                        data-id="@cat.Id"
+                                        data-nombre="@Html.AttributeEncode(cat.Nombre)"
+                                        data-descripcion="@Html.AttributeEncode(cat.Descripcion)"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#modalEditar"
+                                        title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+
+                                @using (Html.BeginForm(
+                                    "ToggleEstado",
+                                    "Categoria",
+                                    new { id = cat.Id },
+                                    FormMethod.Post,
+                                    new
+                                    {
+                                        @class = "d-inline",
+                                        id = "formToggle_" + cat.Id
+                                    }))
+                                {
+                                    @Html.AntiForgeryToken()
+
+                                    <button type="button"
+                                            class="btn btn-sm @(cat.EsActiva ? "btn-outline-warning" : "btn-outline-success") btn-toggle"
+                                            data-form-id="formToggle_@cat.Id"
+                                            data-accion="@(cat.EsActiva ? "desactivar" : "activar")"
+                                            data-nombre="@Html.AttributeEncode(cat.Nombre)"
+                                            title="@(cat.EsActiva ? "Desactivar" : "Activar")">
+                                        <i class="bi @(cat.EsActiva ? "bi-eye-slash" : "bi-eye")"></i>
+                                    </button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (Model.Categorias != null && Model.Categorias.Any())
+    {
+        <div class="card-footer text-muted small">
+            @Model.Categorias.Count categoría(s) encontrada(s)
+        </div>
+    }
+</div>
+
+<!-- MODAL CREAR -->
+<div class="modal fade"
+     id="modalCrear"
+     tabindex="-1"
+     aria-labelledby="lblModalCrear"
+     aria-hidden="true">
+
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            @using (Html.BeginForm(
+                "Crear",
+                "Categoria",
+                FormMethod.Post,
+                new { id = "formCrear" }))
+            {
+                @Html.AntiForgeryToken()
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="lblModalCrear">
+                        <i class="bi bi-plus-circle me-2 text-brand"></i>
+                        Nueva categoría
+                    </h5>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal">
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="crearNombre"
+                               class="form-label fw-semibold">
+                            Nombre
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        <input type="text"
+                               id="crearNombre"
+                               name="Nombre"
+                               class="form-control"
+                               maxlength="100"
+                               placeholder="Ej: Globos metálicos"
+                               required />
+                    </div>
+
+                    <div class="mb-1">
+                        <label for="crearDescripcion"
+                               class="form-label fw-semibold">
+                            Descripción
+                        </label>
+
+                        <textarea id="crearDescripcion"
+                                  name="Descripcion"
+                                  class="form-control"
+                                  rows="3"
+                                  maxlength="500"
+                                  placeholder="Descripción opcional de la categoría"></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+
+                    <button type="submit"
+                            class="btn btn-brand">
+                        <i class="bi bi-check-lg me-1"></i>
+                        Crear
+                    </button>
+                </div>
+            }
+
+        </div>
+    </div>
+</div>
+
+<!-- MODAL EDITAR -->
+<div class="modal fade"
+     id="modalEditar"
+     tabindex="-1"
+     aria-labelledby="lblModalEditar"
+     aria-hidden="true">
+
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            @using (Html.BeginForm(
+                "Editar",
+                "Categoria",
+                FormMethod.Post,
+                new { id = "formEditar" }))
+            {
+                @Html.AntiForgeryToken()
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="lblModalEditar">
+                        <i class="bi bi-pencil-square me-2 text-brand"></i>
+                        Editar categoría
+                    </h5>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal">
+                    </button>
+                </div>
+
+                <div class="modal-body">
+
+                    <input type="hidden"
+                           id="editId"
+                           name="Id" />
+
+                    <div class="mb-3">
+                        <label for="editNombre"
+                               class="form-label fw-semibold">
+                            Nombre
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        <input type="text"
+                               id="editNombre"
+                               name="Nombre"
+                               class="form-control"
+                               maxlength="100"
+                               required />
+                    </div>
+
+                    <div class="mb-1">
+                        <label for="editDescripcion"
+                               class="form-label fw-semibold">
+                            Descripción
+                        </label>
+
+                        <textarea id="editDescripcion"
+                                  name="Descripcion"
+                                  class="form-control"
+                                  rows="3"
+                                  maxlength="500"></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+
+                    <button type="submit"
+                            class="btn btn-brand">
+                        <i class="bi bi-check-lg me-1"></i>
+                        Guardar cambios
+                    </button>
+                </div>
+            }
+
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        document.querySelectorAll('.btn-editar').forEach(function (btn) {
+
+            btn.addEventListener('click', function () {
+
+                document.getElementById('editId').value =
+                    this.dataset.id;
+
+                document.getElementById('editNombre').value =
+                    this.dataset.nombre;
+
+                document.getElementById('editDescripcion').value =
+                    this.dataset.descripcion || '';
+            });
+        });
+
+        document.querySelectorAll('.btn-toggle').forEach(function (btn) {
+
+            btn.addEventListener('click', function () {
+
+                var accion = this.dataset.accion;
+                var nombre = this.dataset.nombre;
+
+                if (confirm('¿Deseas ' + accion + ' la categoría "' + nombre + '"?')) {
+
+                    document.getElementById(this.dataset.formId).submit();
+                }
+            });
+        });
+    </script>
+}

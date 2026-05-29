@@ -1,0 +1,76 @@
+@model HappyTimesBalloons.Web.Models.ViewModels.ProductoViewModel
+
+<div class="card h-100 shadow-sm border-0 position-relative">
+    @if (Model.TienePromocion)
+    {
+        <span class="badge bg-danger position-absolute top-0 start-0 m-2" style="z-index:1;">
+            <i class="bi bi-tag-fill me-1"></i>Promoción
+        </span>
+    }
+    else if (Model.TieneDescuento)
+    {
+        <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-2" style="z-index:1;">Oferta</span>
+    }
+    @if (Model.Stock == 0)
+    {
+        <span class="badge bg-secondary position-absolute top-0 end-0 m-2" style="z-index:1;">Agotado</span>
+    }
+
+    @if (!string.IsNullOrEmpty(Model.ImagenPrincipal))
+    {
+        <img src="@Model.ImagenPrincipal" alt="@Model.Nombre"
+             class="card-img-top"
+             style="height:200px;object-fit:cover;" />
+    }
+    else
+    {
+        <div class="bg-light d-flex align-items-center justify-content-center" style="height:200px;">
+            <i class="bi bi-image fs-1 text-muted opacity-25"></i>
+        </div>
+    }
+
+    <div class="card-body d-flex flex-column">
+        @if (!string.IsNullOrEmpty(Model.CategoriaNombre))
+        {
+            <span class="badge bg-light text-dark border small mb-1 align-self-start">@Model.CategoriaNombre</span>
+        }
+
+        <h6 class="fw-semibold mb-1">
+            <a href="@Url.Action("Detalle", "Home", new { id = Model.Id })"
+               class="text-dark text-decoration-none">@Model.Nombre</a>
+        </h6>
+
+        @if (!string.IsNullOrEmpty(Model.Descripcion))
+        {
+            <p class="text-muted small mb-2">
+                @(Model.Descripcion.Length > 60
+                    ? Model.Descripcion.Substring(0, 60) + "…"
+                    : Model.Descripcion)
+            </p>
+        }
+
+        <div class="mt-auto">
+            @if (Model.TieneDescuento)
+            {
+                <div class="text-muted text-decoration-line-through small">₡@Model.Precio.ToString("N0")</div>
+                <div class="fw-bold text-success mb-2">₡@Model.PrecioDescuento.Value.ToString("N0")</div>
+            }
+            else
+            {
+                <div class="fw-bold mb-2">₡@Model.Precio.ToString("N0")</div>
+            }
+
+            @using (Html.BeginForm("AgregarAlCarrito", "Pedido", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="productoId" value="@Model.Id" />
+                <input type="hidden" name="cantidad" value="1" />
+                <button type="submit"
+                        class="btn btn-brand btn-sm w-100"
+                        @(Model.Stock == 0 ? Html.Raw("disabled") : Html.Raw(""))>
+                    <i class="bi bi-cart-plus me-1"></i>Agregar
+                </button>
+            }
+        </div>
+    </div>
+</div>

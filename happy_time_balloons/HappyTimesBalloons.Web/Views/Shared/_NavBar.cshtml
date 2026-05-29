@@ -1,0 +1,214 @@
+<nav class="navbar navbar-expand-md navbar-light bg-white border-bottom shadow-sm sticky-top">
+    <div class="container">
+
+        <a class="navbar-brand d-flex align-items-center gap-2"
+           href="@Url.Action("Index", "Home")">
+
+            <i class="bi bi-balloon-heart-fill fs-4"
+               style="color:#e91e8c;"></i>
+
+            <div class="lh-sm">
+                <div class="fw-bold lh-1">Happy Times</div>
+                <div class="text-muted" style="font-size:0.7rem;">
+                    Balloons
+                </div>
+            </div>
+        </a>
+
+        <button class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navMain"
+                aria-controls="navMain"
+                aria-expanded="false"
+                aria-label="Toggle navigation">
+
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navMain">
+
+            <ul class="navbar-nav me-auto">
+
+                <li class="nav-item">
+                    @Html.ActionLink(
+                        "Catálogo",
+                        "Index",
+                        "Home",
+                        null,
+                        new { @class = "nav-link" })
+                </li>
+
+                @if (Request.IsAuthenticated &&
+                    (User.IsInRole("Administrador") || User.IsInRole("Operador")))
+                {
+                    <li class="nav-item dropdown">
+
+                        <a class="nav-link dropdown-toggle"
+                           href="#"
+                           role="button"
+                           data-bs-toggle="dropdown"
+                           aria-expanded="false">
+
+                            Administración
+
+                        </a>
+
+                        <ul class="dropdown-menu">
+
+                            <li>
+                                @Html.ActionLink(
+                                    "Dashboard",
+                                    "Index",
+                                    "Admin",
+                                    null,
+                                    new { @class = "dropdown-item" })
+                            </li>
+
+                            <li>
+                                @Html.ActionLink(
+                                    "Categorías",
+                                    "Index",
+                                    "Categoria",
+                                    null,
+                                    new { @class = "dropdown-item" })
+                            </li>
+
+                            <li>
+                                @Html.ActionLink(
+                                    "Productos",
+                                    "Index",
+                                    "Producto",
+                                    null,
+                                    new { @class = "dropdown-item" })
+                            </li>
+
+                            <li>
+                                @Html.ActionLink(
+                                    "Pedidos",
+                                    "Index",
+                                    "Pedido",
+                                    null,
+                                    new { @class = "dropdown-item" })
+                            </li>
+
+                        </ul>
+                    </li>
+                }
+
+            </ul>
+
+            <ul class="navbar-nav ms-auto align-items-center gap-1">
+
+                @if (Request.IsAuthenticated && User.IsInRole("Cliente"))
+                {
+                    <li class="nav-item">
+                        @Html.ActionLink(
+                            "Mis pedidos",
+                            "MisPedidos",
+                            "Pedido",
+                            new { area = "" },
+                            new { @class = "nav-link" })
+                    </li>
+                }
+
+                <li class="nav-item position-relative">
+
+                    <a class="nav-link"
+                       href="@Url.Action("Carrito", "Pedido")">
+
+                        <i class="bi bi-cart3 fs-5"></i>
+
+                        @{
+                            var carritoCount = Session["CarritoCount"] as int?;
+                        }
+
+                        @if (carritoCount.HasValue && carritoCount > 0)
+                        {
+                            <span class="badge bg-danger rounded-pill badge-cart">
+                                @carritoCount
+                            </span>
+                        }
+
+                    </a>
+                </li>
+
+                @if (Request.IsAuthenticated)
+                {
+                    <li class="nav-item dropdown">
+
+                        <a class="nav-link dropdown-toggle"
+                           href="#"
+                           role="button"
+                           data-bs-toggle="dropdown"
+                           aria-expanded="false">
+
+                            <i class="bi bi-person-circle"></i>
+
+                        </a>
+
+                        <ul class="dropdown-menu dropdown-menu-end">
+
+                            <li>
+                                <span class="dropdown-item-text fw-semibold">
+                                    @User.Identity.Name
+                                </span>
+                            </li>
+
+                            <li>
+                                <hr class="dropdown-divider" />
+                            </li>
+
+                            <li>
+                                <a class="dropdown-item" href="@Url.Action("ConfigurarDobleFactor", "Cuenta")">
+                                    <i class="bi bi-shield-lock me-1"></i>Verificación en dos pasos
+                                </a>
+                            </li>
+
+                            <li>
+                                <hr class="dropdown-divider" />
+                            </li>
+
+                            <li>
+
+                                @using (Html.BeginForm(
+                                    "Logout",
+                                    "Cuenta",
+                                    FormMethod.Post,
+                                    new { @class = "d-inline" }))
+                                {
+                                    @Html.AntiForgeryToken()
+
+                                    <button type="submit"
+                                            class="dropdown-item text-danger">
+
+                                        <i class="bi bi-box-arrow-right me-1"></i>
+                                        Cerrar sesión
+
+                                    </button>
+                                }
+
+                            </li>
+
+                        </ul>
+                    </li>
+                }
+                else
+                {
+                    <li class="nav-item">
+
+                        @Html.ActionLink(
+                            "Iniciar sesión",
+                            "Login",
+                            "Cuenta",
+                            null,
+                            new { @class = "btn btn-brand btn-sm" })
+
+                    </li>
+                }
+
+            </ul>
+
+        </div>
+    </div>
+</nav>

@@ -1,0 +1,71 @@
+@{
+    ViewBag.Title = "Verificación en dos pasos";
+    bool activo = (bool)(ViewBag.DobleFactorActivo ?? false);
+}
+
+<div class="container" style="max-width:560px; margin-top:2rem;">
+
+    <div class="d-flex align-items-center mb-4 gap-2">
+        <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary btn-sm" title="Volver">
+            <i class="bi bi-chevron-left"></i>
+        </a>
+        <h4 class="mb-0 fw-bold">Verificación en dos pasos</h4>
+    </div>
+
+    @if (TempData["MensajeDobleFactor"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show py-2 small">
+            <i class="bi bi-check-circle me-1"></i>@TempData["MensajeDobleFactor"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+
+            <div class="d-flex align-items-center gap-3 mb-3">
+                <i class="bi bi-shield-@(activo ? "lock-fill text-success" : "slash text-secondary")"
+                   style="font-size:2.5rem;"></i>
+                <div>
+                    <div class="fw-semibold">
+                        @(activo ? "Activada" : "Desactivada")
+                    </div>
+                    <div class="text-muted small">
+                        @if (activo)
+                        {
+                            <span>Al iniciar sesión se enviará un código de 6 dígitos a tu correo.</span>
+                        }
+                        else
+                        {
+                            <span>Solo se requiere tu correo y contraseña para entrar.</span>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <p class="text-muted small mb-4">
+                La verificación en dos pasos agrega una capa extra de seguridad a tu cuenta.
+                Cuando está activa, recibirás un código por email cada vez que inicies sesión.
+            </p>
+
+            @using (Html.BeginForm("CambiarDobleFactor", "Cuenta",
+                new { activar = !activo }, FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+
+                if (activo)
+                {
+                    <button type="submit" class="btn btn-outline-danger w-100">
+                        <i class="bi bi-shield-slash me-1"></i>Desactivar verificación en dos pasos
+                    </button>
+                }
+                else
+                {
+                    <button type="submit" class="btn btn-success w-100">
+                        <i class="bi bi-shield-lock me-1"></i>Activar verificación en dos pasos
+                    </button>
+                }
+            }
+        </div>
+    </div>
+</div>

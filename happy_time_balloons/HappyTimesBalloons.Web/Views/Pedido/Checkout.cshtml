@@ -1,0 +1,237 @@
+@model HappyTimesBalloons.Web.Models.ViewModels.CheckoutViewModel
+@using HappyTimesBalloons.Web.Models.ViewModels
+@{
+    ViewBag.Title = "Checkout";
+}
+
+<div class="d-flex align-items-center mb-4">
+    <h2 class="mb-0">
+        <i class="bi bi-bag-check me-2 text-brand"></i>Confirmar pedido
+    </h2>
+</div>
+
+@using (Html.BeginForm("ConfirmarPedido", "Pedido", FormMethod.Post, new { id = "formCheckout" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="row g-4">
+
+        @* ── Columna izquierda: formulario ── *@
+        <div class="col-lg-8">
+
+            @* Zona de entrega *@
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white fw-semibold">
+                    <i class="bi bi-geo-alt me-2 text-brand"></i>Zona de entrega
+                </div>
+                <div class="card-body">
+                    @if (!Model.ZonasEntrega.Any())
+                    {
+                        <p class="text-muted">No hay zonas de entrega disponibles.</p>
+                    }
+                    else
+                    {
+                        <div class="row g-2 mb-3">
+                            @foreach (var zona in Model.ZonasEntrega)
+                            {
+                                <div class="col-md-6">
+                                    <div class="form-check p-0">
+                                        <label class="card border rounded p-3 w-100 d-flex align-items-start gap-2 cursor-pointer zona-card @(zona.Id == Model.ZonaEntregaId ? "border-brand" : "")"
+                                               for="zona_@zona.Id"
+                                               data-costo="@zona.CostoEnvio.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)">
+                                            <input class="form-check-input mt-1 zona-radio" type="radio"
+                                                   name="ZonaEntregaId" id="zona_@zona.Id"
+                                                   value="@zona.Id"
+                                                   @(zona.Id == Model.ZonaEntregaId ? "checked" : "") />
+                                            <div class="flex-grow-1">
+                                                <div class="fw-semibold">@zona.Nombre</div>
+                                                @if (!string.IsNullOrEmpty(zona.Descripcion))
+                                                {
+                                                    <div class="text-muted small">@zona.Descripcion</div>
+                                                }
+                                                <div class="text-brand small fw-semibold mt-1">
+                                                    Envío: ₡@zona.CostoEnvio.ToString("N0")
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    @Html.ValidationMessageFor(m => m.ZonaEntregaId, "", new { @class = "text-danger small" })
+
+                    <div class="mb-0">
+                        @Html.LabelFor(m => m.DireccionEntrega, new { @class = "form-label fw-semibold" })
+                        @Html.TextAreaFor(m => m.DireccionEntrega, 2,
+                            new { @class = "form-control", placeholder = "Ej: 100 m sur del parque central, casa blanca..." })
+                        @Html.ValidationMessageFor(m => m.DireccionEntrega, "", new { @class = "text-danger small" })
+                    </div>
+                </div>
+            </div>
+
+            @* Método de pago *@
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white fw-semibold">
+                    <i class="bi bi-credit-card me-2 text-brand"></i>Método de pago
+                </div>
+                <div class="card-body">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <div class="form-check p-0">
+                                <label class="card border rounded p-3 w-100 d-flex align-items-center gap-2 cursor-pointer pago-card @(Model.MetodoPago == "SINPE" ? "border-brand" : "")"
+                                       for="pago_sinpe">
+                                    <input class="form-check-input mt-0 pago-radio" type="radio"
+                                           name="MetodoPago" id="pago_sinpe" value="SINPE"
+                                           @(Model.MetodoPago == "SINPE" ? "checked" : "") />
+                                    <div>
+                                        <div class="fw-semibold"><i class="bi bi-phone me-1"></i>SINPE Móvil</div>
+                                        <div class="text-muted small">Transferencia SINPE</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check p-0">
+                                <label class="card border rounded p-3 w-100 d-flex align-items-center gap-2 cursor-pointer pago-card @(Model.MetodoPago == "Tarjeta" ? "border-brand" : "")"
+                                       for="pago_tarjeta">
+                                    <input class="form-check-input mt-0 pago-radio" type="radio"
+                                           name="MetodoPago" id="pago_tarjeta" value="Tarjeta"
+                                           @(Model.MetodoPago == "Tarjeta" ? "checked" : "") />
+                                    <div>
+                                        <div class="fw-semibold"><i class="bi bi-credit-card me-1"></i>Tarjeta</div>
+                                        <div class="text-muted small">Crédito / Débito</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    @Html.ValidationMessageFor(m => m.MetodoPago, "", new { @class = "text-danger small" })
+
+                    <div class="mb-3" id="panelSinpe" style="@(Model.MetodoPago == "Tarjeta" ? "display:none;" : "")">
+                        <label class="form-label fw-semibold">Número de comprobante SINPE</label>
+                        @Html.TextBoxFor(m => m.NumeroReferencia, new { @class = "form-control", placeholder = "Ej: 123456789" })
+                        <div class="form-text">Ingresa el número de comprobante de tu transferencia SINPE.</div>
+                    </div>
+
+                    <div class="mb-3" id="panelTarjeta" style="@(Model.MetodoPago != "Tarjeta" ? "display:none;" : "")">
+                        <label class="form-label fw-semibold">Nombre en la tarjeta</label>
+                        @Html.TextBoxFor(m => m.NumeroReferencia, new { @class = "form-control", placeholder = "Nombre completo tal como aparece en la tarjeta" })
+                        <div class="form-text">Tu pedido será procesado al momento de la entrega.</div>
+                    </div>
+
+                    <div class="mb-0">
+                        @Html.LabelFor(m => m.Notas, new { @class = "form-label fw-semibold" })
+                        @Html.TextAreaFor(m => m.Notas, 2,
+                            new { @class = "form-control", placeholder = "Instrucciones especiales, alergias, personalizaciones..." })
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        @* ── Columna derecha: resumen ── *@
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 sticky-top" style="top: 16px;">
+                <div class="card-header bg-white fw-semibold">
+                    <i class="bi bi-receipt me-2 text-brand"></i>Resumen del pedido
+                </div>
+                <div class="card-body">
+                    @foreach (var item in Model.ItemsCarrito)
+                    {
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="d-flex align-items-center gap-2">
+                                @if (!string.IsNullOrEmpty(item.ImagenUrl))
+                                {
+                                    <img src="@item.ImagenUrl" alt="@item.Nombre"
+                                         class="rounded" style="width:40px;height:40px;object-fit:cover;" />
+                                }
+                                <div>
+                                    <div class="small fw-semibold">@item.Nombre</div>
+                                    <div class="text-muted" style="font-size:0.75rem;">x@item.Cantidad — ₡@item.PrecioEfectivo.ToString("N0")</div>
+                                </div>
+                            </div>
+                            <span class="small fw-semibold">₡@item.Subtotal.ToString("N0")</span>
+                        </div>
+                    }
+
+                    <hr />
+
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="text-muted">Subtotal</span>
+                        <span>₡@Model.Subtotal.ToString("N0")</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Envío</span>
+                        <span id="lblCostoEnvio">₡@Model.CostoEnvio.ToString("N0")</span>
+                    </div>
+                    <hr />
+                    <div class="d-flex justify-content-between mb-4">
+                        <span class="fw-bold fs-5">Total</span>
+                        <span class="fw-bold fs-5 text-brand" id="lblTotal">₡@Model.Total.ToString("N0")</span>
+                    </div>
+
+                    <input type="hidden" id="hfSubtotal" value="@Model.Subtotal.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)" />
+
+                    <button type="submit" class="btn btn-brand w-100">
+                        <i class="bi bi-check-circle me-2"></i>Confirmar pedido
+                    </button>
+                    <a href="@Url.Action("Carrito", "Pedido")" class="btn btn-outline-secondary w-100 mt-2">
+                        <i class="bi bi-arrow-left me-1"></i>Volver al carrito
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+}
+
+@section scripts {
+<style>
+    .cursor-pointer { cursor: pointer; }
+    .border-brand { border-color: #e91e8c !important; border-width: 2px !important; }
+    .zona-card:hover, .pago-card:hover { border-color: #e91e8c; }
+</style>
+<script>
+    (function () {
+        var subtotal = parseFloat(document.getElementById('hfSubtotal').value) || 0;
+
+        function formatColones(num) {
+            return '₡' + Math.round(num).toLocaleString('es-CR');
+        }
+
+        function actualizarTotal() {
+            var radio = document.querySelector('.zona-radio:checked');
+            if (!radio) return;
+            var costo = parseFloat(radio.closest('label').dataset.costo) || 0;
+            document.getElementById('lblCostoEnvio').textContent = formatColones(costo);
+            document.getElementById('lblTotal').textContent = formatColones(subtotal + costo);
+        }
+
+        document.querySelectorAll('.zona-radio').forEach(function (r) {
+            r.addEventListener('change', function () {
+                document.querySelectorAll('.zona-card').forEach(function (c) {
+                    c.classList.remove('border-brand');
+                });
+                this.closest('label').classList.add('border-brand');
+                actualizarTotal();
+            });
+        });
+
+        document.querySelectorAll('.pago-radio').forEach(function (r) {
+            r.addEventListener('change', function () {
+                document.querySelectorAll('.pago-card').forEach(function (c) {
+                    c.classList.remove('border-brand');
+                });
+                this.closest('label').classList.add('border-brand');
+
+                var esSinpe = this.value === 'SINPE';
+                document.getElementById('panelSinpe').style.display = esSinpe ? '' : 'none';
+                document.getElementById('panelTarjeta').style.display = esSinpe ? 'none' : '';
+            });
+        });
+
+        actualizarTotal();
+    })();
+</script>
+}

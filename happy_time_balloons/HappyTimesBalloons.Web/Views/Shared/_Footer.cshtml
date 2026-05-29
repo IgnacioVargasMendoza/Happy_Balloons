@@ -1,0 +1,29 @@
+<footer class="bg-white border-top mt-5 py-4">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-4 mb-3 mb-md-0">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-balloon-heart-fill fs-4" style="color:#e91e8c;"></i>
+                    <div class="lh-sm">
+                        <div class="fw-bold">Happy Times Balloons</div>
+                        <div class="text-muted" style="font-size:0.75rem;">Decoraciones y globos personalizados</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3 mb-md-0 text-md-center">
+                <ul class="list-inline mb-0 small">
+                    <li class="list-inline-item">
+                        @Html.ActionLink("Catálogo", "Index", "Home", null, new { @class = "text-muted text-decoration-none" })
+                    </li>
+                    <li class="list-inline-item">·</li>
+                    <li class="list-inline-item">
+                        @Html.ActionLink("Mi cuenta", "Login", "Cuenta", null, new { @class = "text-muted text-decoration-none" })
+                    </li>
+                </ul>
+            </div>
+            <div class="col-md-4 text-md-end text-muted small">
+                &copy; @DateTime.Now.Year — Happy Times Balloons
+            </div>
+        </div>
+    </div>
+</footer>

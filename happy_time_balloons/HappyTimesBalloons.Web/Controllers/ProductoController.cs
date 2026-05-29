@@ -1,0 +1,246 @@
+using HappyTimesBalloons.Abstraccion.DTOs;
+using HappyTimesBalloons.Abstraccion.Enums;
+using HappyTimesBalloons.Abstraccion.Interfaces.Servicios;
+using HappyTimesBalloons.Web.Models.ViewModels;
+using System;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Web;
+using System.Web.Mvc;
+
+namespace HappyTimesBalloons.Web.Controllers
+{
+    [Authorize(Roles = "Administrador,Operador")]
+    public class ProductoController : Controller
+    {
+        private static readonly string[] _extensionesPermitidas =
+            { ".jpg", ".jpeg", ".png", ".webp" };
+        private const int _maxTamanoBytes = 5 * 1024 * 1024;
+
+        private readonly IProductoServicio _productoServicio;
+        private readonly ICategoriaServicio _categoriaServicio;
+        private readonly IAuditoriaServicio _auditoriaServicio;
+
+        public ProductoController(
+            IProductoServicio productoServicio,
+            ICategoriaServicio categoriaServicio,
+            IAuditoriaServicio auditoriaServicio)
+        {
+            _productoServicio = productoServicio;
+            _categoriaServicio = categoriaServicio;
+            _auditoriaServicio = auditoriaServicio;
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> Index(string busqueda, int? categoriaId)
+        {
+            var productos = await _productoServicio.ObtenerTodosAsync(busqueda, categoriaId);
+            var categorias = (await _categoriaServicio.ObtenerTodasAsync())
+                .Where(c => c.EsActiva).OrderBy(c => c.Nombre).ToList();
+
+            var vm = new ProductoIndexViewModel
+            {
+                Busqueda = busqueda,
+                CategoriaId = categoriaId,
+                Categorias = new SelectList(categorias, "Id", "Nombre", categoriaId),
+                Productos = productos.Select(p => new ProductoViewModel
+                {
+                    Id = p.Id,
+                    Nombre = p.Nombre,
+                    Descripcion = p.Descripcion,
+                    Precio = p.Precio,
+                    PrecioDescuento = p.PrecioDescuento,
+                    Stock = p.Stock,
+                    CategoriaId = p.CategoriaId,
+                    CategoriaNombre = p.CategoriaNombre,
+                    EsActivo = p.EsActivo,
+                    FechaCreacion = p.FechaCreacion,
+                    Imagenes = p.Imagenes.Select(i => new ImagenProductoViewModel
+                    {
+                        Id = i.Id,
+                        RutaImagen = i.RutaImagen,
+                        EsPrincipal = i.EsPrincipal,
+                        Orden = i.Orden
+                    }).ToList()
+                }).ToList()
+            };
+
+            return View(vm);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> Crear()
+        {
+            return View(await ConstruirFormViewModel());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Crear(ProductoFormViewModel model, HttpPostedFileBase[] imagenes)
+        {
+            if (!ModelState.IsValid)
+                return View(await ConstruirFormViewModel(model));
+
+            var dto = new ProductoDTO
+            {
+                Nombre = model.Nombre,
+                Descripcion = model.Descripcion,
+                Precio = model.Precio,
+                PrecioDescuento = model.PrecioDescuento,
+                Stock = model.Stock,
+                CategoriaId = model.CategoriaId
+            };
+
+            var resultado = await _productoServicio.CrearAsync(dto);
+            if (!resultado.Exito)
+            {
+                TempData["Error"] = resultado.Mensaje;
+                return View(await ConstruirFormViewModel(model));
+            }
+
+            await ProcesarImagenes(dto.Id, imagenes);
+            await _auditoriaServicio.RegistrarAsync(
+                User.Identity.Name, User.Identity.Name,
+                TipoOperacion.Crear, "Productos",
+                registroId: dto.Id, detalle: model.Nombre, ip: Request.UserHostAddress);
+            TempData["Exito"] = resultado.Mensaje;
+
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Editar(ProductoFormViewModel model, HttpPostedFileBase[] imagenes)
+        {
+            if (!ModelState.IsValid)
+            {
+                TempData["Error"] = "Por favor corrige los errores del formulario.";
+                return RedirectToAction("Index");
+            }
+
+            var resultado = await _productoServicio.ActualizarAsync(new ProductoDTO
+            {
+                Id = model.Id,
+                Nombre = model.Nombre,
+                Descripcion = model.Descripcion,
+                Precio = model.Precio,
+                PrecioDescuento = model.PrecioDescuento,
+                Stock = model.Stock,
+                CategoriaId = model.CategoriaId
+            });
+
+            if (!resultado.Exito)
+            {
+                TempData["Error"] = resultado.Mensaje;
+                return RedirectToAction("Index");
+            }
+
+            await ProcesarImagenes(model.Id, imagenes);
+            await _auditoriaServicio.RegistrarAsync(
+                User.Identity.Name, User.Identity.Name,
+                TipoOperacion.Actualizar, "Productos",
+                registroId: model.Id, detalle: model.Nombre, ip: Request.UserHostAddress);
+            TempData["Exito"] = resultado.Mensaje;
+
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> ToggleEstado(int id)
+        {
+            var resultado = await _productoServicio.ToggleEstadoAsync(id);
+
+            if (resultado.Exito)
+            {
+                await _auditoriaServicio.RegistrarAsync(
+                    User.Identity.Name, User.Identity.Name,
+                    TipoOperacion.Actualizar, "Productos",
+                    registroId: id, detalle: "ToggleEstado", ip: Request.UserHostAddress);
+                TempData["Exito"] = resultado.Mensaje;
+            }
+            else
+            {
+                TempData["Error"] = resultado.Mensaje;
+            }
+
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> EliminarImagen(int imagenId, int productoId)
+        {
+            var imagen = await _productoServicio.ObtenerImagenPorIdAsync(imagenId);
+            if (imagen != null)
+            {
+                string rutaFisica = Server.MapPath(imagen.RutaImagen);
+                if (System.IO.File.Exists(rutaFisica))
+                    System.IO.File.Delete(rutaFisica);
+            }
+
+            await _productoServicio.EliminarImagenAsync(imagenId);
+            await _auditoriaServicio.RegistrarAsync(
+                User.Identity.Name, User.Identity.Name,
+                TipoOperacion.Eliminar, "ImagenesProducto",
+                registroId: imagenId, ip: Request.UserHostAddress);
+
+            TempData["Exito"] = "Imagen eliminada.";
+
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> EstablecerPrincipal(int imagenId, int productoId)
+        {
+            await _productoServicio.EstablecerImagenPrincipalAsync(imagenId, productoId);
+            TempData["Exito"] = "Imagen principal actualizada.";
+
+            return RedirectToAction("Index");
+        }
+
+        private async Task<ProductoFormViewModel> ConstruirFormViewModel(
+            ProductoFormViewModel modelo = null)
+        {
+            var categorias = (await _categoriaServicio.ObtenerTodasAsync())
+                .Where(c => c.EsActiva).OrderBy(c => c.Nombre).ToList();
+
+            if (modelo == null)
+                modelo = new ProductoFormViewModel();
+
+            modelo.Categorias = new SelectList(categorias, "Id", "Nombre", modelo.CategoriaId);
+            return modelo;
+        }
+
+        private async Task ProcesarImagenes(int productoId, HttpPostedFileBase[] archivos)
+        {
+            if (archivos == null) return;
+
+            string carpeta = Server.MapPath("~/Content/Uploads/Productos/");
+            if (!Directory.Exists(carpeta))
+                Directory.CreateDirectory(carpeta);
+
+            foreach (var archivo in archivos)
+            {
+                if (archivo == null || archivo.ContentLength == 0) continue;
+
+                string ext = Path.GetExtension(archivo.FileName)?.ToLower();
+                if (!_extensionesPermitidas.Contains(ext)) continue;
+                if (archivo.ContentLength > _maxTamanoBytes) continue;
+
+                string nombreArchivo = $"p{productoId}_{Guid.NewGuid():N}{ext}";
+                string rutaFisica = Path.Combine(carpeta, nombreArchivo);
+                archivo.SaveAs(rutaFisica);
+
+                await _productoServicio.AgregarImagenAsync(new ImagenProductoDTO
+                {
+                    ProductoId = productoId,
+                    RutaImagen = $"/Content/Uploads/Productos/{nombreArchivo}",
+                    EsPrincipal = false
+                });
+            }
+        }
+    }
+}

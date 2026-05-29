@@ -1,0 +1,148 @@
+@model HappyTimesBalloons.Web.Models.ViewModels.AdminPromocionesViewModel
+@{
+    ViewBag.Title = "Gestión de Promociones";
+}
+
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h4 class="fw-bold mb-0">Promociones</h4>
+        <small class="text-muted">Descuentos por porcentaje aplicados a productos</small>
+    </div>
+    @Html.ActionLink("← Dashboard", "Index", "Admin", null,
+        new { @class = "btn btn-outline-secondary btn-sm" })
+</div>
+
+@Html.Partial("_Mensajes")
+
+<div class="row g-4">
+
+    @* Formulario de nueva promoción *@
+    <div class="col-lg-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white fw-semibold border-bottom">
+                <i class="bi bi-tag me-2 text-brand"></i>Nueva promoción
+            </div>
+            <div class="card-body">
+                @using (Html.BeginForm("Crear", "Promocion", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+
+                    <div class="mb-3">
+                        @Html.LabelFor(m => m.Formulario.ProductoId, "Producto", new { @class = "form-label fw-semibold" })
+                        @Html.DropDownListFor(m => m.Formulario.ProductoId,
+                            Model.Formulario.Productos,
+                            "-- Seleccione un producto --",
+                            new { @class = "form-select" })
+                        @Html.ValidationMessageFor(m => m.Formulario.ProductoId, "", new { @class = "text-danger small" })
+                    </div>
+
+                    <div class="mb-3">
+                        @Html.LabelFor(m => m.Formulario.DescuentoPorcentaje, new { @class = "form-label fw-semibold" })
+                        <div class="input-group">
+                            @Html.TextBoxFor(m => m.Formulario.DescuentoPorcentaje,
+                                new { @class = "form-control", type = "number", min = "1", max = "100", step = "1", placeholder = "Ej: 15" })
+                            <span class="input-group-text">%</span>
+                        </div>
+                        @Html.ValidationMessageFor(m => m.Formulario.DescuentoPorcentaje, "", new { @class = "text-danger small" })
+                    </div>
+
+                    <div class="mb-3">
+                        @Html.LabelFor(m => m.Formulario.FechaInicio, new { @class = "form-label fw-semibold" })
+                        @Html.TextBoxFor(m => m.Formulario.FechaInicio,
+                            "{0:yyyy-MM-dd}",
+                            new { @class = "form-control", type = "date" })
+                        @Html.ValidationMessageFor(m => m.Formulario.FechaInicio, "", new { @class = "text-danger small" })
+                    </div>
+
+                    <div class="mb-3">
+                        @Html.LabelFor(m => m.Formulario.FechaFin, new { @class = "form-label fw-semibold" })
+                        @Html.TextBoxFor(m => m.Formulario.FechaFin,
+                            "{0:yyyy-MM-dd}",
+                            new { @class = "form-control", type = "date" })
+                        @Html.ValidationMessageFor(m => m.Formulario.FechaFin, "", new { @class = "text-danger small" })
+                    </div>
+
+                    <button type="submit" class="btn btn-brand w-100">
+                        <i class="bi bi-plus-circle me-2"></i>Crear promoción
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+
+    @* Lista de promociones *@
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white fw-semibold border-bottom d-flex align-items-center justify-content-between">
+                <span><i class="bi bi-list-ul me-2 text-brand"></i>Promociones registradas</span>
+                <span class="badge bg-secondary">@Model.Promociones.Count</span>
+            </div>
+            <div class="card-body p-0">
+                @if (!Model.Promociones.Any())
+                {
+                    <div class="text-center text-muted py-5">
+                        <i class="bi bi-tag fs-1 d-block mb-2 opacity-25"></i>
+                        No hay promociones registradas.
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Producto</th>
+                                    <th class="text-center">Descuento</th>
+                                    <th>Vigencia</th>
+                                    <th class="text-center">Estado</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var p in Model.Promociones)
+                                {
+                                    <tr>
+                                        <td class="fw-semibold">@p.ProductoNombre</td>
+                                        <td class="text-center">
+                                            <span class="badge bg-danger fs-6">@p.DescuentoPorcentaje.ToString("0")% OFF</span>
+                                        </td>
+                                        <td class="small text-muted">
+                                            @p.FechaInicio.ToString("dd/MM/yyyy") —
+                                            @p.FechaFin.ToString("dd/MM/yyyy")
+                                        </td>
+                                        <td class="text-center">
+                                            @if (p.EstaVencida)
+                                            {
+                                                <span class="badge bg-secondary">Vencida</span>
+                                            }
+                                            else if (p.EstaVigente)
+                                            {
+                                                <span class="badge bg-success">Vigente</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-warning text-dark">Próxima</span>
+                                            }
+                                        </td>
+                                        <td class="text-end">
+                                            @using (Html.BeginForm("Eliminar", "Promocion", new { id = p.Id }, FormMethod.Post))
+                                            {
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit"
+                                                        class="btn btn-outline-danger btn-sm"
+                                                        onclick="return confirm('¿Eliminar la promoción de @p.ProductoNombre?')">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+</div>
