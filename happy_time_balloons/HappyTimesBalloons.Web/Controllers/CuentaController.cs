@@ -4,6 +4,7 @@ using HappyTimesBalloons.AccesoADatos.Contexto;
 using HappyTimesBalloons.Web.Models.ViewModels;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Security;
+using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
@@ -17,6 +18,7 @@ namespace HappyTimesBalloons.Web.Controllers
     public class CuentaController : Controller
     {
         private readonly IAuthServicio _authServicio;
+        private readonly IRecuperacionPasswordServicio _recuperacionServicio;
 
         private IAuthenticationManager AuthManager
             => HttpContext.GetOwinContext().Authentication;
@@ -26,9 +28,12 @@ namespace HappyTimesBalloons.Web.Controllers
         private ApplicationUserManager GetUserManager()
             => ApplicationUserManager.Create(new ApplicationDbContext());
 
-        public CuentaController(IAuthServicio authServicio)
+        public CuentaController(
+            IAuthServicio authServicio,
+            IRecuperacionPasswordServicio recuperacionServicio)
         {
             _authServicio = authServicio;
+            _recuperacionServicio = recuperacionServicio;
         }
 
         [HttpGet]
@@ -143,6 +148,82 @@ namespace HappyTimesBalloons.Web.Controllers
             AuthManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
             Session.Abandon();
             return RedirectToAction("Index", "Home");
+        }
+
+        [HttpGet]
+        public ActionResult OlvideContrasena()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> OlvideContrasena(OlvideContrasenaViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var urlBase = Request.Url.GetLeftPart(UriPartial.Authority) +
+                          Request.ApplicationPath.TrimEnd('/');
+
+            var resultado = await _recuperacionServicio.SolicitarRecuperacionAsync(
+                new RecuperacionPasswordDTO
+                {
+                    Email = model.Email,
+                    UrlBase = urlBase
+                });
+
+            TempData["Email"] = model.Email;
+            TempData["UrlReset"] = !string.IsNullOrEmpty(resultado.Mensaje) ? resultado.Mensaje : null;
+
+            return RedirectToAction("ConfirmacionEnvio");
+        }
+
+        [HttpGet]
+        public ActionResult ConfirmacionEnvio()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> RestablecerContrasena(string t)
+        {
+            if (string.IsNullOrWhiteSpace(t) || !await _recuperacionServicio.ValidarTokenAsync(t))
+            {
+                TempData["Error"] = "El enlace de recuperación es inválido o ha expirado.";
+                return RedirectToAction("OlvideContrasena");
+            }
+
+            return View(new RestablecerContrasenaViewModel { Token = t });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> RestablecerContrasena(RestablecerContrasenaViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var resultado = await _recuperacionServicio.RestablecerContrasenaAsync(
+                new RestablecerPasswordDTO
+                {
+                    Token = model.Token,
+                    NuevaContrasena = model.NuevaContrasena
+                });
+
+            if (!resultado.Exito)
+            {
+                ModelState.AddModelError("", resultado.Mensaje);
+                return View(model);
+            }
+
+            return RedirectToAction("ConfirmacionReset");
+        }
+
+        [HttpGet]
+        public ActionResult ConfirmacionReset()
+        {
+            return View();
         }
 
         private ActionResult RedirectToLocal(string returnUrl)
