@@ -83,6 +83,10 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
             if (!addResult.Succeeded)
                 return ResultadoOperacionDTO.Fallo(string.Join(" ", addResult.Errors));
 
+            // Limpiar bloqueo para que el usuario pueda iniciar sesión inmediatamente
+            await _userManager.ResetAccessFailedCountAsync(usuarioId);
+            await _userManager.SetLockoutEndDateAsync(usuarioId, DateTimeOffset.UtcNow.AddMinutes(-1));
+
             return ResultadoOperacionDTO.Ok("Contraseña actualizada exitosamente.");
         }
 
