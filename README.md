@@ -34,14 +34,23 @@ HappyTimesBalloons.sln
 - SQL Server Express con instancia `Nacho\SQLEXPRESS`
 - .NET Framework 4.8 SDK
 
-### Cadena de conexión (`Web.config`)
+### Cadena de conexión
+
+La cadena de conexión vive en un archivo separado que **no se sube al repo** porque contiene el nombre del servidor local de cada desarrollador.
+
+1. Copiar el template incluido en el repo:
+```
+HappyTimesBalloons.Web/connectionStrings.config.example  →  connectionStrings.config
+```
+2. Editar `connectionStrings.config` con tu instancia de SQL Server:
 ```xml
 <connectionStrings>
   <add name="HappyTimesBallooonsContext"
-       connectionString="Data Source=Nacho\SQLEXPRESS;Initial Catalog=HappyTimesBalloons;Integrated Security=True;MultipleActiveResultSets=True"
+       connectionString="Data Source=TU_SERVIDOR\SQLEXPRESS;Initial Catalog=HappyTimesBalloons;Integrated Security=True;MultipleActiveResultSets=True"
        providerName="System.Data.SqlClient" />
 </connectionStrings>
 ```
+> `connectionStrings.config` está en `.gitignore`. Solo se commitea el `.example`.
 
 ### Ejecutar la aplicación
 1. Abrir `happy_time_balloons/HappyTimesBalloons.slnx` en Visual Studio 2022.

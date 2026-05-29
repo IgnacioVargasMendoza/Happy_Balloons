@@ -32,8 +32,8 @@ Web.Release.config
 # Credenciales SMTP y otros secretos de appSettings
 AppSettings.secret.config
 
-# Cadena de conexión local (si se usa configSource)
-connectionStrings.local.config
+# Cadena de conexión local (contiene nombre del servidor — cada dev tiene el suyo)
+connectionStrings.config
 
 # Variables de entorno locales
 .env
