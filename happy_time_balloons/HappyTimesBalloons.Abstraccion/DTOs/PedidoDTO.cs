@@ -1,6 +1,7 @@
 using HappyTimesBalloons.Abstraccion.Enums;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace HappyTimesBalloons.Abstraccion.DTOs
 {
@@ -22,5 +23,6 @@ namespace HappyTimesBalloons.Abstraccion.DTOs
         public decimal CostoEnvio { get; set; }
         public string Notas { get; set; }
         public IList<DetallePedidoDTO> Detalles { get; set; } = new List<DetallePedidoDTO>();
+        public int CantidadItems => Detalles?.Sum(d => d.Cantidad) ?? 0;
     }
 }

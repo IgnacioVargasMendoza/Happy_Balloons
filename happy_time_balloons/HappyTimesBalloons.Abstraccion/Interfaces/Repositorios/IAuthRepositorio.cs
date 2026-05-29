@@ -15,5 +15,8 @@ namespace HappyTimesBalloons.Abstraccion.Interfaces.Repositorios
         Task<int> ObtenerIntentosRestantesAsync(string userId);
         Task ResetearIntentosAsync(string userId);
         Task<bool> EsEnRolAsync(string userId, string rol);
+        Task<UsuarioDTO> ObtenerPorIdAsync(string userId);
+        Task<ResultadoOperacionDTO> EditarPerfilAsync(EditarPerfilDTO dto);
+        Task<ResultadoOperacionDTO> CambiarContrasenaAsync(string userId, string contrasenaActual, string nuevaContrasena);
     }
 }

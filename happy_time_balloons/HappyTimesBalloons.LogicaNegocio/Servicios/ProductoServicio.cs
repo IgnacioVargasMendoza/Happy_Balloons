@@ -15,8 +15,8 @@ namespace HappyTimesBalloons.LogicaNegocio.Servicios
             _repo = repo;
         }
 
-        public Task<List<ProductoDTO>> ObtenerTodosAsync(string busqueda = null, int? categoriaId = null)
-            => _repo.ObtenerTodosAsync(busqueda, categoriaId);
+        public Task<List<ProductoDTO>> ObtenerTodosAsync(string busqueda = null, int? categoriaId = null, bool? soloActivos = null)
+            => _repo.ObtenerTodosAsync(busqueda, categoriaId, soloActivos);
 
         public Task<ProductoDTO> ObtenerPorIdAsync(int id)
             => _repo.ObtenerPorIdAsync(id);

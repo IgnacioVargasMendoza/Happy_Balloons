@@ -73,10 +73,9 @@ namespace HappyTimesBalloons.Web.Controllers
         private async Task<AdminPromocionesViewModel> ConstruirVmAsync()
         {
             var promociones = await _promoServicio.ObtenerTodasAsync();
-            var productos = await _productoServicio.ObtenerTodosAsync();
+            var productos = await _productoServicio.ObtenerTodosAsync(soloActivos: true);
 
             var productosItems = productos
-                .Where(p => p.EsActivo)
                 .OrderBy(p => p.Nombre)
                 .Select(p => new SelectListItem
                 {

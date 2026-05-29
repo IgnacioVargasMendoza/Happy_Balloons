@@ -1,0 +1,131 @@
+@{
+    ViewBag.Title = "Configuración de cuenta";
+}
+
+<div class="mb-4">
+    <h2 class="mb-0"><i class="bi bi-gear me-2 text-brand"></i>Configuración de cuenta</h2>
+    <p class="text-muted small mb-0">Administra tu perfil y preferencias de seguridad</p>
+</div>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle me-2"></i>@TempData["Mensaje"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="row g-3">
+
+    @* ── Perfil y seguridad — todos los roles ── *@
+    <div class="col-md-6 col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body d-flex flex-column">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="rounded-3 p-3 bg-brand-soft text-brand fs-4">
+                        <i class="bi bi-person-circle"></i>
+                    </div>
+                    <div>
+                        <div class="fw-semibold">Editar perfil</div>
+                        <div class="text-muted small">Nombre, dirección y teléfono</div>
+                    </div>
+                </div>
+                <a href="@Url.Action("EditarPerfil", "Configuracion")"
+                   class="btn btn-outline-secondary btn-sm mt-auto">
+                    Ir a perfil
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body d-flex flex-column">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="rounded-3 p-3 bg-brand-soft text-brand fs-4">
+                        <i class="bi bi-key"></i>
+                    </div>
+                    <div>
+                        <div class="fw-semibold">Cambiar contraseña</div>
+                        <div class="text-muted small">Actualiza tu contraseña de acceso</div>
+                    </div>
+                </div>
+                <a href="@Url.Action("CambiarContrasena", "Configuracion")"
+                   class="btn btn-outline-secondary btn-sm mt-auto">
+                    Cambiar contraseña
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body d-flex flex-column">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="rounded-3 p-3 bg-brand-soft text-brand fs-4">
+                        <i class="bi bi-shield-lock"></i>
+                    </div>
+                    <div>
+                        <div class="fw-semibold">Verificación en dos pasos</div>
+                        <div class="text-muted small">Activa o desactiva el 2FA</div>
+                    </div>
+                </div>
+                <a href="@Url.Action("ConfigurarDobleFactor", "Cuenta")"
+                   class="btn btn-outline-secondary btn-sm mt-auto">
+                    Configurar 2FA
+                </a>
+            </div>
+        </div>
+    </div>
+
+    @* ── Administración — solo Administrador ── *@
+    @if (User.IsInRole("Administrador"))
+    {
+        <div class="col-12 mt-2">
+            <h5 class="fw-semibold text-muted">
+                <i class="bi bi-shield-fill-check me-2"></i>Administración del sistema
+            </h5>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body d-flex flex-column">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="rounded-3 p-3 bg-brand-soft text-brand fs-4">
+                            <i class="bi bi-shield"></i>
+                        </div>
+                        <div>
+                            <div class="fw-semibold">Gestión de roles</div>
+                            <div class="text-muted small">Crear, editar y eliminar roles</div>
+                        </div>
+                    </div>
+                    <a href="@Url.Action("Index", "Rol")"
+                       class="btn btn-outline-secondary btn-sm mt-auto">
+                        Administrar roles
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body d-flex flex-column">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="rounded-3 p-3 bg-brand-soft text-brand fs-4">
+                            <i class="bi bi-people"></i>
+                        </div>
+                        <div>
+                            <div class="fw-semibold">Gestión de usuarios</div>
+                            <div class="text-muted small">Asignar y revocar roles a usuarios</div>
+                        </div>
+                    </div>
+                    <a href="@Url.Action("Usuarios", "Rol")"
+                       class="btn btn-outline-secondary btn-sm mt-auto">
+                        Administrar usuarios
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+
+</div>

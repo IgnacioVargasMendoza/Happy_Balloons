@@ -63,7 +63,7 @@
 
                     <div class="mb-0">
                         @Html.LabelFor(m => m.DireccionEntrega, new { @class = "form-label fw-semibold" })
-                        @Html.TextAreaFor(m => m.DireccionEntrega, 2,
+                        @Html.TextAreaFor(m => m.DireccionEntrega, 2, 0,
                             new { @class = "form-control", placeholder = "Ej: 100 m sur del parque central, casa blanca..." })
                         @Html.ValidationMessageFor(m => m.DireccionEntrega, "", new { @class = "text-danger small" })
                     </div>
@@ -122,7 +122,7 @@
 
                     <div class="mb-0">
                         @Html.LabelFor(m => m.Notas, new { @class = "form-label fw-semibold" })
-                        @Html.TextAreaFor(m => m.Notas, 2,
+                        @Html.TextAreaFor(m => m.Notas, 2, 0,
                             new { @class = "form-control", placeholder = "Instrucciones especiales, alergias, personalizaciones..." })
                     </div>
                 </div>

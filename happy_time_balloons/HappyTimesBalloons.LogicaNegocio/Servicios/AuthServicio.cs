@@ -1,4 +1,5 @@
 using HappyTimesBalloons.Abstraccion.DTOs;
+using HappyTimesBalloons.Abstraccion.Enums;
 using HappyTimesBalloons.Abstraccion.Interfaces.Repositorios;
 using HappyTimesBalloons.Abstraccion.Interfaces.Servicios;
 using System.Threading.Tasks;
@@ -8,10 +9,12 @@ namespace HappyTimesBalloons.LogicaNegocio.Servicios
     public class AuthServicio : IAuthServicio
     {
         private readonly IAuthRepositorio _authRepo;
+        private readonly IAuditoriaServicio _auditoria;
 
-        public AuthServicio(IAuthRepositorio authRepo)
+        public AuthServicio(IAuthRepositorio authRepo, IAuditoriaServicio auditoria)
         {
             _authRepo = authRepo;
+            _auditoria = auditoria;
         }
 
         public async Task<ResultadoOperacionDTO> RegistrarAsync(RegistroDTO registro)
@@ -108,6 +111,43 @@ namespace HappyTimesBalloons.LogicaNegocio.Servicios
                 EsAdmin = esAdmin,
                 TieneDobleFactor = usuario.TieneDobleFactor
             };
+        }
+
+        public Task<UsuarioDTO> ObtenerPorIdAsync(string userId)
+            => _authRepo.ObtenerPorIdAsync(userId);
+
+        public async Task<ResultadoOperacionDTO> EditarPerfilAsync(
+            EditarPerfilDTO dto, string adminId, string adminNombre, string ip)
+        {
+            dto.Nombre = dto.Nombre?.Trim();
+            dto.Direccion = dto.Direccion?.Trim();
+            dto.Telefono = dto.Telefono?.Trim();
+
+            if (string.IsNullOrEmpty(dto.Nombre))
+                return ResultadoOperacionDTO.Fallo("El nombre es requerido.", CodigoResultado.DatosInvalidos);
+
+            var resultado = await _authRepo.EditarPerfilAsync(dto);
+            if (!resultado.Exito) return resultado;
+
+            await _auditoria.RegistrarAsync(adminId, adminNombre, TipoOperacion.EditarPerfil,
+                "AspNetUsers", detalle: "Perfil actualizado", ip: ip);
+
+            return resultado;
+        }
+
+        public async Task<ResultadoOperacionDTO> CambiarContrasenaAsync(
+            string userId, string contrasenaActual, string nuevaContrasena, string ip)
+        {
+            var resultado = await _authRepo.CambiarContrasenaAsync(userId, contrasenaActual, nuevaContrasena);
+            if (!resultado.Exito) return resultado;
+
+            var usuario = await _authRepo.ObtenerPorIdAsync(userId);
+            var nombre = usuario?.Nombre ?? userId;
+
+            await _auditoria.RegistrarAsync(userId, nombre, TipoOperacion.CambiarContrasena,
+                "AspNetUsers", detalle: "Contraseña cambiada", ip: ip);
+
+            return resultado;
         }
     }
 }

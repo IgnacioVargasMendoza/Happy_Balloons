@@ -8,6 +8,13 @@ namespace HappyTimesBalloons.Abstraccion.Enums
         Eliminar,
         IniciarSesion,
         CerrarSesion,
-        AccesoFallido
+        AccesoFallido,
+        CrearRol,
+        EditarRol,
+        EliminarRol,
+        AsignarRol,
+        RevocarRol,
+        EditarPerfil,
+        CambiarContrasena
     }
 }

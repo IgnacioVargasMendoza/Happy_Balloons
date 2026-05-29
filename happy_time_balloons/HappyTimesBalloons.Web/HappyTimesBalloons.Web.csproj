@@ -11,7 +11,7 @@
     <RootNamespace>HappyTimesBalloons.Web</RootNamespace>
     <AssemblyName>HappyTimesBalloons.Web</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <MvcBuildViews>false</MvcBuildViews>
+    <MvcBuildViews>true</MvcBuildViews>
     <UseGlobalApplicationHostFile />
     <NuGetPackageImportStamp />
     <UseIISExpress>true</UseIISExpress>
@@ -86,6 +86,10 @@
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="App_Start\ApplicationUserManager.cs" />
     <Compile Include="Controllers\AdminController.cs" />
+    <Compile Include="Controllers\ConfiguracionController.cs" />
+    <Compile Include="Controllers\ErrorController.cs" />
+    <Compile Include="Controllers\RolController.cs" />
+    <Compile Include="Infrastructure\AutorizarRolAttribute.cs" />
     <Compile Include="Controllers\Autenticacion2FAController.cs" />
     <Compile Include="Controllers\CategoriaController.cs" />
     <Compile Include="Controllers\CuentaController.cs" />
@@ -120,6 +124,8 @@
     <Compile Include="Models\ViewModels\AdminDashboardViewModel.cs" />
     <Compile Include="Models\ViewModels\AdminPromocionesViewModel.cs" />
     <Compile Include="Models\ViewModels\Verificar2FAViewModel.cs" />
+    <Compile Include="Models\ViewModels\ConfiguracionViewModel.cs" />
+    <Compile Include="Models\ViewModels\RolViewModel.cs" />
     <Compile Include="Models\ViewModels\PromocionFormViewModel.cs" />
     <Compile Include="Models\ViewModels\PromocionViewModel.cs" />
     <Compile Include="Models\ViewModels\ZonaEntregaViewModel.cs" />
@@ -163,6 +169,15 @@
     <Content Include="Views\Producto\Index.cshtml" />
     <Content Include="Views\Promocion\Index.cshtml" />
     <Content Include="Views\Autenticacion2FA\Verificar.cshtml" />
+    <Content Include="Views\Configuracion\Index.cshtml" />
+    <Content Include="Views\Configuracion\EditarPerfil.cshtml" />
+    <Content Include="Views\Configuracion\CambiarContrasena.cshtml" />
+    <Content Include="Views\Error\Prohibido.cshtml" />
+    <Content Include="Views\Rol\Index.cshtml" />
+    <Content Include="Views\Rol\Crear.cshtml" />
+    <Content Include="Views\Rol\Editar.cshtml" />
+    <Content Include="Views\Rol\Usuarios.cshtml" />
+    <Content Include="Scripts\Rol\rol-index.js" />
     <Content Include="Views\Shared\_NavBar.cshtml" />
     <Content Include="Views\Shared\_TarjetaProducto.cshtml" />
     <Content Include="Views\Web.config" />

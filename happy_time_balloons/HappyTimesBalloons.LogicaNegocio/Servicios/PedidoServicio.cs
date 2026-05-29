@@ -2,6 +2,7 @@ using HappyTimesBalloons.Abstraccion.DTOs;
 using HappyTimesBalloons.Abstraccion.Enums;
 using HappyTimesBalloons.Abstraccion.Interfaces.Repositorios;
 using HappyTimesBalloons.Abstraccion.Interfaces.Servicios;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -104,5 +105,8 @@ namespace HappyTimesBalloons.LogicaNegocio.Servicios
 
         public Task<PedidoEstadisticasDTO> ObtenerEstadisticasAsync()
             => _pedidoRepo.ObtenerEstadisticasAsync();
+
+        public int AjustarCantidad(int cantidadSolicitada, int stockDisponible)
+            => Math.Min(cantidadSolicitada > 0 ? cantidadSolicitada : 1, stockDisponible);
     }
 }

@@ -32,16 +32,19 @@ namespace HappyTimesBalloons.Web.App_Start
             builder.RegisterType<RecuperacionPasswordRepositorio>().As<IRecuperacionPasswordRepositorio>().InstancePerRequest();
             builder.RegisterType<AuthRepositorio>().As<IAuthRepositorio>().InstancePerRequest();
             builder.RegisterType<CodigoVerificacion2FARepositorio>().As<ICodigoVerificacion2FARepositorio>().InstancePerRequest();
+            builder.RegisterType<RolRepositorio>().As<IRolRepositorio>().InstancePerRequest();
 
             // Servicios
             builder.RegisterType<CategoriaServicio>().As<ICategoriaServicio>().InstancePerRequest();
             builder.RegisterType<ProductoServicio>().As<IProductoServicio>().InstancePerRequest();
             builder.RegisterType<PedidoServicio>().As<IPedidoServicio>().InstancePerRequest();
+            builder.RegisterType<ZonaEntregaServicio>().As<IZonaEntregaServicio>().InstancePerRequest();
             builder.RegisterType<AuditoriaServicio>().As<IAuditoriaServicio>().InstancePerRequest();
             builder.RegisterType<AuthServicio>().As<IAuthServicio>().InstancePerRequest();
             builder.RegisterType<PromocionServicio>().As<IPromocionServicio>().InstancePerRequest();
             builder.RegisterType<RecuperacionPasswordServicio>().As<IRecuperacionPasswordServicio>().InstancePerRequest();
             builder.RegisterType<Autenticacion2FAServicio>().As<IAutenticacion2FAServicio>().InstancePerRequest();
+            builder.RegisterType<RolServicio>().As<IRolServicio>().InstancePerRequest();
 
             var container = builder.Build();
             DependencyResolver.SetResolver(new AutofacDependencyResolver(container));

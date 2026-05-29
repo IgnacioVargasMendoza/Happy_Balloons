@@ -6,7 +6,7 @@ namespace HappyTimesBalloons.Abstraccion.Interfaces.Servicios
 {
     public interface ICategoriaServicio
     {
-        Task<List<CategoriaDTO>> ObtenerTodasAsync(string busqueda = null);
+        Task<List<CategoriaDTO>> ObtenerTodasAsync(string busqueda = null, bool? soloActivas = null);
 
         Task<CategoriaDTO> ObtenerPorIdAsync(int id);
 

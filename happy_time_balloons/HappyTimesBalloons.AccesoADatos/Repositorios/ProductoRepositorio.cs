@@ -19,7 +19,7 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
             _ctx = ctx;
         }
 
-        public async Task<List<ProductoDTO>> ObtenerTodosAsync(string busqueda = null, int? categoriaId = null)
+        public async Task<List<ProductoDTO>> ObtenerTodosAsync(string busqueda = null, int? categoriaId = null, bool? soloActivos = null)
         {
             var query = _ctx.Productos
                 .Include(p => p.Categoria)
@@ -32,6 +32,9 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
 
             if (categoriaId.HasValue)
                 query = query.Where(p => p.CategoriaId == categoriaId.Value);
+
+            if (soloActivos.HasValue)
+                query = query.Where(p => p.EsActivo == soloActivos.Value);
 
             var productos = await query.OrderBy(p => p.Nombre).ToListAsync();
             var promoDict = await ObtenerPromosActivasAsync();
