@@ -1,0 +1,182 @@
+@model HappyTimesBalloons.Web.Models.ViewModels.Verificar2FAViewModel
+@{
+    ViewBag.Title = "Verificación en dos pasos";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Verificación en dos pasos — Happy Times Balloons</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <style>
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #fce4ec, #f3e5f5, #e3f2fd);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .btn-brand { background-color: #e91e8c; color: #fff; border-color: #e91e8c; }
+        .btn-brand:hover { background-color: #c2177b; color: #fff; }
+        .link-brand { color: #e91e8c; }
+        .link-brand:hover { color: #c2177b; }
+        .codigo-input {
+            font-size: 2rem;
+            letter-spacing: 0.75rem;
+            text-align: center;
+            font-weight: 700;
+        }
+        .countdown-badge {
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="w-100" style="max-width:440px; padding:1rem;">
+
+        <div class="text-center mb-4">
+            <i class="bi bi-shield-lock-fill" style="font-size:3rem; color:#e91e8c;"></i>
+            <div>
+                <span class="fw-bold fs-4 lh-1">Happy Times</span><br />
+                <small class="text-muted">Balloons</small>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+                <h5 class="card-title fw-bold mb-1">Verificación en dos pasos</h5>
+
+                @if (!string.IsNullOrEmpty(Model.EmailParcial))
+                {
+                    <p class="text-muted small mb-3">
+                        Ingresa el código de 6 dígitos que enviamos a
+                        <strong>@Model.EmailParcial</strong>.
+                        Expira en <span id="countdown" class="badge bg-warning text-dark countdown-badge">5:00</span>.
+                    </p>
+                }
+                else
+                {
+                    <p class="text-muted small mb-3">
+                        Ingresa el código de 6 dígitos enviado a tu correo.
+                        Expira en <span id="countdown" class="badge bg-warning text-dark countdown-badge">5:00</span>.
+                    </p>
+                }
+
+                @* Mensaje de reenvío exitoso *@
+                @if (TempData["MensajeReenvio"] != null)
+                {
+                    <div class="alert alert-success py-2 small">
+                        <i class="bi bi-check-circle me-1"></i>@TempData["MensajeReenvio"]
+                    </div>
+                }
+
+                @* Error de intentos máximos desde TempData *@
+                @if (TempData["Error2FA"] != null)
+                {
+                    <div class="alert alert-danger py-2 small">
+                        <i class="bi bi-exclamation-triangle me-1"></i>@TempData["Error2FA"]
+                    </div>
+                }
+
+                @* Error de código expirado desde el modelo *@
+                @if (!string.IsNullOrEmpty(Model.MensajeError))
+                {
+                    <div class="alert alert-warning py-2 small">
+                        <i class="bi bi-clock me-1"></i>@Model.MensajeError
+                    </div>
+                }
+
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    @Html.ValidationSummary(false, "", new { @class = "alert alert-danger py-2 small" })
+                }
+
+                @using (Html.BeginForm("Verificar", "Autenticacion2FA", FormMethod.Post,
+                    new { @class = "needs-validation", novalidate = "novalidate" }))
+                {
+                    @Html.AntiForgeryToken()
+
+                    <div class="mb-4">
+                        @Html.LabelFor(m => m.Codigo, new { @class = "form-label fw-semibold" })
+                        @Html.TextBoxFor(m => m.Codigo, new
+                        {
+                            @class = "form-control codigo-input",
+                            type = "text",
+                            inputmode = "numeric",
+                            pattern = "[0-9]{6}",
+                            maxlength = "6",
+                            placeholder = "000000",
+                            autocomplete = "one-time-code"
+                        })
+                        @Html.ValidationMessageFor(m => m.Codigo, "", new { @class = "text-danger small" })
+                    </div>
+
+                    <button type="submit" class="btn btn-brand w-100 mb-3">
+                        <i class="bi bi-check2-circle me-1"></i>Verificar código
+                    </button>
+                }
+
+                <hr class="my-2" />
+
+                <p class="text-center small text-muted mb-2">¿No recibiste el código?</p>
+
+                @using (Html.BeginForm("ReenviarCodigo", "Autenticacion2FA", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-outline-secondary w-100 btn-sm">
+                        <i class="bi bi-arrow-repeat me-1"></i>Reenviar código
+                    </button>
+                }
+
+                <div class="text-center mt-3">
+                    <a href="@Url.Action("Login", "Cuenta")" class="link-brand small">
+                        <i class="bi bi-chevron-left me-1"></i>Volver al inicio de sesión
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <p class="text-center text-muted small mt-3">
+            <i class="bi bi-lock-fill me-1"></i>
+            El código se invalida tras 3 intentos fallidos.
+        </p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+            crossorigin="anonymous"></script>
+    <script>
+        var Verificar2FA = (function () {
+            function init(segundosTotales) {
+                var restantes = segundosTotales;
+                var el = document.getElementById('countdown');
+                if (!el) return;
+
+                function actualizar() {
+                    var min = Math.floor(restantes / 60);
+                    var seg = restantes % 60;
+                    el.textContent = min + ':' + (seg < 10 ? '0' : '') + seg;
+
+                    if (restantes <= 60) {
+                        el.className = 'badge bg-danger countdown-badge';
+                    }
+                    if (restantes <= 0) {
+                        el.textContent = 'Expirado';
+                        return;
+                    }
+                    restantes--;
+                    setTimeout(actualizar, 1000);
+                }
+
+                actualizar();
+            }
+
+            return { init: init };
+        }());
+
+        Verificar2FA.init(300);
+    </script>
+</body>
+</html>

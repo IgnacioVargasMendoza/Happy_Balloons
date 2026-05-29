@@ -44,7 +44,8 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
                 Nombre = usuario.Nombre,
                 Email = usuario.Email,
                 Telefono = usuario.PhoneNumber,
-                Direccion = usuario.Direccion
+                Direccion = usuario.Direccion,
+                TieneDobleFactor = usuario.TwoFactorEnabled
             };
         }
 

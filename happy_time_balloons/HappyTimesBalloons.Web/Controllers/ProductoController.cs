@@ -109,38 +109,15 @@ namespace HappyTimesBalloons.Web.Controllers
             return RedirectToAction("Index");
         }
 
-        [HttpGet]
-        public async Task<ActionResult> Editar(int id)
-        {
-            var producto = await _productoServicio.ObtenerPorIdAsync(id);
-            if (producto == null) return HttpNotFound();
-
-            var vm = await ConstruirFormViewModel();
-            vm.Id = producto.Id;
-            vm.Nombre = producto.Nombre;
-            vm.Descripcion = producto.Descripcion;
-            vm.Precio = producto.Precio;
-            vm.PrecioDescuento = producto.PrecioDescuento;
-            vm.Stock = producto.Stock;
-            vm.CategoriaId = producto.CategoriaId;
-            vm.EsActivo = producto.EsActivo;
-            vm.ImagenesExistentes = producto.Imagenes.Select(i => new ImagenProductoViewModel
-            {
-                Id = i.Id,
-                RutaImagen = i.RutaImagen,
-                EsPrincipal = i.EsPrincipal,
-                Orden = i.Orden
-            }).ToList();
-
-            return View(vm);
-        }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Editar(ProductoFormViewModel model, HttpPostedFileBase[] imagenes)
         {
             if (!ModelState.IsValid)
-                return View(await ConstruirFormViewModel(model));
+            {
+                TempData["Error"] = "Por favor corrige los errores del formulario.";
+                return RedirectToAction("Index");
+            }
 
             var resultado = await _productoServicio.ActualizarAsync(new ProductoDTO
             {
@@ -156,7 +133,7 @@ namespace HappyTimesBalloons.Web.Controllers
             if (!resultado.Exito)
             {
                 TempData["Error"] = resultado.Mensaje;
-                return View(await ConstruirFormViewModel(model));
+                return RedirectToAction("Index");
             }
 
             await ProcesarImagenes(model.Id, imagenes);
@@ -210,7 +187,8 @@ namespace HappyTimesBalloons.Web.Controllers
                 registroId: imagenId, ip: Request.UserHostAddress);
 
             TempData["Exito"] = "Imagen eliminada.";
-            return RedirectToAction("Editar", new { id = productoId });
+
+            return RedirectToAction("Index");
         }
 
         [HttpPost]
@@ -219,7 +197,8 @@ namespace HappyTimesBalloons.Web.Controllers
         {
             await _productoServicio.EstablecerImagenPrincipalAsync(imagenId, productoId);
             TempData["Exito"] = "Imagen principal actualizada.";
-            return RedirectToAction("Editar", new { id = productoId });
+
+            return RedirectToAction("Index");
         }
 
         private async Task<ProductoFormViewModel> ConstruirFormViewModel(

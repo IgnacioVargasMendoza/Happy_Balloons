@@ -140,11 +140,20 @@
                                 }
                             </td>
                             <td class="text-end pe-4">
-                                <a href="@Url.Action("Editar", "Producto", new { id = p.Id })"
-                                   class="btn btn-sm btn-outline-primary me-1"
-                                   title="Editar" data-bs-toggle="tooltip">
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-primary me-1 btn-editar"
+                                        data-id="@p.Id"
+                                        data-nombre="@Html.AttributeEncode(p.Nombre)"
+                                        data-descripcion="@Html.AttributeEncode(p.Descripcion)"
+                                        data-precio="@p.Precio.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                        data-precio-descuento="@(p.PrecioDescuento.HasValue ? p.PrecioDescuento.Value.ToString(System.Globalization.CultureInfo.InvariantCulture) : "")"
+                                        data-stock="@p.Stock"
+                                        data-categoria-id="@p.CategoriaId"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#modalEditar"
+                                        title="Editar">
                                     <i class="bi bi-pencil"></i>
-                                </a>
+                                </button>
 
                                 @using (Html.BeginForm("ToggleEstado", "Producto",
                                     new { id = p.Id }, FormMethod.Post,
@@ -175,11 +184,354 @@
     }
 </div>
 
+<!-- Contenedores de imágenes por producto (ocultos, se clonan al abrir el modal) -->
+@foreach (var p in Model.Productos)
+{
+    <div id="imgs-@p.Id" class="d-none">
+        @if (p.Imagenes != null && p.Imagenes.Any())
+        {
+            <div class="row g-2">
+                @foreach (var img in p.Imagenes)
+                {
+                    <div class="col-4">
+                        <div class="position-relative">
+                            <img src="@img.RutaImagen"
+                                 alt="Imagen"
+                                 class="img-thumbnail w-100"
+                                 style="height:90px;object-fit:cover;" />
+
+                            @if (img.EsPrincipal)
+                            {
+                                <span class="position-absolute top-0 start-0 badge"
+                                      style="font-size:0.6rem;background:#e91e8c;">
+                                    Principal
+                                </span>
+                            }
+
+                            <div class="d-flex gap-1 mt-1">
+                                @if (!img.EsPrincipal)
+                                {
+                                    <form action="@Url.Action("EstablecerPrincipal", "Producto")"
+                                          method="post"
+                                          class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="imagenId" value="@img.Id" />
+                                        <input type="hidden" name="productoId" value="@p.Id" />
+                                        <input type="hidden" name="from" value="index" />
+
+                                        <button type="submit"
+                                                class="btn btn-sm btn-outline-primary w-100"
+                                                style="font-size:0.7rem;padding:1px 4px;"
+                                                title="Marcar como principal">
+                                            <i class="bi bi-star"></i>
+                                        </button>
+                                    </form>
+                                }
+
+                                <form action="@Url.Action("EliminarImagen", "Producto")"
+                                      method="post"
+                                      class="d-inline form-del-img">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="imagenId" value="@img.Id" />
+                                    <input type="hidden" name="productoId" value="@p.Id" />
+                                    <input type="hidden" name="from" value="index" />
+
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-danger w-100 btn-del-img"
+                                            style="font-size:0.7rem;padding:1px 4px;">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <p class="text-muted small mb-0">Sin imágenes</p>
+        }
+    </div>
+}
+
+<!-- MODAL EDITAR -->
+<div class="modal fade"
+     id="modalEditar"
+     tabindex="-1"
+     aria-labelledby="lblModalEditar"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="lblModalEditar">
+                    <i class="bi bi-pencil-square me-2 text-brand"></i>
+                    Editar producto
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                </button>
+            </div>
+
+            <div class="modal-body">
+
+                @using (Html.BeginForm(
+                    "Editar",
+                    "Producto",
+                    FormMethod.Post,
+                    new { id = "formEditar", enctype = "multipart/form-data" }))
+                {
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden"
+                           id="editId"
+                           name="Id" />
+
+                    <div class="mb-3">
+                        <label for="editNombre"
+                               class="form-label fw-semibold">
+                            Nombre
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        <input type="text"
+                               id="editNombre"
+                               name="Nombre"
+                               class="form-control"
+                               maxlength="200"
+                               required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editDescripcion"
+                               class="form-label fw-semibold">
+                            Descripción
+                        </label>
+
+                        <textarea id="editDescripcion"
+                                  name="Descripcion"
+                                  class="form-control"
+                                  rows="3"></textarea>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="editPrecio"
+                                   class="form-label fw-semibold">
+                                Precio
+                                <span class="text-danger">*</span>
+                            </label>
+
+                            <div class="input-group">
+                                <span class="input-group-text">₡</span>
+
+                                <input type="number"
+                                       id="editPrecio"
+                                       name="Precio"
+                                       class="form-control"
+                                       min="0.01"
+                                       step="0.01"
+                                       required />
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="editPrecioDescuento"
+                                   class="form-label fw-semibold">
+                                Precio con descuento
+                            </label>
+
+                            <div class="input-group">
+                                <span class="input-group-text">₡</span>
+
+                                <input type="number"
+                                       id="editPrecioDescuento"
+                                       name="PrecioDescuento"
+                                       class="form-control"
+                                       min="0"
+                                       step="0.01" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mt-1">
+                        <div class="col-md-6">
+                            <label for="editStock"
+                                   class="form-label fw-semibold">
+                                Stock
+                                <span class="text-danger">*</span>
+                            </label>
+
+                            <input type="number"
+                                   id="editStock"
+                                   name="Stock"
+                                   class="form-control"
+                                   min="0"
+                                   required />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="editCategoriaId"
+                                   class="form-label fw-semibold">
+                                Categoría
+                                <span class="text-danger">*</span>
+                            </label>
+
+                            <select id="editCategoriaId"
+                                    name="CategoriaId"
+                                    class="form-select"
+                                    required>
+                                <option value="">-- Selecciona --</option>
+
+                                @foreach (var cat in Model.Categorias)
+                                {
+                                    <option value="@cat.Value">@cat.Text</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-1 mt-3">
+                        <label for="editInputImagenes"
+                               class="form-label fw-semibold">
+                            Agregar imágenes
+                        </label>
+
+                        <p class="text-muted small mb-1">JPG, PNG o WEBP · máx. 5 MB</p>
+
+                        <input type="file"
+                               name="imagenes"
+                               id="editInputImagenes"
+                               class="form-control"
+                               accept=".jpg,.jpeg,.png,.webp"
+                               multiple />
+
+                        <div id="editPrevisualizacion"
+                             class="d-flex flex-wrap gap-2 mt-2"></div>
+                    </div>
+                }
+
+                <hr class="my-3" />
+
+                <div class="mb-1">
+                    <label class="form-label fw-semibold">
+                        <i class="bi bi-images me-1"></i>Imágenes actuales
+                    </label>
+
+                    <div id="modalImagenes" class="text-muted small">
+                        Sin imágenes
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+                    Cancelar
+                </button>
+
+                <button type="submit"
+                        form="formEditar"
+                        class="btn btn-brand">
+                    <i class="bi bi-check-lg me-1"></i>
+                    Guardar cambios
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
 @section scripts {
 <script>
-    document.querySelectorAll('.btn-toggle').forEach(function (btn) {
+    function cablearBotonesEliminar(contenedor) {
+
+        contenedor.querySelectorAll('.btn-del-img').forEach(function (btn) {
+
+            btn.addEventListener('click', function () {
+
+                if (confirm('¿Eliminar esta imagen?')) {
+
+                    this.closest('.form-del-img').submit();
+                }
+            });
+        });
+    }
+
+    document.querySelectorAll('.btn-editar').forEach(function (btn) {
+
         btn.addEventListener('click', function () {
+
+            document.getElementById('editId').value =
+                this.dataset.id;
+
+            document.getElementById('editNombre').value =
+                this.dataset.nombre;
+
+            document.getElementById('editDescripcion').value =
+                this.dataset.descripcion || '';
+
+            document.getElementById('editPrecio').value =
+                this.dataset.precio;
+
+            document.getElementById('editPrecioDescuento').value =
+                this.dataset.precioDescuento || '';
+
+            document.getElementById('editStock').value =
+                this.dataset.stock;
+
+            document.getElementById('editCategoriaId').value =
+                this.dataset.categoriaId;
+
+            var contenedor = document.getElementById('modalImagenes');
+            var fuente = document.getElementById('imgs-' + this.dataset.id);
+
+            if (fuente) {
+                contenedor.innerHTML = fuente.innerHTML;
+                cablearBotonesEliminar(contenedor);
+            } else {
+                contenedor.innerHTML = '<p class="text-muted small mb-0">Sin imágenes</p>';
+            }
+
+            document.getElementById('editInputImagenes').value = '';
+            document.getElementById('editPrevisualizacion').innerHTML = '';
+        });
+    });
+
+    document.getElementById('editInputImagenes').addEventListener('change', function () {
+
+        var previsualizacion = document.getElementById('editPrevisualizacion');
+        previsualizacion.innerHTML = '';
+
+        Array.from(this.files).forEach(function (file) {
+
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+
+                var img = document.createElement('img');
+                img.src = e.target.result;
+                img.style.cssText =
+                    'width:70px;height:70px;object-fit:cover;border-radius:6px;border:1px solid #dee2e6;';
+                previsualizacion.appendChild(img);
+            };
+
+            reader.readAsDataURL(file);
+        });
+    });
+
+    document.querySelectorAll('.btn-toggle').forEach(function (btn) {
+
+        btn.addEventListener('click', function () {
+
             if (confirm('¿Deseas ' + this.dataset.accion + ' el producto "' + this.dataset.nombre + '"?')) {
+
                 document.getElementById(this.dataset.formId).submit();
             }
         });

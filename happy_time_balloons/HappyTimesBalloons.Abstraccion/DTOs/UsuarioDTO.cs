@@ -8,5 +8,6 @@ namespace HappyTimesBalloons.Abstraccion.DTOs
         public string Telefono { get; set; }
         public string Direccion { get; set; }
         public string Rol { get; set; }
+        public bool TieneDobleFactor { get; set; }
     }
 }
