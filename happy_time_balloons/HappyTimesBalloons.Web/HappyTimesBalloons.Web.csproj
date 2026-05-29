@@ -11,7 +11,7 @@
     <RootNamespace>HappyTimesBalloons.Web</RootNamespace>
     <AssemblyName>HappyTimesBalloons.Web</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <MvcBuildViews>false</MvcBuildViews>
+    <MvcBuildViews>true</MvcBuildViews>
     <UseGlobalApplicationHostFile />
     <NuGetPackageImportStamp />
     <UseIISExpress>true</UseIISExpress>

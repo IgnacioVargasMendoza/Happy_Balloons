@@ -94,6 +94,19 @@ Todas las operaciones CRUD en tablas críticas deben registrar:
   ```
 - Reservar `Html.ActionLink` únicamente para enlaces con texto visible plano (sin HTML interno)
 
+#### TextAreaFor — siempre usar el overload de 4 argumentos
+`Html.TextAreaFor` solo tiene dos overloads válidos. No existe `(expr, rows, htmlAttributes)`:
+```html
+<%-- CORRECTO — overload completo; columns=0 deja el ancho a Bootstrap --%>
+@Html.TextAreaFor(m => m.Campo, 3, 0, new { @class = "form-control" })
+
+<%-- CORRECTO — sin filas explícitas, pasar rows como atributo HTML --%>
+@Html.TextAreaFor(m => m.Campo, new { @class = "form-control", rows = 3 })
+
+<%-- INCORRECTO — no existe este overload, falla en runtime --%>
+@Html.TextAreaFor(m => m.Campo, 3, new { @class = "form-control" })
+```
+
 ### Base de datos
 - Nombre de la base de datos: `HappyTimesBalloons`
 - Servidor: `Nacho\SQLEXPRESS`
