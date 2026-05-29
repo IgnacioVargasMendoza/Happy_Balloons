@@ -60,6 +60,8 @@ HappyTimesBalloons.sln
 | Módulo | Estado | HU |
 |---|---|---|
 | Autenticación (login / registro) | Completo | HU-AUT-001, HU-CLI-001 |
+| Recuperación de contraseña | Completo | — |
+| Autenticación de doble factor (2FA) | Completo | — |
 | Bitácora de auditoría | Completo | — |
 | Layout base + partials compartidos | Completo | — |
 | Categorías | Completo | — |
@@ -85,7 +87,25 @@ HappyTimesBalloons.sln
 ## Base de datos
 
 La base se genera automáticamente con EF6 Migrations (`AutomaticMigrationsEnabled = true`).  
-Las tablas principales son: `Productos`, `Categorias`, `ImagenesProducto`, `Pedidos`, `DetallesPedido`, `ZonasEntrega`, `BitacoraAuditoria` y las tablas de Identity (`AspNet*`).
+Las tablas principales son: `Productos`, `Categorias`, `ImagenesProducto`, `Pedidos`, `DetallesPedido`, `ZonasEntrega`, `BitacoraAuditoria`, `RecuperacionTokens`, `CodigoVerificacion2FA` y las tablas de Identity (`AspNet*`).
+
+## Configuración SMTP (2FA y recuperación de contraseña)
+
+El envío de emails usa `System.Net.Mail.SmtpClient` con credenciales leídas desde `AppSettings`.  
+Las credenciales reales **nunca se suben al repo** — van en un archivo local ignorado por git:
+
+1. Crear `HappyTimesBalloons.Web/AppSettings.secret.config` (ya está en `.gitignore`):
+```xml
+<appSettings>
+  <add key="Smtp:Host" value="smtp.gmail.com" />
+  <add key="Smtp:Port" value="587" />
+  <add key="Smtp:Usuario" value="tu-email@gmail.com" />
+  <add key="Smtp:Contrasena" value="tu-app-password" />
+</appSettings>
+```
+2. Para Gmail, usar una **Contraseña de aplicación** (no la contraseña normal): Cuenta Google → Seguridad → Verificación en 2 pasos → Contraseñas de aplicación.
+
+Sin esta configuración la app funciona, pero los emails no se envían.
 
 ## Inyección de dependencias
 
