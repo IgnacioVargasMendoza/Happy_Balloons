@@ -1,4 +1,5 @@
 using HappyTimesBalloons.Abstraccion.DTOs;
+using HappyTimesBalloons.Abstraccion.Enums;
 using HappyTimesBalloons.Abstraccion.Interfaces.Servicios;
 using HappyTimesBalloons.AccesoADatos.Contexto;
 using HappyTimesBalloons.Web.Models.ViewModels;
@@ -19,6 +20,7 @@ namespace HappyTimesBalloons.Web.Controllers
     {
         private readonly IAuthServicio _authServicio;
         private readonly IRecuperacionPasswordServicio _recuperacionServicio;
+        private readonly IAuditoriaServicio _auditoriaServicio;
 
         private IAuthenticationManager AuthManager
             => HttpContext.GetOwinContext().Authentication;
@@ -28,12 +30,14 @@ namespace HappyTimesBalloons.Web.Controllers
         private ApplicationUserManager GetUserManager()
             => ApplicationUserManager.Create(new ApplicationDbContext());
 
+
         public CuentaController(
             IAuthServicio authServicio,
-            IRecuperacionPasswordServicio recuperacionServicio)
+            IRecuperacionPasswordServicio recuperacionServicio, IAuditoriaServicio auditoriaServicio)
         {
             _authServicio = authServicio;
             _recuperacionServicio = recuperacionServicio;
+            _auditoriaServicio = auditoriaServicio;
         }
 
         [HttpGet]
@@ -50,54 +54,36 @@ namespace HappyTimesBalloons.Web.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
+            var ip = Request.UserHostAddress;
+            var resultado = await _authServicio.ValidarCredencialesAsync(model.Email, model.Contrasena);
+
+            var tipoAuditoria = resultado.Exito ? TipoOperacion.IniciarSesion : TipoOperacion.AccesoFallido;
+            await _auditoriaServicio.RegistrarAsync(
+                resultado.UsuarioId ?? model.Email,
+                resultado.NombreUsuario ?? model.Email,
+                tipoAuditoria, "AspNetUsers",
+                detalle: resultado.Mensaje, ip: ip);
+
+            if (!resultado.Exito)
+            {
+                ModelState.AddModelError("", resultado.Mensaje);
+                return View(model);
+            }
+
             using (var userManager = GetUserManager())
             {
                 var usuario = await userManager.FindByEmailAsync(model.Email);
-
-                if (usuario == null)
-                {
-                    ModelState.AddModelError("", "Credenciales incorrectas.");
-                    return View(model);
-                }
-
-                if (await userManager.IsLockedOutAsync(usuario.Id))
-                {
-                    ModelState.AddModelError("", "Cuenta bloqueada temporalmente por múltiples intentos fallidos.");
-                    return View(model);
-                }
-
-                bool passwordValida = await userManager.CheckPasswordAsync(usuario, model.Contrasena);
-                if (!passwordValida)
-                {
-                    await userManager.AccessFailedAsync(usuario.Id);
-
-                    if (await userManager.IsLockedOutAsync(usuario.Id))
-                    {
-                        ModelState.AddModelError("", "Cuenta bloqueada por múltiples intentos fallidos.");
-                    }
-                    else
-                    {
-                        int intentos   = await userManager.GetAccessFailedCountAsync(usuario.Id);
-                        int restantes  = userManager.MaxFailedAccessAttemptsBeforeLockout - intentos;
-                        ModelState.AddModelError("",
-                            restantes > 0
-                                ? $"Contraseña incorrecta. Te quedan {restantes} intento(s)."
-                                : "Credenciales incorrectas.");
-                    }
-                    return View(model);
-                }
-
-                await userManager.ResetAccessFailedCountAsync(usuario.Id);
-
                 var identidad = await userManager.CreateIdentityAsync(
                     usuario, DefaultAuthenticationTypes.ApplicationCookie);
-
                 AuthManager.SignIn(
                     new AuthenticationProperties { IsPersistent = model.Recordarme },
                     identidad);
-
-                return RedirectToLocal(returnUrl);
             }
+
+            if (resultado.EsAdmin)
+                return RedirectToAction("Index", "Admin");
+
+            return RedirectToLocal(returnUrl);
         }
 
         [HttpGet]
@@ -115,10 +101,10 @@ namespace HappyTimesBalloons.Web.Controllers
 
             var resultado = await _authServicio.RegistrarAsync(new RegistroDTO
             {
-                Nombre    = model.Nombre,
-                Email     = model.Email,
+                Nombre = model.Nombre,
+                Email = model.Email,
                 Contrasena = model.Contrasena,
-                Telefono  = model.Telefono,
+                Telefono = model.Telefono,
                 Direccion = model.Direccion
             });
 
@@ -130,7 +116,7 @@ namespace HappyTimesBalloons.Web.Controllers
 
             using (var userManager = GetUserManager())
             {
-                var usuario  = await userManager.FindByEmailAsync(model.Email);
+                var usuario = await userManager.FindByEmailAsync(model.Email);
                 var identidad = await userManager.CreateIdentityAsync(
                     usuario, DefaultAuthenticationTypes.ApplicationCookie);
                 AuthManager.SignIn(
@@ -143,8 +129,17 @@ namespace HappyTimesBalloons.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Logout()
+        public async Task<ActionResult> Logout()
         {
+            var usuarioId = User.Identity.GetUserId() ?? "Anónimo";
+            var nombreUsuario = User.Identity.Name ?? "Anónimo";
+            var ip = Request.UserHostAddress;
+
+            await _auditoriaServicio.RegistrarAsync(
+                usuarioId, nombreUsuario,
+                TipoOperacion.CerrarSesion, "AspNetUsers",
+                detalle: "Logout", ip: ip);
+
             AuthManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
             Session.Abandon();
             return RedirectToAction("Index", "Home");

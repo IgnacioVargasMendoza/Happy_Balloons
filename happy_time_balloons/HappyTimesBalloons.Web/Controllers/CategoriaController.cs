@@ -1,7 +1,6 @@
 using HappyTimesBalloons.Abstraccion.DTOs;
 using HappyTimesBalloons.Abstraccion.Enums;
 using HappyTimesBalloons.Abstraccion.Interfaces.Servicios;
-using HappyTimesBalloons.Web.Helpers;
 using HappyTimesBalloons.Web.Models.ViewModels;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,10 +12,12 @@ namespace HappyTimesBalloons.Web.Controllers
     public class CategoriaController : Controller
     {
         private readonly ICategoriaServicio _categoriaServicio;
+        private readonly IAuditoriaServicio _auditoriaServicio;
 
-        public CategoriaController(ICategoriaServicio categoriaServicio)
+        public CategoriaController(ICategoriaServicio categoriaServicio, IAuditoriaServicio auditoriaServicio)
         {
             _categoriaServicio = categoriaServicio;
+            _auditoriaServicio = auditoriaServicio;
         }
 
         [HttpGet]
@@ -58,8 +59,10 @@ namespace HappyTimesBalloons.Web.Controllers
 
             if (resultado.Exito)
             {
-                await AuditoriaHelper.RegistrarAsync(
-                    HttpContext, TipoOperacion.Crear, "Categorias", detalle: model.Nombre);
+                await _auditoriaServicio.RegistrarAsync(
+                    User.Identity.Name, User.Identity.Name,
+                    TipoOperacion.Crear, "Categorias",
+                    detalle: model.Nombre, ip: Request.UserHostAddress);
                 TempData["Exito"] = resultado.Mensaje;
             }
             else
@@ -89,8 +92,10 @@ namespace HappyTimesBalloons.Web.Controllers
 
             if (resultado.Exito)
             {
-                await AuditoriaHelper.RegistrarAsync(
-                    HttpContext, TipoOperacion.Actualizar, "Categorias", model.Id, model.Nombre);
+                await _auditoriaServicio.RegistrarAsync(
+                    User.Identity.Name, User.Identity.Name,
+                    TipoOperacion.Actualizar, "Categorias",
+                    registroId: model.Id, detalle: model.Nombre, ip: Request.UserHostAddress);
                 TempData["Exito"] = resultado.Mensaje;
             }
             else
@@ -109,8 +114,10 @@ namespace HappyTimesBalloons.Web.Controllers
 
             if (resultado.Exito)
             {
-                await AuditoriaHelper.RegistrarAsync(
-                    HttpContext, TipoOperacion.Actualizar, "Categorias", id, "Cambio de estado");
+                await _auditoriaServicio.RegistrarAsync(
+                    User.Identity.Name, User.Identity.Name,
+                    TipoOperacion.Actualizar, "Categorias",
+                    registroId: id, detalle: "Cambio de estado", ip: Request.UserHostAddress);
                 TempData["Exito"] = resultado.Mensaje;
             }
             else

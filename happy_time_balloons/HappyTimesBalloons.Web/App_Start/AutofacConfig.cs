@@ -30,6 +30,7 @@ namespace HappyTimesBalloons.Web.App_Start
             builder.RegisterType<BitacoraRepositorio>().As<IBitacoraRepositorio>().InstancePerRequest();
             builder.RegisterType<PromocionRepositorio>().As<IPromocionRepositorio>().InstancePerRequest();
             builder.RegisterType<RecuperacionPasswordRepositorio>().As<IRecuperacionPasswordRepositorio>().InstancePerRequest();
+            builder.RegisterType<AuthRepositorio>().As<IAuthRepositorio>().InstancePerRequest();
 
             // Servicios
             builder.RegisterType<CategoriaServicio>().As<ICategoriaServicio>().InstancePerRequest();
