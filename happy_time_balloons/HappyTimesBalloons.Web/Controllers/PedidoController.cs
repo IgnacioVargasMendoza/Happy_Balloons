@@ -75,10 +75,10 @@ namespace HappyTimesBalloons.Web.Controllers
 
                 carrito.Add(new CarritoItemViewModel
                 {
-                    ProductoId    = producto.Id,
-                    Nombre        = producto.Nombre,
-                    ImagenUrl     = imagenUrl,
-                    Precio        = producto.Precio,
+                    ProductoId = producto.Id,
+                    Nombre = producto.Nombre,
+                    ImagenUrl = imagenUrl,
+                    Precio = producto.Precio,
                     PrecioDescuento = producto.PrecioDescuento,
                     Cantidad = _pedidoServicio.AjustarCantidad(cantidad, producto.Stock)
                 });
@@ -142,7 +142,7 @@ namespace HappyTimesBalloons.Web.Controllers
             if (vm.ZonasEntrega.Any())
             {
                 vm.ZonaEntregaId = vm.ZonasEntrega.First().Id;
-                vm.CostoEnvio    = vm.ZonasEntrega.First().CostoEnvio;
+                vm.CostoEnvio = vm.ZonasEntrega.First().CostoEnvio;
             }
 
             return View(vm);
@@ -170,15 +170,15 @@ namespace HappyTimesBalloons.Web.Controllers
 
             var checkout = new CheckoutDTO
             {
-                ZonaEntregaId    = model.ZonaEntregaId,
+                ZonaEntregaId = model.ZonaEntregaId,
                 DireccionEntrega = model.DireccionEntrega,
-                MetodoPago       = model.MetodoPago,
+                MetodoPago = model.MetodoPago,
                 NumeroReferencia = model.NumeroReferencia,
-                Notas            = model.Notas,
-                Items            = carrito.Select(i => new CheckoutItemDTO
+                Notas = model.Notas,
+                Items = carrito.Select(i => new CheckoutItemDTO
                 {
                     ProductoId = i.ProductoId,
-                    Cantidad   = i.Cantidad
+                    Cantidad = i.Cantidad
                 }).ToList()
             };
 
@@ -219,12 +219,12 @@ namespace HappyTimesBalloons.Web.Controllers
             {
                 Pedidos = pedidos.Select(p => new PedidoResumenViewModel
                 {
-                    Id            = p.Id,
-                    Numero        = p.Numero,
+                    Id = p.Id,
+                    Numero = p.Numero,
                     NombreUsuario = p.NombreUsuario,
-                    FechaPedido   = p.FechaPedido,
-                    EstadoPedido  = p.EstadoPedido,
-                    Total         = p.Total,
+                    FechaPedido = p.FechaPedido,
+                    EstadoPedido = p.EstadoPedido,
+                    Total = p.Total,
                     CantidadItems = p.CantidadItems
                 }).ToList()
             };
@@ -250,13 +250,13 @@ namespace HappyTimesBalloons.Web.Controllers
                 Pedido = pedido,
                 Resumen = new PedidoResumenViewModel
                 {
-                    Id            = pedido.Id,
-                    Numero        = pedido.Numero,
+                    Id = pedido.Id,
+                    Numero = pedido.Numero,
                     NombreUsuario = pedido.NombreUsuario,
-                    FechaPedido   = pedido.FechaPedido,
-                    EstadoPedido  = pedido.EstadoPedido,
-                    Total         = pedido.Total,
-                    CantidadItems = pedido.Detalles.Sum(d => d.Cantidad)
+                    FechaPedido = pedido.FechaPedido,
+                    EstadoPedido = pedido.EstadoPedido,
+                    Total = pedido.Total,
+                    CantidadItems = pedido.CantidadItems
                 }
             };
 
@@ -286,25 +286,25 @@ namespace HappyTimesBalloons.Web.Controllers
             {
                 estadosItems.Add(new SelectListItem
                 {
-                    Value    = est.ToString(),
-                    Text     = ObtenerTextoEstado(est),
+                    Value = est.ToString(),
+                    Text = ObtenerTextoEstado(est),
                     Selected = estadoFiltro.HasValue && estadoFiltro.Value == est
                 });
             }
 
             var vm = new GestionPedidosViewModel
             {
-                FiltroEstado       = filtroEstado,
-                FiltroBusqueda     = filtroBusqueda,
+                FiltroEstado = filtroEstado,
+                FiltroBusqueda = filtroBusqueda,
                 EstadosDisponibles = new SelectList(estadosItems, "Value", "Text", filtroEstado),
                 Pedidos = pedidos.Select(p => new PedidoResumenViewModel
                 {
-                    Id            = p.Id,
-                    Numero        = p.Numero,
+                    Id = p.Id,
+                    Numero = p.Numero,
                     NombreUsuario = p.NombreUsuario,
-                    FechaPedido   = p.FechaPedido,
-                    EstadoPedido  = p.EstadoPedido,
-                    Total         = p.Total,
+                    FechaPedido = p.FechaPedido,
+                    EstadoPedido = p.EstadoPedido,
+                    Total = p.Total,
                     CantidadItems = p.CantidadItems
                 }).ToList()
             };
@@ -346,23 +346,23 @@ namespace HappyTimesBalloons.Web.Controllers
 
         private void GuardarCarrito(List<CarritoItemViewModel> carrito)
         {
-            Session[SessionCarrito]     = carrito;
+            Session[SessionCarrito] = carrito;
             Session[SessionCarritoCount] = carrito.Sum(i => i.Cantidad);
         }
 
         private void LimpiarCarrito()
         {
-            Session[SessionCarrito]     = new List<CarritoItemViewModel>();
+            Session[SessionCarrito] = new List<CarritoItemViewModel>();
             Session[SessionCarritoCount] = 0;
         }
 
         private static ZonaEntregaViewModel MapearZona(ZonaEntregaDTO z) =>
             new ZonaEntregaViewModel
             {
-                Id          = z.Id,
-                Nombre      = z.Nombre,
+                Id = z.Id,
+                Nombre = z.Nombre,
                 Descripcion = z.Descripcion,
-                CostoEnvio  = z.CostoEnvio,
+                CostoEnvio = z.CostoEnvio,
                 EsDisponible = z.EsDisponible
             };
 
