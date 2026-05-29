@@ -19,7 +19,7 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
             _ctx = ctx;
         }
 
-        public async Task<List<CategoriaDTO>> ObtenerTodasAsync(string busqueda = null)
+        public async Task<List<CategoriaDTO>> ObtenerTodasAsync(string busqueda = null, bool? soloActivas = null)
         {
             var query = _ctx.Categorias.AsQueryable();
 
@@ -29,6 +29,9 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
                     c.Nombre.Contains(busqueda) ||
                     c.Descripcion.Contains(busqueda));
             }
+
+            if (soloActivas.HasValue)
+                query = query.Where(c => c.EsActiva == soloActivas.Value);
 
             return await query
                 .OrderByDescending(c => c.EsActiva)

@@ -6,7 +6,7 @@ namespace HappyTimesBalloons.Abstraccion.Interfaces.Repositorios
 {
     public interface IProductoRepositorio
     {
-        Task<List<ProductoDTO>> ObtenerTodosAsync(string busqueda = null, int? categoriaId = null);
+        Task<List<ProductoDTO>> ObtenerTodosAsync(string busqueda = null, int? categoriaId = null, bool? soloActivos = null);
         Task<ProductoDTO> ObtenerPorIdAsync(int id);
         Task<ProductoEstadisticasDTO> ObtenerEstadisticasAsync();
         Task<ImagenProductoDTO> ObtenerImagenPorIdAsync(int imagenId);

@@ -36,8 +36,8 @@ namespace HappyTimesBalloons.Web.Controllers
         public async Task<ActionResult> Index(string busqueda, int? categoriaId)
         {
             var productos = await _productoServicio.ObtenerTodosAsync(busqueda, categoriaId);
-            var categorias = (await _categoriaServicio.ObtenerTodasAsync())
-                .Where(c => c.EsActiva).OrderBy(c => c.Nombre).ToList();
+            var categorias = (await _categoriaServicio.ObtenerTodasAsync(soloActivas: true))
+                .OrderBy(c => c.Nombre).ToList();
 
             var vm = new ProductoIndexViewModel
             {
@@ -204,8 +204,8 @@ namespace HappyTimesBalloons.Web.Controllers
         private async Task<ProductoFormViewModel> ConstruirFormViewModel(
             ProductoFormViewModel modelo = null)
         {
-            var categorias = (await _categoriaServicio.ObtenerTodasAsync())
-                .Where(c => c.EsActiva).OrderBy(c => c.Nombre).ToList();
+            var categorias = (await _categoriaServicio.ObtenerTodasAsync(soloActivas: true))
+                .OrderBy(c => c.Nombre).ToList();
 
             if (modelo == null)
                 modelo = new ProductoFormViewModel();

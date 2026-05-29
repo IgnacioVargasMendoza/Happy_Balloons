@@ -21,20 +21,17 @@ namespace HappyTimesBalloons.Web.Controllers
         [HttpGet]
         public async Task<ActionResult> Index(string busqueda, int? categoriaId)
         {
-            var dtos = await _productoServicio.ObtenerTodosAsync(busqueda, categoriaId);
-            var categoriasDtos = await _categoriaServicio.ObtenerTodasAsync();
+            var dtos = await _productoServicio.ObtenerTodosAsync(busqueda, categoriaId, soloActivos: true);
+            var categoriasDtos = await _categoriaServicio.ObtenerTodasAsync(soloActivas: true);
 
             var vm = new CatalogoIndexViewModel
             {
                 Busqueda = busqueda,
                 CategoriaId = categoriaId,
                 Categorias = new SelectList(
-                    categoriasDtos.Where(c => c.EsActiva).OrderBy(c => c.Nombre).ToList(),
+                    categoriasDtos.OrderBy(c => c.Nombre).ToList(),
                     "Id", "Nombre", categoriaId),
-                Productos = dtos
-                    .Where(p => p.EsActivo)
-                    .Select(p => MapearProducto(p))
-                    .ToList()
+                Productos = dtos.Select(p => MapearProducto(p)).ToList()
             };
 
             return View(vm);
@@ -48,13 +45,13 @@ namespace HappyTimesBalloons.Web.Controllers
             if (dto == null || !dto.EsActivo)
                 return HttpNotFound();
 
-            var relacionados = await _productoServicio.ObtenerTodosAsync(null, dto.CategoriaId);
+            var relacionados = await _productoServicio.ObtenerTodosAsync(null, dto.CategoriaId, soloActivos: true);
 
             var vm = new ProductoDetalleViewModel
             {
                 Producto = MapearProducto(dto),
                 ProductosRelacionados = relacionados
-                    .Where(p => p.EsActivo && p.Id != id)
+                    .Where(p => p.Id != id)
                     .Take(4)
                     .Select(p => MapearProducto(p))
                     .ToList()
