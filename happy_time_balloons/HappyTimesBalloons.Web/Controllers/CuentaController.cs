@@ -5,6 +5,7 @@ using HappyTimesBalloons.AccesoADatos.Contexto;
 using HappyTimesBalloons.Web.Models.ViewModels;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Security;
+using System;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -18,6 +19,7 @@ namespace HappyTimesBalloons.Web.Controllers
     {
         private readonly IAuthServicio _authServicio;
         private readonly IAuditoriaServicio _auditoriaServicio;
+        private readonly IRecuperacionPasswordServicio _recuperacionServicio;
 
         private IAuthenticationManager AuthManager
             => HttpContext.GetOwinContext().Authentication;
@@ -27,10 +29,14 @@ namespace HappyTimesBalloons.Web.Controllers
         private ApplicationUserManager GetUserManager()
             => ApplicationUserManager.Create(new ApplicationDbContext());
 
-        public CuentaController(IAuthServicio authServicio, IAuditoriaServicio auditoriaServicio)
+        public CuentaController(
+            IAuthServicio authServicio,
+            IAuditoriaServicio auditoriaServicio,
+            IRecuperacionPasswordServicio recuperacionServicio)
         {
             _authServicio = authServicio;
             _auditoriaServicio = auditoriaServicio;
+            _recuperacionServicio = recuperacionServicio;
         }
 
         [HttpGet]
@@ -136,6 +142,81 @@ namespace HappyTimesBalloons.Web.Controllers
             AuthManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
             Session.Abandon();
             return RedirectToAction("Index", "Home");
+        }
+
+        [HttpGet]
+        public ActionResult OlvideContrasena()
+        {
+            if (TempData["Error"] != null)
+                ViewBag.Error = TempData["Error"];
+            return View(new OlvideContrasenaViewModel());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> OlvideContrasena(OlvideContrasenaViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var resultado = await _recuperacionServicio.SolicitarRecuperacionAsync(model.Email);
+
+            if (resultado.Exito && resultado.Datos != null)
+            {
+                var baseUrl = Request.Url.GetLeftPart(UriPartial.Authority);
+                var enlace = baseUrl + Url.Action("RestablecerContrasena", "Cuenta", new { token = resultado.Datos });
+                TempData["EnlaceRecuperacion"] = enlace;
+            }
+
+            TempData["EmailRecuperacion"] = model.Email;
+            return RedirectToAction("ConfirmacionEnvio");
+        }
+
+        [HttpGet]
+        public ActionResult ConfirmacionEnvio()
+        {
+            ViewBag.Email = TempData["EmailRecuperacion"];
+            ViewBag.Enlace = TempData["EnlaceRecuperacion"];
+            return View();
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> RestablecerContrasena(string token)
+        {
+            if (string.IsNullOrEmpty(token))
+                return RedirectToAction("OlvideContrasena");
+
+            var tokenDto = await _recuperacionServicio.ValidarTokenAsync(token);
+            if (tokenDto == null)
+            {
+                TempData["Error"] = "El enlace de recuperación no es válido o ha expirado.";
+                return RedirectToAction("OlvideContrasena");
+            }
+
+            return View(new RestablecerContrasenaViewModel { Token = token });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> RestablecerContrasena(RestablecerContrasenaViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var resultado = await _recuperacionServicio.RestablecerContrasenaAsync(model.Token, model.NuevaContrasena);
+            if (!resultado.Exito)
+            {
+                ModelState.AddModelError("", resultado.Mensaje);
+                return View(model);
+            }
+
+            return RedirectToAction("ConfirmacionReset");
+        }
+
+        [HttpGet]
+        public ActionResult ConfirmacionReset()
+        {
+            return View();
         }
 
         private ActionResult RedirectToLocal(string returnUrl)

@@ -2,9 +2,9 @@ using Autofac;
 using Autofac.Integration.Mvc;
 using HappyTimesBalloons.AccesoADatos.Contexto;
 using HappyTimesBalloons.AccesoADatos.Repositorios;
+using HappyTimesBalloons.LogicaNegocio.Servicios;
 using HappyTimesBalloons.Abstraccion.Interfaces.Repositorios;
 using HappyTimesBalloons.Abstraccion.Interfaces.Servicios;
-using HappyTimesBalloons.LogicaNegocio.Servicios;
 using System.Web.Mvc;
 
 namespace HappyTimesBalloons.Web.App_Start
@@ -30,6 +30,7 @@ namespace HappyTimesBalloons.Web.App_Start
             builder.RegisterType<BitacoraRepositorio>().As<IBitacoraRepositorio>().InstancePerRequest();
             builder.RegisterType<PromocionRepositorio>().As<IPromocionRepositorio>().InstancePerRequest();
             builder.RegisterType<AuthRepositorio>().As<IAuthRepositorio>().InstancePerRequest();
+            builder.RegisterType<RecuperacionPasswordRepositorio>().As<IRecuperacionPasswordRepositorio>().InstancePerRequest();
 
             // Servicios
             builder.RegisterType<CategoriaServicio>().As<ICategoriaServicio>().InstancePerRequest();
@@ -38,6 +39,7 @@ namespace HappyTimesBalloons.Web.App_Start
             builder.RegisterType<AuditoriaServicio>().As<IAuditoriaServicio>().InstancePerRequest();
             builder.RegisterType<AuthServicio>().As<IAuthServicio>().InstancePerRequest();
             builder.RegisterType<PromocionServicio>().As<IPromocionServicio>().InstancePerRequest();
+            builder.RegisterType<RecuperacionPasswordServicio>().As<IRecuperacionPasswordServicio>().InstancePerRequest();
 
             var container = builder.Build();
             DependencyResolver.SetResolver(new AutofacDependencyResolver(container));
