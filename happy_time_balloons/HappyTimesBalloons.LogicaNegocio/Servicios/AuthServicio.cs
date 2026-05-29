@@ -105,7 +105,8 @@ namespace HappyTimesBalloons.LogicaNegocio.Servicios
                 UsuarioId = usuario.Id,
                 NombreUsuario = usuario.Nombre ?? usuario.Email,
                 Email = usuario.Email,
-                EsAdmin = esAdmin
+                EsAdmin = esAdmin,
+                TieneDobleFactor = usuario.TieneDobleFactor
             };
         }
     }

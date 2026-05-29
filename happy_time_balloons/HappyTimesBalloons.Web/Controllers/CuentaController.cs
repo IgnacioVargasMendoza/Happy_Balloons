@@ -20,6 +20,7 @@ namespace HappyTimesBalloons.Web.Controllers
         private readonly IAuthServicio _authServicio;
         private readonly IRecuperacionPasswordServicio _recuperacionServicio;
         private readonly IAuditoriaServicio _auditoriaServicio;
+        private readonly IAutenticacion2FAServicio _servicio2FA;
 
         private IAuthenticationManager AuthManager
             => HttpContext.GetOwinContext().Authentication;
@@ -32,11 +33,13 @@ namespace HappyTimesBalloons.Web.Controllers
         public CuentaController(
             IAuthServicio authServicio,
             IAuditoriaServicio auditoriaServicio,
-            IRecuperacionPasswordServicio recuperacionServicio)
+            IRecuperacionPasswordServicio recuperacionServicio,
+            IAutenticacion2FAServicio servicio2FA)
         {
             _authServicio = authServicio;
             _auditoriaServicio = auditoriaServicio;
             _recuperacionServicio = recuperacionServicio;
+            _servicio2FA = servicio2FA;
         }
 
         [HttpGet]
@@ -69,20 +72,32 @@ namespace HappyTimesBalloons.Web.Controllers
                 return View(model);
             }
 
+            // Si el usuario tiene 2FA activo, redirigir al flujo de verificación.
+            // Si no, completar el SignIn directamente.
+            if (resultado.TieneDobleFactor)
+            {
+                await _servicio2FA.GenerarYEnviarCodigoAsync(resultado.UsuarioId, model.Email, ip);
+
+                TempData["UsuarioId2FA"] = resultado.UsuarioId;
+                TempData["Email2FA"] = _servicio2FA.EnmascararEmail(model.Email);
+                TempData["EmailCompleto2FA"] = model.Email;
+                TempData["EsAdmin2FA"] = resultado.EsAdmin;
+
+                return RedirectToAction("Verificar", "Autenticacion2FA");
+            }
+
             using (var userManager = GetUserManager())
             {
-                var usuario = await userManager.FindByEmailAsync(model.Email);
+                var usuario = await userManager.FindByIdAsync(resultado.UsuarioId);
                 var identidad = await userManager.CreateIdentityAsync(
                     usuario, DefaultAuthenticationTypes.ApplicationCookie);
-                AuthManager.SignIn(
-                    new AuthenticationProperties { IsPersistent = model.Recordarme },
-                    identidad);
+                AuthManager.SignIn(new AuthenticationProperties { IsPersistent = false }, identidad);
             }
 
             if (resultado.EsAdmin)
                 return RedirectToAction("Index", "Admin");
 
-            return RedirectToLocal(returnUrl);
+            return RedirectToAction("Index", "Home");
         }
 
         [HttpGet]
@@ -224,6 +239,37 @@ namespace HappyTimesBalloons.Web.Controllers
         public ActionResult ConfirmacionReset()
         {
             return View();
+        }
+
+        [HttpGet]
+        [Authorize]
+        public async Task<ActionResult> ConfigurarDobleFactor()
+        {
+            var usuarioId = User.Identity.GetUserId();
+            using (var userManager = GetUserManager())
+            {
+                var usuario = await userManager.FindByIdAsync(usuarioId);
+                ViewBag.DobleFactorActivo = usuario.TwoFactorEnabled;
+            }
+            return View();
+        }
+
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> CambiarDobleFactor(bool activar)
+        {
+            var usuarioId = User.Identity.GetUserId();
+            using (var userManager = GetUserManager())
+            {
+                await userManager.SetTwoFactorEnabledAsync(usuarioId, activar);
+            }
+
+            TempData["MensajeDobleFactor"] = activar
+                ? "Verificación en dos pasos activada. Se pedirá un código al iniciar sesión."
+                : "Verificación en dos pasos desactivada.";
+
+            return RedirectToAction("ConfigurarDobleFactor");
         }
 
         private ActionResult RedirectToLocal(string returnUrl)

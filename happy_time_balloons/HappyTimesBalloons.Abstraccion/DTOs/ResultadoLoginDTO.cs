@@ -10,5 +10,6 @@ namespace HappyTimesBalloons.Abstraccion.DTOs
         public string NombreUsuario { get; set; }
         public string Email { get; set; }
         public bool EsAdmin { get; set; }
+        public bool TieneDobleFactor { get; set; }
     }
 }

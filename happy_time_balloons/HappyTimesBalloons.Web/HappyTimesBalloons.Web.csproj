@@ -86,6 +86,7 @@
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="App_Start\ApplicationUserManager.cs" />
     <Compile Include="Controllers\AdminController.cs" />
+    <Compile Include="Controllers\Autenticacion2FAController.cs" />
     <Compile Include="Controllers\CategoriaController.cs" />
     <Compile Include="Controllers\CuentaController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -118,6 +119,7 @@
     <Compile Include="Models\ViewModels\RestablecerContrasenaViewModel.cs" />
     <Compile Include="Models\ViewModels\AdminDashboardViewModel.cs" />
     <Compile Include="Models\ViewModels\AdminPromocionesViewModel.cs" />
+    <Compile Include="Models\ViewModels\Verificar2FAViewModel.cs" />
     <Compile Include="Models\ViewModels\PromocionFormViewModel.cs" />
     <Compile Include="Models\ViewModels\PromocionViewModel.cs" />
     <Compile Include="Models\ViewModels\ZonaEntregaViewModel.cs" />
@@ -145,6 +147,7 @@
     <Content Include="Views\Categoria\Index.cshtml" />
     <Content Include="Views\Cuenta\ConfirmacionEnvio.cshtml" />
     <Content Include="Views\Cuenta\ConfirmacionReset.cshtml" />
+    <Content Include="Views\Cuenta\ConfigurarDobleFactor.cshtml" />
     <Content Include="Views\Cuenta\Login.cshtml" />
     <Content Include="Views\Cuenta\OlvideContrasena.cshtml" />
     <Content Include="Views\Cuenta\Registro.cshtml" />
@@ -157,9 +160,9 @@
     <Content Include="Views\Pedido\Index.cshtml" />
     <Content Include="Views\Pedido\MisPedidos.cshtml" />
     <Content Include="Views\Producto\Crear.cshtml" />
-    <Content Include="Views\Producto\Editar.cshtml" />
     <Content Include="Views\Producto\Index.cshtml" />
     <Content Include="Views\Promocion\Index.cshtml" />
+    <Content Include="Views\Autenticacion2FA\Verificar.cshtml" />
     <Content Include="Views\Shared\_NavBar.cshtml" />
     <Content Include="Views\Shared\_TarjetaProducto.cshtml" />
     <Content Include="Views\Web.config" />
