@@ -18,8 +18,8 @@ namespace HappyTimesBalloons.Web.Controllers
     public class CuentaController : Controller
     {
         private readonly IAuthServicio _authServicio;
-        private readonly IAuditoriaServicio _auditoriaServicio;
         private readonly IRecuperacionPasswordServicio _recuperacionServicio;
+        private readonly IAuditoriaServicio _auditoriaServicio;
 
         private IAuthenticationManager AuthManager
             => HttpContext.GetOwinContext().Authentication;
@@ -159,24 +159,25 @@ namespace HappyTimesBalloons.Web.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            var resultado = await _recuperacionServicio.SolicitarRecuperacionAsync(model.Email);
+            var urlBase = Request.Url.GetLeftPart(UriPartial.Authority) +
+                          Request.ApplicationPath.TrimEnd('/');
 
-            if (resultado.Exito && resultado.Datos != null)
-            {
-                var baseUrl = Request.Url.GetLeftPart(UriPartial.Authority);
-                var enlace = baseUrl + Url.Action("RestablecerContrasena", "Cuenta", new { token = resultado.Datos });
-                TempData["EnlaceRecuperacion"] = enlace;
-            }
+            var resultado = await _recuperacionServicio.SolicitarRecuperacionAsync(
+                new RecuperacionPasswordDTO
+                {
+                    Email = model.Email,
+                    UrlBase = urlBase
+                });
 
-            TempData["EmailRecuperacion"] = model.Email;
+            TempData["Email"] = model.Email;
+            TempData["UrlReset"] = resultado.Datos;
+
             return RedirectToAction("ConfirmacionEnvio");
         }
 
         [HttpGet]
         public ActionResult ConfirmacionEnvio()
         {
-            ViewBag.Email = TempData["EmailRecuperacion"];
-            ViewBag.Enlace = TempData["EnlaceRecuperacion"];
             return View();
         }
 
@@ -203,7 +204,13 @@ namespace HappyTimesBalloons.Web.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            var resultado = await _recuperacionServicio.RestablecerContrasenaAsync(model.Token, model.NuevaContrasena);
+            var resultado = await _recuperacionServicio.RestablecerContrasenaAsync(
+                new RestablecerPasswordDTO
+                {
+                    Token = model.Token,
+                    NuevaContrasena = model.NuevaContrasena
+                });
+
             if (!resultado.Exito)
             {
                 ModelState.AddModelError("", resultado.Mensaje);

@@ -5,8 +5,8 @@ namespace HappyTimesBalloons.Abstraccion.Interfaces.Servicios
 {
     public interface IRecuperacionPasswordServicio
     {
-        Task<ResultadoOperacionDTO<string>> SolicitarRecuperacionAsync(string email);
+        Task<ResultadoOperacionDTO<string>> SolicitarRecuperacionAsync(RecuperacionPasswordDTO solicitud);
         Task<TokenRecuperacionDTO> ValidarTokenAsync(string token);
-        Task<ResultadoOperacionDTO> RestablecerContrasenaAsync(string token, string nuevaContrasena);
+        Task<ResultadoOperacionDTO> RestablecerContrasenaAsync(RestablecerPasswordDTO datos);
     }
 }
