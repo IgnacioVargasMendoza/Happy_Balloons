@@ -4,21 +4,40 @@
     ViewBag.Title = "Catálogo";
 }
 
-<h2 class="mb-4">Catálogo de Productos</h2>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-0">
+            <i class="bi bi-grid me-2 text-brand"></i>
+            Catálogo de Productos
+        </h2>
 
-<form method="get" class="mb-4">
-    <div class="row">
+        <p class="text-muted small mb-0">
+            Explora nuestros productos disponibles
+        </p>
+    </div>
+</div>
+
+@using (Html.BeginForm("Index", "Catalogo", FormMethod.Get))
+{
+    <div class="row g-2 mb-4">
 
         <div class="col-md-5">
-            <input type="text"
-                   name="busqueda"
-                   value="@Request.QueryString["busqueda"]"
-                   class="form-control"
-                   placeholder="Buscar producto..." />
+            <div class="input-group">
+
+                <span class="input-group-text bg-white">
+                    <i class="bi bi-search text-muted"></i>
+                </span>
+
+                <input type="text"
+                       name="busqueda"
+                       class="form-control border-start-0"
+                       placeholder="Buscar producto..."
+                       value="@Request.QueryString["busqueda"]" />
+            </div>
         </div>
 
         <div class="col-md-3">
-            <select name="categoriaId" class="form-control">
+            <select name="categoriaId" class="form-select">
                 <option value="">Todas las categorías</option>
 
                 @if (ViewBag.Categorias != null)
@@ -34,20 +53,30 @@
         </div>
 
         <div class="col-md-2">
-            <button type="submit" class="btn btn-primary">
-                Buscar
+            <button type="submit"
+                    class="btn btn-outline-secondary w-100">
+
+                <i class="bi bi-funnel me-1"></i>
+                Filtrar
             </button>
         </div>
 
         <div class="col-md-2">
-            <a href="@Url.Action("Index", "Catalogo")"
-               class="btn btn-secondary">
-                Limpiar
-            </a>
+
+            @if (!string.IsNullOrEmpty(Request.QueryString["busqueda"])
+                || !string.IsNullOrEmpty(Request.QueryString["categoriaId"]))
+            {
+                <a href="@Url.Action("Index", "Catalogo")"
+                   class="btn btn-outline-danger w-100">
+
+                    Limpiar
+                </a>
+            }
+
         </div>
 
     </div>
-</form>
+}
 
 <div class="row">
 
@@ -56,67 +85,102 @@
         foreach (var item in Model)
         {
             <div class="col-md-4 mb-4">
-                <div class="card h-100 shadow-sm">
+
+                <div class="card h-100 shadow-sm border-0">
 
                     <img src="@item.ImagenPrincipal"
                          class="card-img-top"
                          style="height:250px; object-fit:cover;" />
 
                     <div class="card-body">
-                        <h5 class="card-title">@item.Nombre</h5>
 
-                        <p class="card-text">@item.Descripcion</p>
+                        @if (item.PrecioDescuento.HasValue)
+                        {
+                            <span class="badge bg-danger mb-2">
+                                Oferta
+                            </span>
+                        }
 
-                        <p>
-                            <strong>Categoría:</strong> @item.CategoriaNombre
+                        <h5 class="card-title">
+                            @item.Nombre
+                        </h5>
+
+                        <p class="card-text text-muted">
+                            @item.Descripcion
+                        </p>
+
+                        <p class="mb-2">
+                            <strong>Categoría:</strong>
+                            @item.CategoriaNombre
                         </p>
 
                         @if (item.PrecioDescuento.HasValue)
                         {
-                            <p>
-                                <span style="text-decoration:line-through;">
-                                    ₡@item.Precio
+                            <p class="mb-2">
+
+                                <span class="text-muted"
+                                      style="text-decoration:line-through;">
+
+                                    ₡@item.Precio.ToString("N0")
                                 </span>
 
-                                <strong class="text-danger">
-                                    ₡@item.PrecioDescuento
+                                <strong class="text-danger fs-5 ms-1">
+                                    ₡@item.PrecioDescuento.Value.ToString("N0")
                                 </strong>
+
                             </p>
                         }
                         else
                         {
-                            <p>
-                                <strong>₡@item.Precio</strong>
+                            <p class="mb-2">
+                                <strong class="fs-5">
+                                    ₡@item.Precio.ToString("N0")
+                                </strong>
                             </p>
                         }
 
                         @if (item.Disponible)
                         {
-                            <span class="badge bg-success">Disponible</span>
+                            <span class="badge bg-success">
+                                Disponible
+                            </span>
                         }
                         else
                         {
-                            <span class="badge bg-danger">Agotado</span>
+                            <span class="badge bg-danger">
+                                Agotado
+                            </span>
                         }
+
                     </div>
 
-                    <div class="card-footer text-center">
+                    <div class="card-footer bg-white border-0 text-center">
+
                         <a href="@Url.Action("Detalle", "Catalogo", new { id = item.ProductoId })"
-                           class="btn btn-outline-primary">
+                           class="btn btn-brand w-100">
+
                             Ver detalle
                         </a>
+
                     </div>
 
                 </div>
+
             </div>
         }
     }
     else
     {
         <div class="col-12">
-            <div class="alert alert-warning">
-                No hay productos disponibles en el catálogo.
+
+            <div class="alert alert-warning text-center shadow-sm">
+
+                <i class="bi bi-exclamation-circle me-2"></i>
+
+                No se encontraron productos con los filtros aplicados.
+
             </div>
+
         </div>
     }
 

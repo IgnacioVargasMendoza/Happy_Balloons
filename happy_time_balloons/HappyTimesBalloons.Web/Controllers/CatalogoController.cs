@@ -9,7 +9,7 @@ namespace HappyTimesBalloons.Web.Controllers
     public class CatalogoController : Controller
     {
         [HttpGet]
-        public ActionResult Index(string busqueda = "", int? categoriaId = null)
+        public ActionResult Index(string busqueda = "", int? categoriaId = null, string orden = "")
         {
             using (var ctx = new ApplicationDbContext())
             {
@@ -18,9 +18,10 @@ namespace HappyTimesBalloons.Web.Controllers
                 ICatalogoProductoServicio servicio =
                     new CatalogoProductoServicio(repositorio);
 
-                var catalogo = servicio.ObtenerCatalogo(busqueda, categoriaId);
+                var catalogo = servicio.ObtenerCatalogo(busqueda, categoriaId, orden);
 
                 ViewBag.Categorias = servicio.ObtenerCategorias();
+                ViewBag.Orden = orden;
 
                 return View(catalogo);
             }

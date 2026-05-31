@@ -7,12 +7,14 @@ using System.Threading.Tasks;
 
 namespace HappyTimesBalloons.Abstraccion.Interfaces.Servicios
 {
-    public interface ICatalogoProductoServicio
-    {
-        List<CatalogoProductoDTO> ObtenerCatalogo(string busqueda = "", int? categoriaId = null);
+    
+        public interface ICatalogoProductoServicio
+        {
+            List<CatalogoProductoDTO> ObtenerCatalogo(string busqueda = "", int? categoriaId = null, string orden = "");
 
-        CatalogoProductoDTO ObtenerProductoCatalogoPorId(int productoId);
+            CatalogoProductoDTO ObtenerProductoCatalogoPorId(int productoId);
 
-        List<CategoriaDTO> ObtenerCategorias();
+            List<CategoriaDTO> ObtenerCategorias();
+        }
     }
-}
+

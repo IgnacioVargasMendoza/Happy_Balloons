@@ -14,9 +14,15 @@ namespace HappyTimesBalloons.LogicaNegocio.Servicios
             _catalogoProductoRepositorio = catalogoProductoRepositorio;
         }
 
-        public List<CatalogoProductoDTO> ObtenerCatalogo(string busqueda = "", int? categoriaId = null)
+        public List<CatalogoProductoDTO> ObtenerCatalogo(
+            string busqueda = "",
+            int? categoriaId = null,
+            string orden = "")
         {
-            return _catalogoProductoRepositorio.ObtenerCatalogo(busqueda, categoriaId);
+            return _catalogoProductoRepositorio.ObtenerCatalogo(
+                busqueda,
+                categoriaId,
+                orden);
         }
 
         public CatalogoProductoDTO ObtenerProductoCatalogoPorId(int productoId)

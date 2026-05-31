@@ -16,7 +16,10 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
             _context = context;
         }
 
-        public List<CatalogoProductoDTO> ObtenerCatalogo(string busqueda = "", int? categoriaId = null)
+        public List<CatalogoProductoDTO> ObtenerCatalogo(
+            string busqueda = "",
+            int? categoriaId = null,
+            string orden = "")
         {
             var query = _context.Productos
                 .Include("Categoria")
@@ -33,6 +36,22 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
             if (categoriaId.HasValue)
             {
                 query = query.Where(p => p.CategoriaId == categoriaId.Value);
+            }
+
+            switch (orden)
+            {
+                case "precio_asc":
+                    query = query.OrderBy(p => p.Precio);
+                    break;
+
+                case "precio_desc":
+                    query = query.OrderByDescending(p => p.Precio);
+                    break;
+
+                case "nombre":
+                default:
+                    query = query.OrderBy(p => p.Nombre);
+                    break;
             }
 
             return query

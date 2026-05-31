@@ -89,6 +89,65 @@
 
                 </ul>
 
+                <ul class="navbar-nav align-items-center">
+
+                    <li class="nav-item me-3 position-relative">
+                        <a class="nav-link"
+                           href="@Url.Action("Index", "Pedido")">
+
+                            <i class="bi bi-cart fs-5"></i>
+                        </a>
+                    </li>
+
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <li class="nav-item dropdown">
+
+                            <a class="nav-link dropdown-toggle"
+                               href="#"
+                               role="button"
+                               data-bs-toggle="dropdown">
+
+                                <i class="bi bi-person-circle"></i>
+                            </a>
+
+                            <ul class="dropdown-menu dropdown-menu-end">
+
+                                <li>
+                                    <a class="dropdown-item"
+                                       href="@Url.Action("MiCuenta", "Cuenta")">
+
+                                        Mi cuenta
+                                    </a>
+                                </li>
+
+                                <li><hr class="dropdown-divider" /></li>
+
+                                <li>
+                                    <a class="dropdown-item"
+                                       href="@Url.Action("Logout", "Cuenta")">
+
+                                        Cerrar sesión
+                                    </a>
+                                </li>
+
+                            </ul>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+
+                            <a class="btn btn-brand"
+                               href="@Url.Action("Login", "Cuenta")">
+
+                                Iniciar sesión
+                            </a>
+                        </li>
+                    }
+
+                </ul>
+
             </div>
         </div>
     </nav>
