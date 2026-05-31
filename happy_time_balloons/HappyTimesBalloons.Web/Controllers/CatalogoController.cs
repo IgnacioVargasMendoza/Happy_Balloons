@@ -26,10 +26,14 @@ namespace HappyTimesBalloons.Web.Controllers
                 return View(catalogo);
             }
         }
-
         [HttpGet]
-        public ActionResult Detalle(int id)
+        public ActionResult Detalle(int? id)
         {
+            if (!id.HasValue)
+            {
+                return RedirectToAction("Index");
+            }
+
             using (var ctx = new ApplicationDbContext())
             {
                 var repositorio = new CatalogoProductoRepositorio(ctx);
@@ -37,7 +41,7 @@ namespace HappyTimesBalloons.Web.Controllers
                 ICatalogoProductoServicio servicio =
                     new CatalogoProductoServicio(repositorio);
 
-                var producto = servicio.ObtenerProductoCatalogoPorId(id);
+                var producto = servicio.ObtenerProductoCatalogoPorId(id.Value);
 
                 if (producto == null)
                 {
@@ -48,4 +52,5 @@ namespace HappyTimesBalloons.Web.Controllers
             }
         }
     }
+
 }
