@@ -92,6 +92,15 @@
                                     new { @class = "dropdown-item" })
                             </li>
 
+                            <li>
+                                @Html.ActionLink(
+                                    "Inventario",
+                                    "Index",
+                                    "Inventario",
+                                    null,
+                                    new { @class = "dropdown-item" })
+                            </li>
+
                             @if (User.IsInRole("Administrador"))
                             {
                                 <li><hr class="dropdown-divider" /></li>
