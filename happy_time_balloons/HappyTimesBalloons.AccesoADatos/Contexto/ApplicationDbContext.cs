@@ -16,11 +16,24 @@ namespace HappyTimesBalloons.AccesoADatos.Contexto
             return new ApplicationDbContext();
         }
 
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Inventario>()
+                .HasRequired(i => i.Producto)
+                .WithMany(p => p.Inventarios)
+                .HasForeignKey(i => i.ProductoId)
+                .WillCascadeOnDelete(true);
+        }
+
         public DbSet<BitacoraAuditoria> BitacoraAuditoria { get; set; }
 
         public DbSet<Categoria> Categorias { get; set; }
 
         public DbSet<Producto> Productos { get; set; }
+
+        public DbSet<Inventario> Inventario { get; set; }
 
         public DbSet<ImagenProducto> ImagenesProducto { get; set; }
 

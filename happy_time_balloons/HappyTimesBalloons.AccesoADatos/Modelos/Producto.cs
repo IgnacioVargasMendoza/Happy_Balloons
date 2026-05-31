@@ -20,8 +20,6 @@ namespace HappyTimesBalloons.AccesoADatos.Modelos
 
         public decimal? PrecioDescuento { get; set; }
 
-        public int Stock { get; set; }
-
         public int CategoriaId { get; set; }
 
         [ForeignKey("CategoriaId")]
@@ -36,5 +34,8 @@ namespace HappyTimesBalloons.AccesoADatos.Modelos
 
         public virtual ICollection<Promocion> Promociones { get; set; }
             = new List<Promocion>();
+
+        public virtual ICollection<Inventario> Inventarios { get; set; }
+            = new List<Inventario>();
     }
 }

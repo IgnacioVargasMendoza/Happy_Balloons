@@ -151,9 +151,10 @@ Al terminar la inicialización, muestra siempre este bloque:
 ```
 ## Agentes disponibles ahora
 
-🔵 module-scaffolder  — LISTO. Crea los archivos de las 4 capas según el alcance confirmado.
-                        Contexto disponible en: .claude/features/{nombre-rama}.md
+🟡 data-normalizer    — LISTO. Normaliza el esquema a 3FN y valida convenciones de nombres
+                        antes de crear ningún archivo. Ejecutar PRIMERO.
 
+⚪ module-scaffolder  — EN ESPERA. Ejecutar después de que data-normalizer confirme el esquema.
 ⚪ di-registrar       — EN ESPERA. Ejecutar después del paso 10 (al terminar module-scaffolder).
 ⚪ convention-fixer   — EN ESPERA. Ejecutar después de implementar los archivos .cs.
 ⚪ architecture-auditor — EN ESPERA. Ejecutar antes del PR final.
@@ -228,7 +229,8 @@ Después de cada mejora confirmada, muestra qué agentes están listos para ejec
 ```
 ## Agentes disponibles ahora
 
-🔵 module-scaffolder  — LISTO si hay archivos nuevos que crear.
+🟡 data-normalizer    — LISTO si se agregaron o cambiaron entidades/atributos. Ejecutar antes del scaffolder.
+⚪ module-scaffolder  — EN ESPERA hasta que data-normalizer confirme el esquema (si hay entidades nuevas).
 🟡 convention-fixer   — LISTO si se modificaron archivos .cs existentes.
 🔴 architecture-auditor — LISTO si se modificó lógica en controladores o servicios.
 ⚪ di-registrar       — EN ESPERA hasta que se implementen los nuevos servicios/repos.

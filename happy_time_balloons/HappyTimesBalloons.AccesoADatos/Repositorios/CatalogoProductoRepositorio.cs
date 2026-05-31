@@ -37,7 +37,7 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
                         .Select(i => i.RutaImagen)
                         .FirstOrDefault(),
                     EsActivo = p.EsActivo,
-                    Disponible = p.Stock > 0
+                    Disponible = p.Inventarios.Any(i => i.StockActual > 0)
                 })
                 .ToList();
         }
@@ -61,7 +61,7 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
                         .Select(i => i.RutaImagen)
                         .FirstOrDefault(),
                     EsActivo = p.EsActivo,
-                    Disponible = p.Stock > 0
+                    Disponible = p.Inventarios.Any(i => i.StockActual > 0)
                 })
                 .FirstOrDefault();
         }

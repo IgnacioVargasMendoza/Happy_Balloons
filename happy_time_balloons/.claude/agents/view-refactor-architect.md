@@ -48,6 +48,11 @@ Scan every `.cshtml` file in scope. For each file, identify and report:
 - UI state management (toggling classes, showing/hiding elements conditionally)
 - Calculation logic
 
+### Razor Helper Violations
+- `@Html.ActionLink("", ...)` — primer argumento vacío lanza `ArgumentException`; reemplazar con `<a href="@Url.Action(...)">` 
+- `@Html.TextAreaFor(m => m.Campo, rows, htmlAttributes)` — overload de 3 argumentos no existe y falla en runtime; usar `(expr, rows, columns, htmlAttributes)` o `(expr, htmlAttributes)`
+- `@using (Html.BeginForm(...))` dentro de `@foreach`, `@if`, `@while` — rompe el parser Razor con "Unexpected 'using' keyword"; reemplazar con `<form action="@Url.Action(...)" method="post">`
+
 ### Structural Violations
 - Repeated HTML blocks (cards, rows, form groups) that should be partials
 - Content that should be in `_Layout.cshtml` but is duplicated across views

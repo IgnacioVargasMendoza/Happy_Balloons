@@ -24,6 +24,7 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
             var query = _ctx.Productos
                 .Include(p => p.Categoria)
                 .Include(p => p.Imagenes)
+                .Include(p => p.Inventarios)
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(busqueda))
@@ -52,7 +53,7 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
                     PrecioDescuento = promo != null
                         ? Math.Round(p.Precio * (1 - promo.DescuentoPorcentaje / 100m), 0)
                         : p.PrecioDescuento,
-                    Stock = p.Stock,
+                    Stock = p.Inventarios.FirstOrDefault()?.StockActual ?? 0,
                     CategoriaId = p.CategoriaId,
                     CategoriaNombre = p.Categoria?.Nombre,
                     EsActivo = p.EsActivo,
@@ -74,16 +75,63 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
 
         public async Task<ProductoEstadisticasDTO> ObtenerEstadisticasAsync()
         {
-            var productos = await _ctx.Productos
-                .Select(p => new { p.EsActivo, p.Stock })
-                .ToListAsync();
+            var total = await _ctx.Productos.CountAsync();
+            var activos = await _ctx.Productos.CountAsync(p => p.EsActivo);
+            var conBajoStock = await _ctx.Productos
+                .CountAsync(p => p.EsActivo && p.Inventarios.Any(i => i.StockActual <= 5));
 
             return new ProductoEstadisticasDTO
             {
-                Total        = productos.Count,
-                Activos      = productos.Count(p => p.EsActivo),
-                ConBajoStock = productos.Count(p => p.Stock <= 5 && p.EsActivo)
+                Total = total,
+                Activos = activos,
+                ConBajoStock = conBajoStock
             };
+        }
+
+        public async Task<List<ProductoDTO>> ObtenerRelacionadosAsync(int excluirId, int categoriaId, int cantidad)
+        {
+            var productos = await _ctx.Productos
+                .Include(p => p.Categoria)
+                .Include(p => p.Imagenes)
+                .Include(p => p.Inventarios)
+                .Where(p => p.CategoriaId == categoriaId && p.Id != excluirId && p.EsActivo)
+                .OrderBy(p => p.Nombre)
+                .Take(cantidad)
+                .ToListAsync();
+
+            var promoDict = await ObtenerPromosActivasAsync();
+
+            return productos.Select(p =>
+            {
+                Promocion promo;
+                promoDict.TryGetValue(p.Id, out promo);
+                return new ProductoDTO
+                {
+                    Id = p.Id,
+                    Nombre = p.Nombre,
+                    Descripcion = p.Descripcion,
+                    Precio = p.Precio,
+                    PrecioDescuento = promo != null
+                        ? Math.Round(p.Precio * (1 - promo.DescuentoPorcentaje / 100m), 0)
+                        : p.PrecioDescuento,
+                    Stock = p.Inventarios.FirstOrDefault()?.StockActual ?? 0,
+                    CategoriaId = p.CategoriaId,
+                    CategoriaNombre = p.Categoria?.Nombre,
+                    EsActivo = p.EsActivo,
+                    FechaCreacion = p.FechaCreacion,
+                    TienePromocion = promo != null,
+                    PromocionFin = promo?.FechaFin,
+                    Imagenes = p.Imagenes.OrderBy(i => i.Orden)
+                        .Select(i => new ImagenProductoDTO
+                        {
+                            Id = i.Id,
+                            ProductoId = i.ProductoId,
+                            RutaImagen = i.RutaImagen,
+                            EsPrincipal = i.EsPrincipal,
+                            Orden = i.Orden
+                        }).ToList()
+                };
+            }).ToList();
         }
 
         public async Task<ImagenProductoDTO> ObtenerImagenPorIdAsync(int imagenId)
@@ -93,11 +141,11 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
 
             return new ImagenProductoDTO
             {
-                Id         = imagen.Id,
+                Id = imagen.Id,
                 ProductoId = imagen.ProductoId,
                 RutaImagen = imagen.RutaImagen,
                 EsPrincipal = imagen.EsPrincipal,
-                Orden      = imagen.Orden
+                Orden = imagen.Orden
             };
         }
 
@@ -106,6 +154,7 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
             var p = await _ctx.Productos
                 .Include(x => x.Categoria)
                 .Include(x => x.Imagenes)
+                .Include(x => x.Inventarios)
                 .FirstOrDefaultAsync(x => x.Id == id);
 
             if (p == null) return null;
@@ -124,7 +173,7 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
                 PrecioDescuento = promo != null
                     ? Math.Round(p.Precio * (1 - promo.DescuentoPorcentaje / 100m), 0)
                     : p.PrecioDescuento,
-                Stock = p.Stock,
+                Stock = p.Inventarios.FirstOrDefault()?.StockActual ?? 0,
                 CategoriaId = p.CategoriaId,
                 CategoriaNombre = p.Categoria?.Nombre,
                 EsActivo = p.EsActivo,
@@ -151,13 +200,23 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
                 Descripcion = dto.Descripcion?.Trim(),
                 Precio = dto.Precio,
                 PrecioDescuento = dto.PrecioDescuento,
-                Stock = dto.Stock,
                 CategoriaId = dto.CategoriaId,
                 EsActivo = true,
                 FechaCreacion = DateTime.UtcNow
             };
 
             _ctx.Productos.Add(entidad);
+            await _ctx.SaveChangesAsync();
+
+            var inventario = new Inventario
+            {
+                ProductoId = entidad.Id,
+                StockActual = dto.Stock,
+                StockMinimo = 5,
+                FechaUltimaActualizacion = DateTime.UtcNow
+            };
+
+            _ctx.Inventario.Add(inventario);
             await _ctx.SaveChangesAsync();
 
             dto.Id = entidad.Id;
@@ -175,8 +234,26 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
             entidad.Descripcion = dto.Descripcion?.Trim();
             entidad.Precio = dto.Precio;
             entidad.PrecioDescuento = dto.PrecioDescuento;
-            entidad.Stock = dto.Stock;
             entidad.CategoriaId = dto.CategoriaId;
+
+            var inventario = await _ctx.Inventario
+                .FirstOrDefaultAsync(i => i.ProductoId == dto.Id);
+
+            if (inventario != null)
+            {
+                inventario.StockActual = dto.Stock;
+                inventario.FechaUltimaActualizacion = DateTime.UtcNow;
+            }
+            else
+            {
+                _ctx.Inventario.Add(new Inventario
+                {
+                    ProductoId = dto.Id,
+                    StockActual = dto.Stock,
+                    StockMinimo = 5,
+                    FechaUltimaActualizacion = DateTime.UtcNow
+                });
+            }
 
             await _ctx.SaveChangesAsync();
             return dto;
