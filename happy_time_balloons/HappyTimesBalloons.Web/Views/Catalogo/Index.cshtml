@@ -1,0 +1,123 @@
+@model List<HappyTimesBalloons.Abstraccion.DTOs.CatalogoProductoDTO>
+
+@{
+    ViewBag.Title = "Catálogo";
+}
+
+<h2 class="mb-4">Catálogo de Productos</h2>
+
+<form method="get" class="mb-4">
+    <div class="row">
+
+        <div class="col-md-5">
+            <input type="text"
+                   name="busqueda"
+                   value="@Request.QueryString["busqueda"]"
+                   class="form-control"
+                   placeholder="Buscar producto..." />
+        </div>
+
+        <div class="col-md-3">
+            <select name="categoriaId" class="form-control">
+                <option value="">Todas las categorías</option>
+
+                @if (ViewBag.Categorias != null)
+                {
+                    foreach (var categoria in ViewBag.Categorias)
+                    {
+                        <option value="@categoria.Id">
+                            @categoria.Nombre
+                        </option>
+                    }
+                }
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary">
+                Buscar
+            </button>
+        </div>
+
+        <div class="col-md-2">
+            <a href="@Url.Action("Index", "Catalogo")"
+               class="btn btn-secondary">
+                Limpiar
+            </a>
+        </div>
+
+    </div>
+</form>
+
+<div class="row">
+
+    @if (Model != null && Model.Any())
+    {
+        foreach (var item in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+
+                    <img src="@item.ImagenPrincipal"
+                         class="card-img-top"
+                         style="height:250px; object-fit:cover;" />
+
+                    <div class="card-body">
+                        <h5 class="card-title">@item.Nombre</h5>
+
+                        <p class="card-text">@item.Descripcion</p>
+
+                        <p>
+                            <strong>Categoría:</strong> @item.CategoriaNombre
+                        </p>
+
+                        @if (item.PrecioDescuento.HasValue)
+                        {
+                            <p>
+                                <span style="text-decoration:line-through;">
+                                    ₡@item.Precio
+                                </span>
+
+                                <strong class="text-danger">
+                                    ₡@item.PrecioDescuento
+                                </strong>
+                            </p>
+                        }
+                        else
+                        {
+                            <p>
+                                <strong>₡@item.Precio</strong>
+                            </p>
+                        }
+
+                        @if (item.Disponible)
+                        {
+                            <span class="badge bg-success">Disponible</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">Agotado</span>
+                        }
+                    </div>
+
+                    <div class="card-footer text-center">
+                        <a href="@Url.Action("Detalle", "Catalogo", new { id = item.ProductoId })"
+                           class="btn btn-outline-primary">
+                            Ver detalle
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-12">
+            <div class="alert alert-warning">
+                No hay productos disponibles en el catálogo.
+            </div>
+        </div>
+    }
+
+</div>

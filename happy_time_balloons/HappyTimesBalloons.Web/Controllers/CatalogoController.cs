@@ -20,6 +20,8 @@ namespace HappyTimesBalloons.Web.Controllers
 
                 var catalogo = servicio.ObtenerCatalogo(busqueda, categoriaId);
 
+                ViewBag.Categorias = servicio.ObtenerCategorias();
+
                 return View(catalogo);
             }
         }

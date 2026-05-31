@@ -23,5 +23,10 @@ namespace HappyTimesBalloons.LogicaNegocio.Servicios
         {
             return _catalogoProductoRepositorio.ObtenerProductoCatalogoPorId(productoId);
         }
+
+        public List<CategoriaDTO> ObtenerCategorias()
+        {
+            return _catalogoProductoRepositorio.ObtenerCategorias();
+        }
     }
 }

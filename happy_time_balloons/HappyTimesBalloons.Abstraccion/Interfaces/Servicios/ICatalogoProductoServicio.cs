@@ -12,5 +12,7 @@ namespace HappyTimesBalloons.Abstraccion.Interfaces.Servicios
         List<CatalogoProductoDTO> ObtenerCatalogo(string busqueda = "", int? categoriaId = null);
 
         CatalogoProductoDTO ObtenerProductoCatalogoPorId(int productoId);
+
+        List<CategoriaDTO> ObtenerCategorias();
     }
 }

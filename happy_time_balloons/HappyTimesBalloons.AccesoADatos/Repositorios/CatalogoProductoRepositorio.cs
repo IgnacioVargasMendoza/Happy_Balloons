@@ -77,5 +77,21 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
                 })
                 .FirstOrDefault();
         }
+
+        public List<CategoriaDTO> ObtenerCategorias()
+        {
+            return _context.Categorias
+                .Where(c => c.EsActiva)
+                .OrderBy(c => c.Nombre)
+                .Select(c => new CategoriaDTO
+                {
+                    Id = c.Id,
+                    Nombre = c.Nombre,
+                    Descripcion = c.Descripcion,
+                    EsActiva = c.EsActiva,
+                    FechaCreacion = c.FechaCreacion
+                })
+                .ToList();
+        }
     }
 }
