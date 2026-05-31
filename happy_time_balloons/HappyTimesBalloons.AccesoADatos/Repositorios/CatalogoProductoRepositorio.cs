@@ -1,11 +1,9 @@
 ﻿using HappyTimesBalloons.Abstraccion.DTOs;
 using HappyTimesBalloons.Abstraccion.Interfaces.Repositorios;
 using HappyTimesBalloons.AccesoADatos.Contexto;
-using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HappyTimesBalloons.AccesoADatos.Repositorios
 {
@@ -18,12 +16,26 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
             _context = context;
         }
 
-        public List<CatalogoProductoDTO> ObtenerCatalogo()
+        public List<CatalogoProductoDTO> ObtenerCatalogo(string busqueda = "", int? categoriaId = null)
         {
-            return _context.Productos
+            var query = _context.Productos
                 .Include("Categoria")
                 .Include("Imagenes")
-                .Where(p => p.EsActivo)
+                .Where(p => p.EsActivo);
+
+            if (!string.IsNullOrWhiteSpace(busqueda))
+            {
+                query = query.Where(p =>
+                    p.Nombre.Contains(busqueda) ||
+                    p.Descripcion.Contains(busqueda));
+            }
+
+            if (categoriaId.HasValue)
+            {
+                query = query.Where(p => p.CategoriaId == categoriaId.Value);
+            }
+
+            return query
                 .Select(p => new CatalogoProductoDTO
                 {
                     ProductoId = p.Id,

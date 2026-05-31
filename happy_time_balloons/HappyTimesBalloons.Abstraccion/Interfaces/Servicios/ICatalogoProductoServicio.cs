@@ -9,7 +9,7 @@ namespace HappyTimesBalloons.Abstraccion.Interfaces.Servicios
 {
     public interface ICatalogoProductoServicio
     {
-        List<CatalogoProductoDTO> ObtenerCatalogo();
+        List<CatalogoProductoDTO> ObtenerCatalogo(string busqueda = "", int? categoriaId = null);
 
         CatalogoProductoDTO ObtenerProductoCatalogoPorId(int productoId);
     }

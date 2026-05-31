@@ -1,11 +1,7 @@
 ﻿using HappyTimesBalloons.Abstraccion.DTOs;
 using HappyTimesBalloons.Abstraccion.Interfaces.Repositorios;
 using HappyTimesBalloons.Abstraccion.Interfaces.Servicios;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HappyTimesBalloons.LogicaNegocio.Servicios
 {
@@ -18,9 +14,9 @@ namespace HappyTimesBalloons.LogicaNegocio.Servicios
             _catalogoProductoRepositorio = catalogoProductoRepositorio;
         }
 
-        public List<CatalogoProductoDTO> ObtenerCatalogo()
+        public List<CatalogoProductoDTO> ObtenerCatalogo(string busqueda = "", int? categoriaId = null)
         {
-            return _catalogoProductoRepositorio.ObtenerCatalogo();
+            return _catalogoProductoRepositorio.ObtenerCatalogo(busqueda, categoriaId);
         }
 
         public CatalogoProductoDTO ObtenerProductoCatalogoPorId(int productoId)
