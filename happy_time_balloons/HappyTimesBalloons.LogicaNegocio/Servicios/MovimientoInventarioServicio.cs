@@ -27,7 +27,8 @@ namespace HappyTimesBalloons.LogicaNegocio.Servicios
 
         public async Task<ResultadoOperacionDTO> RegistrarMovimientoAsync(
             MovimientoInventarioDTO dto,
-            string usuarioId)
+            string usuarioId,
+            string nombreUsuario)
         {
             if (string.IsNullOrWhiteSpace(dto.Motivo))
             {
@@ -104,7 +105,7 @@ namespace HappyTimesBalloons.LogicaNegocio.Servicios
                 await _bitacora.GuardarAsync(new BitacoraEntradaDTO
                 {
                     UsuarioId = usuarioId,
-                    NombreUsuario = usuarioId,
+                    NombreUsuario = nombreUsuario,
                     Accion = TipoOperacion.Crear,
                     TablaAfectada = "MovimientosInventario",
                     RegistroId = movimientoGuardado.Id,

@@ -40,7 +40,7 @@ namespace HappyTimesBalloons.Web.Controllers
                 Motivo = vm.Motivo
             };
 
-            var resultado = await _movimientoServicio.RegistrarMovimientoAsync(dto, User.Identity.GetUserId());
+            var resultado = await _movimientoServicio.RegistrarMovimientoAsync(dto, User.Identity.GetUserId(), User.Identity.Name);
 
             if (!resultado.Exito)
             {
