@@ -136,6 +136,7 @@
                                     <th class="text-center">Stock Actual</th>
                                     <th class="text-center">Stock Mínimo</th>
                                     <th class="text-center">Estado</th>
+                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -155,6 +156,16 @@
                                             {
                                                 <span class="badge bg-warning text-dark">Stock bajo</span>
                                             }
+                                        </td>
+                                        <td class="text-end">
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-primary btn-registrar-mov"
+                                                    data-producto-id="@alerta.ProductoId"
+                                                    data-producto-nombre="@Html.AttributeEncode(alerta.ProductoNombre)"
+                                                    data-stock-actual="@alerta.StockActual"
+                                                    title="Registrar movimiento">
+                                                <i class="bi bi-arrow-left-right"></i>
+                                            </button>
                                         </td>
                                     </tr>
                                 }
@@ -230,13 +241,14 @@
                                 <th class="text-center">Stock Mínimo</th>
                                 <th class="text-center">Estado</th>
                                 <th>Última Actualización</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
                             @if (!Model.Items.Any())
                             {
                                 <tr>
-                                    <td colspan="6" class="text-center text-muted py-4">
+                                    <td colspan="7" class="text-center text-muted py-4">
                                         <i class="bi bi-inbox fs-4 d-block mb-2"></i>
                                         No se encontraron productos con los filtros aplicados.
                                     </td>
@@ -277,6 +289,16 @@
                                         </td>
                                         <td class="text-muted small">
                                             @item.FechaUltimaActualizacion.ToString("dd/MM/yyyy HH:mm")
+                                        </td>
+                                        <td class="text-end pe-3">
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-primary btn-registrar-mov"
+                                                    data-producto-id="@item.ProductoId"
+                                                    data-producto-nombre="@Html.AttributeEncode(item.ProductoNombre)"
+                                                    data-stock-actual="@item.StockActual"
+                                                    title="Registrar movimiento">
+                                                <i class="bi bi-arrow-left-right"></i>
+                                            </button>
                                         </td>
                                     </tr>
                                 }
@@ -351,6 +373,94 @@
         </div>
     </div>
 
+</div>
+
+@* ───────────────────────────── Modal Registrar Movimiento ─── *@
+<div class="modal fade" id="modalMovimiento" tabindex="-1" aria-labelledby="modalMovimientoLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalMovimientoLabel">
+                    <i class="bi bi-arrow-left-right me-2 text-primary"></i>Registrar movimiento
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="@Url.Action("Registrar", "MovimientosInventario")" method="post" id="formMovimiento">
+                @Html.AntiForgeryToken()
+                <input type="hidden" id="movProductoId" name="ProductoId" />
+                <input type="hidden" id="movProductoNombre" name="ProductoNombre" />
+                <input type="hidden" id="movStockActual" name="StockActual" />
+                <div class="modal-body">
+                    <div class="alert alert-light border mb-4 d-flex align-items-center gap-3">
+                        <i class="bi bi-box-seam fs-4 text-secondary"></i>
+                        <div>
+                            <div class="text-muted small">Producto</div>
+                            <div class="fw-semibold" id="movNombreDisplay"></div>
+                        </div>
+                        <div class="ms-auto text-end">
+                            <div class="text-muted small">Stock actual</div>
+                            <div class="fs-5 fw-bold" id="movStockDisplay"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">
+                            Tipo de movimiento <span class="text-danger">*</span>
+                        </label>
+                        <div class="d-flex gap-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="TipoMovimiento"
+                                       id="movEntrada" value="0" />
+                                <label class="form-check-label text-success fw-semibold" for="movEntrada">
+                                    <i class="bi bi-arrow-down-circle me-1"></i>Entrada
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="TipoMovimiento"
+                                       id="movSalida" value="1" />
+                                <label class="form-check-label text-danger fw-semibold" for="movSalida">
+                                    <i class="bi bi-arrow-up-circle me-1"></i>Salida
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="TipoMovimiento"
+                                       id="movAjuste" value="2" />
+                                <label class="form-check-label text-warning fw-semibold" for="movAjuste">
+                                    <i class="bi bi-sliders me-1"></i>Ajuste
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="movCantidad" class="form-label fw-semibold">
+                            Cantidad <span class="text-danger">*</span>
+                        </label>
+                        <div class="form-text text-muted mb-1">
+                            Entrada y Salida: valor positivo. Ajuste: positivo (aumenta) o negativo (reduce).
+                        </div>
+                        <input type="number" class="form-control" id="movCantidad" name="Cantidad" step="1" />
+                    </div>
+
+                    <div class="mb-1">
+                        <label for="movMotivo" class="form-label fw-semibold">
+                            Motivo <span class="text-danger">*</span>
+                        </label>
+                        <textarea class="form-control" id="movMotivo" name="Motivo" rows="3"
+                                  placeholder="Describe el motivo del movimiento..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-lg me-1"></i>Registrar movimiento
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 @section scripts {
@@ -436,6 +546,32 @@
 
     // Inicializar solo cuando el tab de Análisis sea visible
     document.getElementById('tab-analisis-btn').addEventListener('shown.bs.tab', initCharts);
+}());
+
+(function () {
+    var modal = new bootstrap.Modal(document.getElementById('modalMovimiento'));
+
+    document.querySelectorAll('.btn-registrar-mov').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var productoId = this.dataset.productoId;
+            var productoNombre = this.dataset.productoNombre;
+            var stockActual = this.dataset.stockActual;
+
+            document.getElementById('movProductoId').value = productoId;
+            document.getElementById('movProductoNombre').value = productoNombre;
+            document.getElementById('movStockActual').value = stockActual;
+            document.getElementById('movNombreDisplay').textContent = productoNombre;
+            document.getElementById('movStockDisplay').textContent = stockActual + ' unidades';
+
+            document.querySelectorAll('input[name="TipoMovimiento"]').forEach(function (r) {
+                r.checked = false;
+            });
+            document.getElementById('movCantidad').value = '';
+            document.getElementById('movMotivo').value = '';
+
+            modal.show();
+        });
+    });
 }());
 </script>
 }

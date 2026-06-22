@@ -22,34 +22,14 @@ namespace HappyTimesBalloons.Web.Controllers
             _inventarioServicio = inventarioServicio;
         }
 
-        [HttpGet]
-        public async Task<ActionResult> Registrar(int productoId)
-        {
-            var inventario = await _inventarioServicio.ObtenerPorProductoIdAsync(productoId);
-
-            if (inventario == null)
-            {
-                TempData["Error"] = "No se encontró el producto en inventario.";
-                return RedirectToAction("Index", "Inventario");
-            }
-
-            var vm = new RegistrarMovimientoViewModel
-            {
-                ProductoId = productoId,
-                ProductoNombre = inventario.ProductoNombre,
-                StockActual = inventario.StockActual
-            };
-
-            return View(vm);
-        }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Registrar(RegistrarMovimientoViewModel vm)
         {
             if (!ModelState.IsValid)
             {
-                return View(vm);
+                TempData["Error"] = "Por favor completa todos los campos requeridos.";
+                return RedirectToAction("Index", "Inventario");
             }
 
             var dto = new MovimientoInventarioDTO
@@ -65,7 +45,7 @@ namespace HappyTimesBalloons.Web.Controllers
             if (!resultado.Exito)
             {
                 TempData["Error"] = resultado.Mensaje;
-                return View(vm);
+                return RedirectToAction("Index", "Inventario");
             }
 
             TempData["Exito"] = resultado.Mensaje;

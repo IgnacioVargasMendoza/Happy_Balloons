@@ -182,7 +182,6 @@
     <Content Include="Views\Rol\Editar.cshtml" />
     <Content Include="Views\Rol\Usuarios.cshtml" />
     <Content Include="Views\Inventario\Index.cshtml" />
-    <Content Include="Views\MovimientosInventario\Registrar.cshtml" />
     <Content Include="Views\MovimientosInventario\Historial.cshtml" />
     <Content Include="Scripts\Rol\rol-index.js" />
     <Content Include="Views\Shared\_NavBar.cshtml" />
