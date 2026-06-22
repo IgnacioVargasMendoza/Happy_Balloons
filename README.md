@@ -13,16 +13,18 @@ Aplicación web para la gestión de pedidos e inventario de una empresa de globo
 | Frontend | Razor Views + Bootstrap 5 + jQuery |
 | DI Container | Autofac 6.5.0 + Autofac.Mvc5 6.1.0 |
 | Autenticación | ASP.NET Identity con roles |
+| Tests | MSTest 3.1.1 + Moq 4.20.70 |
 | IDE | Visual Studio 2022 |
 
 ## Arquitectura — Solución en 4 proyectos
 
 ```
-HappyTimesBalloons.sln
+HappyTimesBalloons.slnx
 ├── HappyTimesBalloons.Abstraccion      ← Interfaces, DTOs, Enums
 ├── HappyTimesBalloons.AccesoADatos     ← Repositorios EF6, DbContext, Migraciones
 ├── HappyTimesBalloons.LogicaNegocio    ← Servicios de negocio
-└── HappyTimesBalloons.Web              ← Controladores, Vistas Razor, App_Start
+├── HappyTimesBalloons.Web              ← Controladores, Vistas Razor, App_Start
+└── HappyTimesBalloons.Tests            ← Tests unitarios (MSTest + Moq)
 ```
 
 **Reglas de dependencia:** Web → LogicaNegocio → AccesoADatos → Abstraccion. Ninguna capa referencia hacia arriba.
@@ -78,12 +80,13 @@ HappyTimesBalloons.Web/connectionStrings.config.example  →  connectionStrings.
 | Pedidos (checkout, mis pedidos, gestión admin) | Completo | — |
 | Dashboard de administrador | Completo | — |
 | Inyección de dependencias (Autofac) | Completo | — |
+| Inventario (consulta, movimientos y stock mínimo) | Completo | HU-INV-001 |
+| Tests unitarios (stock mínimo) | Completo | HU-INV-001 T7 |
 
 ## Módulos pendientes
 
 - **Promociones** — HU-PRM-001
 - **Configuración del sistema** — HU-CFG-001
-- Pruebas de punta a punta (FASE 6)
 
 ## Roles del sistema
 

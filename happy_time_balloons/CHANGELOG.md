@@ -35,6 +35,16 @@ Versiones vinculadas a la rama `develop` (ASP.NET MVC 5).
 - `Controllers/PedidoController.cs` — Nuevo controlador con acciones: `Carrito` (GET, anónimo), `AgregarAlCarrito` (POST, valida stock vía `ProductoServicio`), `ActualizarCantidad` (POST), `QuitarDelCarrito` (POST), `Index` (placeholder hasta Phase 5). El carrito se persiste en `Session["Carrito"]` (`List<CarritoItemViewModel>`) y el conteo en `Session["CarritoCount"]`.
 - `Views/Pedido/Carrito.cshtml` — Vista de dos columnas: tabla de ítems con formularios inline +/- y botón de eliminar por fila; columna de resumen con subtotal, total y botón de pago (deshabilitado hasta Phase 5). Estado vacío con enlace al catálogo.
 
+#### Inventario — Configurar stock mínimo (2026-06-22)
+- `Abstraccion/DTOs/InventarioDTO.cs` — Agrega `[Required]` y `[Range(0, int.MaxValue)]` sobre `StockActual` y `StockMinimo`; agrega referencia a `System.ComponentModel.DataAnnotations` en el `.csproj` de Abstraccion.
+- `Abstraccion/Interfaces/Repositorios/IInventarioRepositorio.cs` — Nuevo método `ActualizarStockMinimoAsync(int inventarioId, int nuevoStockMinimo, string usuarioId)`.
+- `Abstraccion/Interfaces/Servicios/IInventarioServicio.cs` — Nuevo método `ActualizarStockMinimoAsync(int inventarioId, int nuevoStockMinimo, string usuarioId, string nombreUsuario)`.
+- `AccesoADatos/Repositorios/InventarioRepositorio.cs` — Implementación de `ActualizarStockMinimoAsync`: actualiza `StockMinimo`, `FechaUltimaActualizacion` y `UsuarioUltimaActualizacionId`; retorna `false` si el registro no existe.
+- `LogicaNegocio/Servicios/InventarioServicio.cs` — Implementación de `ActualizarStockMinimoAsync`: valida `nuevoStockMinimo >= 0`, llama al repositorio y registra en bitácora con `TipoOperacion.Actualizar` si la operación fue exitosa.
+- `Web/Controllers/InventarioController.cs` — Nueva acción `[HttpPost] EditarStockMinimo` con `[ValidateAntiForgeryToken]`; lee `usuarioId` con `User.Identity.GetUserId()` y redirige a `Index` con `TempData` de éxito o error.
+- `Web/Views/Inventario/Index.cshtml` — Modal "Editar stock mínimo" con formulario POST, input numérico `min="0"` y token CSRF; JavaScript que carga el `inventarioId` y valor actual al abrir el modal.
+- `HappyTimesBalloons.Tests/` — Nuevo proyecto de tests unitarios (MSTest 3.1.1 + Moq 4.20.70) con 15 tests: `InventarioServicioTests` (8 tests: validación numérica, flujo exitoso, auditoría y cortocircuito) y `AlertaStockTests` (7 tests: estados `sin_stock`, `bajo`, `normal` con casos borde). 15/15 pasan.
+
 ### Pendiente (próximas fases)
 - **Phase 5** — Checkout y Mis Pedidos: requiere entidades `Pedido`, `DetallePedido`, `ZonaEntrega` en backend.
 - **Phase 6** — Gestión de pedidos (admin/operador): `PedidoController.Index` con tabla filtrable y modal de cambio de estado.
