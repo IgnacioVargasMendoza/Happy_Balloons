@@ -1,6 +1,7 @@
 using HappyTimesBalloons.Abstraccion.DTOs;
 using HappyTimesBalloons.Abstraccion.Interfaces.Servicios;
 using HappyTimesBalloons.Web.Models.ViewModels;
+using Microsoft.AspNet.Identity;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
@@ -59,7 +60,7 @@ namespace HappyTimesBalloons.Web.Controllers
                 Motivo = vm.Motivo
             };
 
-            var resultado = await _movimientoServicio.RegistrarMovimientoAsync(dto, User.Identity.Name);
+            var resultado = await _movimientoServicio.RegistrarMovimientoAsync(dto, User.Identity.GetUserId());
 
             if (!resultado.Exito)
             {
