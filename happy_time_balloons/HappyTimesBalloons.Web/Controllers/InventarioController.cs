@@ -1,5 +1,6 @@
 using HappyTimesBalloons.Abstraccion.Interfaces.Servicios;
 using HappyTimesBalloons.Web.Models.ViewModels;
+using Microsoft.AspNet.Identity;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
@@ -51,6 +52,21 @@ namespace HappyTimesBalloons.Web.Controllers
             };
 
             return View(vm);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> EditarStockMinimo(int id, int stockMinimo)
+        {
+            var resultado = await _inventarioServicio.ActualizarStockMinimoAsync(
+                id, stockMinimo, User.Identity.GetUserId(), User.Identity.Name);
+
+            if (!resultado.Exito)
+                TempData["Error"] = resultado.Mensaje;
+            else
+                TempData["Exito"] = resultado.Mensaje;
+
+            return RedirectToAction("Index");
         }
 
         private static InventarioItemViewModel MapearItem(

@@ -290,6 +290,14 @@
                                         </td>
                                         <td class="text-end pe-3">
                                             <button type="button"
+                                                    class="btn btn-sm btn-outline-secondary me-1 btn-editar-minimo"
+                                                    data-id="@item.Id"
+                                                    data-producto-nombre="@Html.AttributeEncode(item.ProductoNombre)"
+                                                    data-stock-minimo="@item.StockMinimo"
+                                                    title="Editar stock mínimo">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                            <button type="button"
                                                     class="btn btn-sm btn-outline-primary btn-registrar-mov"
                                                     data-producto-id="@item.ProductoId"
                                                     data-producto-nombre="@Html.AttributeEncode(item.ProductoNombre)"
@@ -371,6 +379,42 @@
         </div>
     </div>
 
+</div>
+
+@* ──────────────────────────── Modal Editar Stock Mínimo ─── *@
+<div class="modal fade" id="modalStockMinimo" tabindex="-1" aria-labelledby="modalStockMinimoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalStockMinimoLabel">
+                    <i class="bi bi-pencil me-2 text-secondary"></i>Editar stock mínimo
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="@Url.Action("EditarStockMinimo", "Inventario")" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" id="minId" name="id" />
+                <div class="modal-body">
+                    <p class="fw-semibold mb-3" id="minNombreDisplay"></p>
+                    <div>
+                        <label for="minStockMinimo" class="form-label fw-semibold">
+                            Stock mínimo <span class="text-danger">*</span>
+                        </label>
+                        <input type="number" class="form-control" id="minStockMinimo"
+                               name="stockMinimo" min="0" step="1" required />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-lg me-1"></i>Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 @* ───────────────────────────── Modal Registrar Movimiento ─── *@
@@ -544,6 +588,19 @@
 
     // Inicializar solo cuando el tab de Análisis sea visible
     document.getElementById('tab-analisis-btn').addEventListener('shown.bs.tab', initCharts);
+}());
+
+(function () {
+    var modalMinimo = new bootstrap.Modal(document.getElementById('modalStockMinimo'));
+
+    document.querySelectorAll('.btn-editar-minimo').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            document.getElementById('minId').value = this.dataset.id;
+            document.getElementById('minNombreDisplay').textContent = this.dataset.productoNombre;
+            document.getElementById('minStockMinimo').value = this.dataset.stockMinimo;
+            modalMinimo.show();
+        });
+    });
 }());
 
 (function () {

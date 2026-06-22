@@ -9,5 +9,6 @@ namespace HappyTimesBalloons.Abstraccion.Interfaces.Servicios
         Task<List<InventarioDTO>> ObtenerTodosAsync(string busqueda = null, int? categoriaId = null, string estadoStock = "todos");
         Task<InventarioKpisDTO> ObtenerKpisAsync();
         Task<InventarioDTO> ObtenerPorProductoIdAsync(int productoId);
+        Task<ResultadoOperacionDTO> ActualizarStockMinimoAsync(int inventarioId, int nuevoStockMinimo, string usuarioId, string nombreUsuario);
     }
 }

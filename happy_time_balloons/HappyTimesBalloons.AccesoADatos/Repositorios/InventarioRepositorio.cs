@@ -132,5 +132,18 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
             inventario.UsuarioUltimaActualizacionId = usuarioId;
             await _ctx.SaveChangesAsync();
         }
+
+        public async Task<bool> ActualizarStockMinimoAsync(int inventarioId, int nuevoStockMinimo, string usuarioId)
+        {
+            var inventario = await _ctx.Inventario.FindAsync(inventarioId);
+            if (inventario == null)
+                return false;
+
+            inventario.StockMinimo = nuevoStockMinimo;
+            inventario.FechaUltimaActualizacion = DateTime.UtcNow;
+            inventario.UsuarioUltimaActualizacionId = usuarioId;
+            await _ctx.SaveChangesAsync();
+            return true;
+        }
     }
 }
