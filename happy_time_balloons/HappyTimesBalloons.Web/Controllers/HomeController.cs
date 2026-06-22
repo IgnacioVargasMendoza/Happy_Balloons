@@ -45,16 +45,12 @@ namespace HappyTimesBalloons.Web.Controllers
             if (dto == null || !dto.EsActivo)
                 return HttpNotFound();
 
-            var relacionados = await _productoServicio.ObtenerTodosAsync(null, dto.CategoriaId, soloActivos: true);
+            var relacionados = await _productoServicio.ObtenerRelacionadosAsync(id, dto.CategoriaId, 4);
 
             var vm = new ProductoDetalleViewModel
             {
                 Producto = MapearProducto(dto),
-                ProductosRelacionados = relacionados
-                    .Where(p => p.Id != id)
-                    .Take(4)
-                    .Select(p => MapearProducto(p))
-                    .ToList()
+                ProductosRelacionados = relacionados.Select(p => MapearProducto(p)).ToList()
             };
 
             return View(vm);

@@ -26,7 +26,24 @@
       "Bash(xargs -0 grep -l \"DbContext\")",
       "Bash(xargs -0 grep -l \"SetInitializer\\\\|MigrateDatabaseToLatest\\\\|DatabaseConfig\\\\|AutofacConfig\")",
       "Bash(xargs -0 cat)",
-      "Bash(xargs -0 grep -A5 \"BuscarPorEmailAsync\\\\|TwoFactor\")"
+      "Bash(xargs -0 grep -A5 \"BuscarPorEmailAsync\\\\|TwoFactor\")",
+      "Bash(Get-ChildItem -Path \"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\\\\HappyTimesBalloons.AccesoADatos\\\\Migrations\" -Recurse)",
+      "Bash(Select-Object FullName, Length, LastWriteTime)",
+      "Bash(\"/c/Program Files/Microsoft Visual Studio/18/Community/MSBuild/Current/Bin/amd64/MSBuild.exe\" \"C:/GitHub/Happy Balloons/RepoCodigoProd/happy_time_balloons/HappyTimesBalloons.sln\" /p:Configuration=Debug /t:Build /v:minimal)",
+      "Bash(\"/c/Program Files/Microsoft Visual Studio/18/Community/MSBuild/Current/Bin/amd64/MSBuild.exe\" HappyTimesBalloons.sln /p:Configuration=Debug /t:Build /v:minimal)",
+      "Bash(\"/c/Program Files/Microsoft Visual Studio/18/Community/MSBuild/Current/Bin/amd64/MSBuild.exe\" HappyTimesBalloons.sln -p:Configuration=Debug -t:Build -v:minimal)",
+      "Bash(\"/c/Program Files/Microsoft Visual Studio/18/Community/MSBuild/Current/Bin/amd64/MSBuild.exe\" \"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\\\\HappyTimesBalloons.sln\" -p:Configuration=Debug -t:Build -v:minimal)",
+      "Bash(\"/c/Program Files/Microsoft Visual Studio/18/Community/MSBuild/Current/Bin/amd64/MSBuild.exe\" \"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\\\\HappyTimesBalloons.slnx\" -p:Configuration=Debug -t:Build -v:minimal)",
+      "PowerShell(& \"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\18\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\MSBuild.exe\" \"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\\\\HappyTimesBalloons.slnx\" /p:Configuration=Debug /verbosity:minimal 2>&1 | Select-Object -Last 20)",
+      "PowerShell(git commit -m $msg)",
+      "PowerShell($msg = \"fix: corregir enlace de 2FA en navbar para apuntar a Configuracion/Index`n`nEl link de verificacion en dos pasos apuntaba a ConfigurarDobleFactor/Cuenta,`nlo que redirig�a al index principal en lugar de la configuracion de cuenta.`nAhora apunta a Configuracion/Index. Tambi�n agrega links de Roles y Usuarios`nen el dropdown de administrador.`n`nCo-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>\")",
+      "PowerShell(& \"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\18\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\MSBuild.exe\" \"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\\\\HappyTimesBalloons.slnx\" /p:Configuration=Debug /verbosity:minimal 2>&1 | Select-Object -Last 12)",
+      "Bash(msbuild HappyTimesBalloons.slnx /p:Configuration=Debug /t:Build /v:minimal /nologo)",
+      "Bash(cmd.exe *)",
+      "PowerShell(& \"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\2022\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\MSBuild.exe\" \"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\\\\HappyTimesBalloons.slnx\" /p:Configuration=Debug /t:Build /v:minimal /nologo)",
+      "PowerShell(& \"C:\\\\Program Files \\(x86\\)\\\\Microsoft Visual Studio\\\\2022\\\\BuildTools\\\\MSBuild\\\\Current\\\\Bin\\\\MSBuild.exe\" \"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\\\\HappyTimesBalloons.slnx\" /p:Configuration=Debug /t:Build /v:minimal /nologo)",
+      "Bash(dotnet build *)",
+      "Bash(dotnet test *)"
     ]
   },
   "hooks": {

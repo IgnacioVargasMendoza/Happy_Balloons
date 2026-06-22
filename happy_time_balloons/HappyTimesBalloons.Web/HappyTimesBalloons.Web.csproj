@@ -94,8 +94,10 @@
     <Compile Include="Controllers\CategoriaController.cs" />
     <Compile Include="Controllers\CuentaController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\InventarioController.cs" />
     <Compile Include="Controllers\PedidoController.cs" />
     <Compile Include="Controllers\ProductoController.cs" />
+    <Compile Include="Controllers\MovimientosInventarioController.cs" />
     <Compile Include="Controllers\PromocionController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -128,6 +130,8 @@
     <Compile Include="Models\ViewModels\RolViewModel.cs" />
     <Compile Include="Models\ViewModels\PromocionFormViewModel.cs" />
     <Compile Include="Models\ViewModels\PromocionViewModel.cs" />
+    <Compile Include="Models\ViewModels\InventarioViewModel.cs" />
+    <Compile Include="Models\ViewModels\MovimientoInventarioViewModel.cs" />
     <Compile Include="Models\ViewModels\ZonaEntregaViewModel.cs" />
     <Compile Include="Models\ViewModels\OlvideContrasenaViewModel.cs" />
     <Compile Include="Models\ViewModels\RestablecerContrasenaViewModel.cs" />
@@ -177,6 +181,8 @@
     <Content Include="Views\Rol\Crear.cshtml" />
     <Content Include="Views\Rol\Editar.cshtml" />
     <Content Include="Views\Rol\Usuarios.cshtml" />
+    <Content Include="Views\Inventario\Index.cshtml" />
+    <Content Include="Views\MovimientosInventario\Historial.cshtml" />
     <Content Include="Scripts\Rol\rol-index.js" />
     <Content Include="Views\Shared\_NavBar.cshtml" />
     <Content Include="Views\Shared\_TarjetaProducto.cshtml" />

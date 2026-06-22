@@ -108,11 +108,54 @@ var total = await _ctx.Pedidos.SumAsync(p => p.Total);
 
 ---
 
+### CONV-07 — `Html.TextAreaFor` con overload incorrecto
+**Regla:** `Html.TextAreaFor` solo tiene dos overloads válidos: `(expr, htmlAttributes)` y `(expr, rows, columns, htmlAttributes)`. El overload de 3 argumentos `(expr, rows, htmlAttributes)` **no existe** y falla en runtime.
+
+```html
+<%-- CORRECTO — overload de 4 args; columns=0 deja el ancho a Bootstrap --%>
+@Html.TextAreaFor(m => m.Campo, 3, 0, new { @class = "form-control" })
+
+<%-- CORRECTO — overload de 2 args; rows como atributo HTML --%>
+@Html.TextAreaFor(m => m.Campo, new { @class = "form-control", rows = 3 })
+
+<%-- INCORRECTO — overload de 3 args no existe, falla en runtime --%>
+@Html.TextAreaFor(m => m.Campo, 3, new { @class = "form-control" })
+```
+
+**Buscar en:** `Web/Views/**/*.cshtml`
+
+---
+
+### CONV-08 — `@using (Html.BeginForm(...))` dentro de bloques Razor
+**Regla:** dentro de bloques de código Razor (`@foreach`, `@if`, `@while`, etc.) el parser ya está en contexto C#. Usar `@using` dentro de esos bloques provoca **"Unexpected 'using' keyword after '@' character"**. Usar siempre `<form>` HTML directo con `@Url.Action()`.
+
+```html
+<%-- CORRECTO — <form> funciona en cualquier contexto --%>
+@foreach (var item in Model.Items)
+{
+    <form action="@Url.Action("Eliminar", "Entidad")" method="post" class="d-inline">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="id" value="@item.Id" />
+        <button type="submit" class="btn btn-danger">Eliminar</button>
+    </form>
+}
+
+<%-- INCORRECTO — rompe el parser Razor --%>
+@foreach (var item in Model.Items)
+{
+    @using (Html.BeginForm("Eliminar", "Entidad", FormMethod.Post)) { ... }
+}
+```
+
+**Buscar en:** `Web/Views/**/*.cshtml`
+
+---
+
 ## Proceso de trabajo
 
 ### Fase 1 — Determinar alcance
 - Si el usuario especificó archivos o un módulo: trabaja solo sobre esos
-- Si la solicitud es general: escanea todos los `.cs` del proyecto y `.cshtml` para CONV-06
+- Si la solicitud es general: escanea todos los `.cs` del proyecto y `.cshtml` para CONV-06, CONV-07 y CONV-08
 
 ### Fase 2 — Auditoría sin cambios
 1. Lee cada archivo en alcance
