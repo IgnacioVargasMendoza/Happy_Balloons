@@ -78,7 +78,7 @@ namespace HappyTimesBalloons.Web.Controllers
                     StockAnterior = m.StockAnterior,
                     StockNuevo = m.StockNuevo,
                     Motivo = m.Motivo,
-                    UsuarioId = m.UsuarioId,
+                    NombreUsuario = m.NombreUsuario,
                     FechaMovimiento = m.FechaMovimiento
                 }).ToList()
             };

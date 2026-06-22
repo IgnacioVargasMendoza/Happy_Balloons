@@ -42,7 +42,7 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
 
         public async Task<List<MovimientoInventarioDTO>> ObtenerPorProductoAsync(int productoId)
         {
-            return await _ctx.MovimientosInventario
+            var movimientos = await _ctx.MovimientosInventario
                 .Where(m => m.ProductoId == productoId)
                 .OrderByDescending(m => m.FechaMovimiento)
                 .Select(m => new MovimientoInventarioDTO
@@ -59,11 +59,14 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
                     FechaMovimiento = m.FechaMovimiento
                 })
                 .ToListAsync();
+
+            await ResolverNombresUsuarioAsync(movimientos);
+            return movimientos;
         }
 
         public async Task<List<MovimientoInventarioDTO>> ObtenerUltimosAsync(int cantidad)
         {
-            return await _ctx.MovimientosInventario
+            var movimientos = await _ctx.MovimientosInventario
                 .OrderByDescending(m => m.FechaMovimiento)
                 .Take(cantidad)
                 .Select(m => new MovimientoInventarioDTO
@@ -80,6 +83,38 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
                     FechaMovimiento = m.FechaMovimiento
                 })
                 .ToListAsync();
+
+            await ResolverNombresUsuarioAsync(movimientos);
+            return movimientos;
+        }
+
+        private async Task ResolverNombresUsuarioAsync(List<MovimientoInventarioDTO> movimientos)
+        {
+            var ids = movimientos
+                .Where(m => m.UsuarioId != null)
+                .Select(m => m.UsuarioId)
+                .Distinct()
+                .ToList();
+
+            if (!ids.Any())
+                return;
+
+            var emails = await _ctx.Users
+                .Where(u => ids.Contains(u.Id))
+                .Select(u => new { u.Id, u.Email })
+                .ToDictionaryAsync(u => u.Id, u => u.Email);
+
+            foreach (var m in movimientos)
+            {
+                if (m.UsuarioId != null && emails.TryGetValue(m.UsuarioId, out var email))
+                {
+                    m.NombreUsuario = email;
+                }
+                else
+                {
+                    m.NombreUsuario = m.UsuarioId;
+                }
+            }
         }
     }
 }
