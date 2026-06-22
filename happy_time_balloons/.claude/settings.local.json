@@ -41,7 +41,9 @@
       "Bash(msbuild HappyTimesBalloons.slnx /p:Configuration=Debug /t:Build /v:minimal /nologo)",
       "Bash(cmd.exe *)",
       "PowerShell(& \"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\2022\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\MSBuild.exe\" \"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\\\\HappyTimesBalloons.slnx\" /p:Configuration=Debug /t:Build /v:minimal /nologo)",
-      "PowerShell(& \"C:\\\\Program Files \\(x86\\)\\\\Microsoft Visual Studio\\\\2022\\\\BuildTools\\\\MSBuild\\\\Current\\\\Bin\\\\MSBuild.exe\" \"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\\\\HappyTimesBalloons.slnx\" /p:Configuration=Debug /t:Build /v:minimal /nologo)"
+      "PowerShell(& \"C:\\\\Program Files \\(x86\\)\\\\Microsoft Visual Studio\\\\2022\\\\BuildTools\\\\MSBuild\\\\Current\\\\Bin\\\\MSBuild.exe\" \"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\\\\HappyTimesBalloons.slnx\" /p:Configuration=Debug /t:Build /v:minimal /nologo)",
+      "Bash(dotnet build *)",
+      "Bash(dotnet test *)"
     ]
   },
   "hooks": {
