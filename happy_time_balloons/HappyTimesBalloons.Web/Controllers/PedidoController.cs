@@ -92,14 +92,21 @@ namespace HappyTimesBalloons.Web.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public ActionResult ActualizarCantidad(int productoId, int cantidad)
+        public async Task<ActionResult> ActualizarCantidad(int productoId, int cantidad)
         {
             if (cantidad < 1) cantidad = 1;
+
+            var producto = await _productoServicio.ObtenerPorIdAsync(productoId);
+            if (producto == null || !producto.EsActivo)
+            {
+                TempData["Error"] = "El producto no está disponible.";
+                return RedirectToAction("Carrito");
+            }
 
             var carrito = ObtenerCarrito();
             var item = carrito.FirstOrDefault(i => i.ProductoId == productoId);
             if (item != null)
-                item.Cantidad = cantidad;
+                item.Cantidad = _pedidoServicio.AjustarCantidad(cantidad, producto.Stock);
 
             GuardarCarrito(carrito);
             return RedirectToAction("Carrito");
@@ -370,12 +377,12 @@ namespace HappyTimesBalloons.Web.Controllers
         {
             switch (estado)
             {
-                case EstadoPedido.Pendiente:  return "Pendiente";
+                case EstadoPedido.Pendiente: return "Pendiente";
                 case EstadoPedido.Procesando: return "Procesando";
-                case EstadoPedido.Enviado:    return "Enviado";
-                case EstadoPedido.Entregado:  return "Entregado";
-                case EstadoPedido.Cancelado:  return "Cancelado";
-                default:                      return estado.ToString();
+                case EstadoPedido.Enviado: return "Enviado";
+                case EstadoPedido.Entregado: return "Entregado";
+                case EstadoPedido.Cancelado: return "Cancelado";
+                default: return estado.ToString();
             }
         }
     }

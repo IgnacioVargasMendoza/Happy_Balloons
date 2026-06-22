@@ -127,6 +127,31 @@ Id = dto.Id,
 
 ---
 
+### VIO-08 — `@using (Html.BeginForm(...))` dentro de bloque Razor (ALTA)
+**Síntoma:** `@using (Html.BeginForm(...))` dentro de un bloque de código Razor (`@foreach`, `@if`, `@while`) — el parser ya está en contexto C# y lanza **"Unexpected 'using' keyword after '@' character"** en compilación.
+
+```html
+<!-- ANTI-PATRÓN (VIO-08) -->
+@foreach (var item in Model.Items)
+{
+    @using (Html.BeginForm("Eliminar", "Entidad", FormMethod.Post)) { ... }
+}
+
+<!-- CORRECTO -->
+@foreach (var item in Model.Items)
+{
+    <form action="@Url.Action("Eliminar", "Entidad")" method="post" class="d-inline">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="id" value="@item.Id" />
+        <button type="submit" class="btn btn-danger">Eliminar</button>
+    </form>
+}
+```
+
+**Buscar en:** `Web/Views/**/*.cshtml` — grep por `@using (Html.BeginForm` dentro de bloques `@foreach`/`@if`/`@while`.
+
+---
+
 ## Proceso de auditoría
 
 ### Fase 1 — Determinar alcance
@@ -153,6 +178,9 @@ Presenta los hallazgos en este formato:
 
 ### Violaciones medias (VIO-06, VIO-07)
 [lista con archivo:línea]
+
+### Violaciones altas adicionales (VIO-08)
+[lista con archivo:línea y extracto]
 
 ### Sin violaciones detectadas
 [áreas auditadas sin problemas]

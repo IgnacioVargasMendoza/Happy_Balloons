@@ -20,9 +20,9 @@ namespace HappyTimesBalloons.LogicaNegocio.Servicios
             IProductoRepositorio productoRepo,
             IZonaEntregaRepositorio zonaRepo)
         {
-            _pedidoRepo  = pedidoRepo;
+            _pedidoRepo = pedidoRepo;
             _productoRepo = productoRepo;
-            _zonaRepo    = zonaRepo;
+            _zonaRepo = zonaRepo;
         }
 
         public async Task<ResultadoOperacionDTO<int>> CrearPedidoAsync(string userId, CheckoutDTO checkout)
@@ -70,19 +70,26 @@ namespace HappyTimesBalloons.LogicaNegocio.Servicios
 
             var dto = new PedidoDTO
             {
-                UserId           = userId,
-                MetodoPago       = checkout.MetodoPago,
+                UserId = userId,
+                MetodoPago = checkout.MetodoPago,
                 NumeroReferencia = checkout.NumeroReferencia,
-                ZonaEntregaId    = checkout.ZonaEntregaId,
+                ZonaEntregaId = checkout.ZonaEntregaId,
                 DireccionEntrega = checkout.DireccionEntrega,
-                Subtotal         = subtotal,
-                CostoEnvio       = costoEnvio,
-                Total            = total,
-                Notas            = checkout.Notas
+                Subtotal = subtotal,
+                CostoEnvio = costoEnvio,
+                Total = total,
+                Notas = checkout.Notas
             };
 
-            var pedidoCreado = await _pedidoRepo.CrearAsync(dto, checkout.Items);
-            return ResultadoOperacionDTO<int>.Ok("Pedido creado exitosamente.", pedidoCreado.Id);
+            try
+            {
+                var pedidoCreado = await _pedidoRepo.CrearAsync(dto, checkout.Items);
+                return ResultadoOperacionDTO<int>.Ok("Pedido creado exitosamente.", pedidoCreado.Id);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return ResultadoOperacionDTO<int>.Fallo(ex.Message, CodigoResultado.Error);
+            }
         }
 
         public Task<PedidoDTO> ObtenerPorIdAsync(int id)

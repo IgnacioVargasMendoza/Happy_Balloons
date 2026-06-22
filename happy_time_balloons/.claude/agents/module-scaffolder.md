@@ -83,6 +83,15 @@ happy_time_balloons/
 - Sin JS inline salvo una llamada a `Module.init()` en `@section Scripts`
 - Usar `@Html.AntiForgeryToken()` en todos los formularios POST
 - Para enlaces con solo icono usar `<a href="@Url.Action(...)">` nunca `Html.ActionLink("")`
+- Formularios dentro de `@foreach`/`@if`: usar `<form action="@Url.Action(...)" method="post">` — **nunca** `@using (Html.BeginForm(...))` dentro de bloques Razor (rompe el parser con "Unexpected 'using' keyword")
+- `Html.TextAreaFor` solo tiene dos overloads válidos: `(expr, htmlAttributes)` y `(expr, rows, columns, htmlAttributes)` — el de 3 args `(expr, rows, htmlAttributes)` no existe y falla en runtime
+
+### Paso 9b — Registrar archivos nuevos en `HappyTimesBalloons.Web.csproj`
+El proyecto Web **no** es SDK-style; los archivos nuevos no se incluyen automáticamente. Por cada archivo `.cs` o `.cshtml` creado en `Web/`, agregar la entrada correspondiente en `HappyTimesBalloons.Web.csproj`:
+- Archivos `.cs` → `<Compile Include="Controllers\XxxController.cs" />` (o Models/ViewModels)
+- Archivos `.cshtml` → `<Content Include="Views\Xxx\Index.cshtml" />`
+
+Los proyectos `Abstraccion`, `AccesoADatos` y `LogicaNegocio` son SDK-style y auto-incluyen sus archivos — no requieren este paso.
 
 ### Paso 10 — Registrar en AutofacConfig
 Al finalizar los pasos 1-9, notificar explícitamente al usuario que debe ejecutar el agente `di-registrar` para registrar `IXxxRepositorio` e `IXxxServicio` en `AutofacConfig.cs`.

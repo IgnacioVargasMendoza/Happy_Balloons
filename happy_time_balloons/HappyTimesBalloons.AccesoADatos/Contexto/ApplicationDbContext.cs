@@ -16,11 +16,36 @@ namespace HappyTimesBalloons.AccesoADatos.Contexto
             return new ApplicationDbContext();
         }
 
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Inventario>()
+                .HasRequired(i => i.Producto)
+                .WithMany(p => p.Inventarios)
+                .HasForeignKey(i => i.ProductoId)
+                .WillCascadeOnDelete(true);
+
+            modelBuilder.Entity<MovimientoInventario>()
+                .HasRequired(m => m.Producto)
+                .WithMany()
+                .HasForeignKey(m => m.ProductoId)
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<MovimientoInventario>()
+                .HasRequired(m => m.Usuario)
+                .WithMany()
+                .HasForeignKey(m => m.UsuarioId)
+                .WillCascadeOnDelete(false);
+        }
+
         public DbSet<BitacoraAuditoria> BitacoraAuditoria { get; set; }
 
         public DbSet<Categoria> Categorias { get; set; }
 
         public DbSet<Producto> Productos { get; set; }
+
+        public DbSet<Inventario> Inventario { get; set; }
 
         public DbSet<ImagenProducto> ImagenesProducto { get; set; }
 
@@ -35,5 +60,7 @@ namespace HappyTimesBalloons.AccesoADatos.Contexto
         public DbSet<RecuperacionToken> RecuperacionTokens { get; set; }
 
         public DbSet<CodigoVerificacion2FA> CodigosVerificacion2FA { get; set; }
+
+        public DbSet<MovimientoInventario> MovimientosInventario { get; set; }
     }
 }

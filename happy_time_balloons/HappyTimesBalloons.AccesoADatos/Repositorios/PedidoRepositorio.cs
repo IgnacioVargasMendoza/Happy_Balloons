@@ -6,6 +6,8 @@ using HappyTimesBalloons.AccesoADatos.Modelos;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -24,27 +26,20 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
         {
             var pedido = new Pedido
             {
-                Numero        = "TEMP",
-                UserId        = dto.UserId,
-                FechaPedido   = DateTime.UtcNow,
-                EstadoPedido  = EstadoPedido.Pendiente,
-                MetodoPago    = dto.MetodoPago,
+                Numero = "TEMP",
+                UserId = dto.UserId,
+                FechaPedido = DateTime.UtcNow,
+                EstadoPedido = EstadoPedido.Pendiente,
+                MetodoPago = dto.MetodoPago,
                 NumeroReferencia = dto.NumeroReferencia,
                 ZonaEntregaId = dto.ZonaEntregaId,
                 DireccionEntrega = dto.DireccionEntrega,
-                Subtotal      = dto.Subtotal,
-                CostoEnvio    = dto.CostoEnvio,
-                Total         = dto.Total,
-                Notas         = dto.Notas
+                Subtotal = dto.Subtotal,
+                CostoEnvio = dto.CostoEnvio,
+                Total = dto.Total,
+                Notas = dto.Notas
             };
 
-            _ctx.Pedidos.Add(pedido);
-            await _ctx.SaveChangesAsync();
-
-            // Generar número definitivo: PED-{año}-{id:D4}
-            pedido.Numero = $"PED-{pedido.FechaPedido.Year}-{pedido.Id:D4}";
-
-            // Agregar detalles
             foreach (var item in items)
             {
                 var producto = await _ctx.Productos.FindAsync(item.ProductoId);
@@ -56,19 +51,37 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
 
                 pedido.DetallesPedido.Add(new DetallePedido
                 {
-                    PedidoId       = pedido.Id,
-                    ProductoId     = item.ProductoId,
-                    Cantidad       = item.Cantidad,
+                    ProductoId = item.ProductoId,
+                    Cantidad = item.Cantidad,
                     PrecioUnitario = precio,
-                    Subtotal       = precio * item.Cantidad
+                    Subtotal = precio * item.Cantidad
                 });
             }
 
+            _ctx.Pedidos.Add(pedido);
+
+            // Un solo SaveChanges: Pedido + Detalles + trigger en la misma transacción (ACID)
+            try
+            {
+                await _ctx.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                var sqlEx = ex.InnerException?.InnerException as SqlException
+                            ?? ex.InnerException as SqlException;
+                string mensaje = sqlEx != null
+                    ? sqlEx.Message
+                    : "No se pudo crear el pedido. Verifique el stock disponible.";
+                throw new InvalidOperationException(mensaje, ex);
+            }
+
+            // Número definitivo: requiere el Id generado por la BD
+            pedido.Numero = $"PED-{pedido.FechaPedido.Year}-{pedido.Id:D4}";
             await _ctx.SaveChangesAsync();
 
-            dto.Id     = pedido.Id;
+            dto.Id = pedido.Id;
             dto.Numero = pedido.Numero;
-            dto.FechaPedido  = pedido.FechaPedido;
+            dto.FechaPedido = pedido.FechaPedido;
             dto.EstadoPedido = pedido.EstadoPedido;
             return dto;
         }
