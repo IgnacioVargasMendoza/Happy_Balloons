@@ -236,25 +236,6 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
             entidad.PrecioDescuento = dto.PrecioDescuento;
             entidad.CategoriaId = dto.CategoriaId;
 
-            var inventario = await _ctx.Inventario
-                .FirstOrDefaultAsync(i => i.ProductoId == dto.Id);
-
-            if (inventario != null)
-            {
-                inventario.StockActual = dto.Stock;
-                inventario.FechaUltimaActualizacion = DateTime.UtcNow;
-            }
-            else
-            {
-                _ctx.Inventario.Add(new Inventario
-                {
-                    ProductoId = dto.Id,
-                    StockActual = dto.Stock,
-                    StockMinimo = 5,
-                    FechaUltimaActualizacion = DateTime.UtcNow
-                });
-            }
-
             await _ctx.SaveChangesAsync();
             return dto;
         }

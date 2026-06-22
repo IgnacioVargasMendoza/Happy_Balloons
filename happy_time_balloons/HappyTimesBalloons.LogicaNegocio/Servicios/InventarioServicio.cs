@@ -23,5 +23,8 @@ namespace HappyTimesBalloons.LogicaNegocio.Servicios
 
         public Task<InventarioKpisDTO> ObtenerKpisAsync()
             => _repo.ObtenerKpisAsync();
+
+        public Task<InventarioDTO> ObtenerPorProductoIdAsync(int productoId)
+            => _repo.ObtenerPorProductoIdAsync(productoId);
     }
 }

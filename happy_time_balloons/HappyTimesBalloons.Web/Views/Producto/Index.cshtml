@@ -140,6 +140,12 @@
                                 }
                             </td>
                             <td class="text-end pe-4">
+                                <a href="@Url.Action("Registrar", "MovimientosInventario", new { productoId = p.Id })"
+                                   class="btn btn-sm btn-outline-secondary me-1"
+                                   title="Registrar movimiento de inventario">
+                                    <i class="bi bi-arrow-left-right"></i>
+                                </a>
+
                                 <button type="button"
                                         class="btn btn-sm btn-outline-primary me-1 btn-editar"
                                         data-id="@p.Id"
@@ -147,7 +153,6 @@
                                         data-descripcion="@Html.AttributeEncode(p.Descripcion)"
                                         data-precio="@p.Precio.ToString(System.Globalization.CultureInfo.InvariantCulture)"
                                         data-precio-descuento="@(p.PrecioDescuento.HasValue ? p.PrecioDescuento.Value.ToString(System.Globalization.CultureInfo.InvariantCulture) : "")"
-                                        data-stock="@p.Stock"
                                         data-categoria-id="@p.CategoriaId"
                                         data-bs-toggle="modal"
                                         data-bs-target="#modalEditar"
@@ -360,18 +365,11 @@
 
                     <div class="row g-3 mt-1">
                         <div class="col-md-6">
-                            <label for="editStock"
-                                   class="form-label fw-semibold">
-                                Stock
-                                <span class="text-danger">*</span>
-                            </label>
-
-                            <input type="number"
-                                   id="editStock"
-                                   name="Stock"
-                                   class="form-control"
-                                   min="0"
-                                   required />
+                            <label class="form-label fw-semibold">Stock</label>
+                            <div class="form-control-plaintext text-muted small">
+                                El stock se gestiona mediante movimientos de inventario.
+                                <a href="@Url.Action("Index", "Inventario")" class="ms-1">Ver inventario</a>
+                            </div>
                         </div>
 
                         <div class="col-md-6">
@@ -482,9 +480,6 @@
 
             document.getElementById('editPrecioDescuento').value =
                 this.dataset.precioDescuento || '';
-
-            document.getElementById('editStock').value =
-                this.dataset.stock;
 
             document.getElementById('editCategoriaId').value =
                 this.dataset.categoriaId;

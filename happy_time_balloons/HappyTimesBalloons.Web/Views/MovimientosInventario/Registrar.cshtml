@@ -1,0 +1,113 @@
+@model HappyTimesBalloons.Web.Models.ViewModels.RegistrarMovimientoViewModel
+@using HappyTimesBalloons.Abstraccion.Enums
+@{
+    ViewBag.Title = "Registrar movimiento";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid py-4">
+
+    <div class="d-flex align-items-center mb-4 gap-2">
+        <a href="@Url.Action("Index", "Inventario")" class="btn btn-outline-secondary btn-sm" title="Volver a inventario">
+            <i class="bi bi-chevron-left"></i>
+        </a>
+        <i class="bi bi-arrow-left-right fs-3 text-primary ms-1"></i>
+        <h1 class="h3 mb-0">Registrar movimiento de inventario</h1>
+    </div>
+
+    @Html.Partial("~/Views/Shared/_Mensajes.cshtml")
+
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white fw-semibold">
+                    <i class="bi bi-box-seam me-2 text-primary"></i>@Model.ProductoNombre
+                </div>
+                <div class="card-body">
+
+                    <div class="alert alert-light border mb-4 d-flex align-items-center gap-3">
+                        <i class="bi bi-layers fs-4 text-secondary"></i>
+                        <div>
+                            <div class="text-muted small">Stock actual</div>
+                            <div class="fs-5 fw-bold">@Model.StockActual unidades</div>
+                        </div>
+                    </div>
+
+                    @using (Html.BeginForm("Registrar", "MovimientosInventario", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.HiddenFor(m => m.ProductoId)
+                        @Html.HiddenFor(m => m.ProductoNombre)
+                        @Html.HiddenFor(m => m.StockActual)
+
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">
+                                @Html.DisplayNameFor(m => m.TipoMovimiento)
+                                <span class="text-danger">*</span>
+                            </label>
+                            <div class="d-flex gap-3">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio"
+                                           name="TipoMovimiento" id="tipoEntrada"
+                                           value="@((int)TipoMovimiento.Entrada)"
+                                           @(Model.TipoMovimiento == TipoMovimiento.Entrada ? "checked" : "") />
+                                    <label class="form-check-label text-success fw-semibold" for="tipoEntrada">
+                                        <i class="bi bi-arrow-down-circle me-1"></i>Entrada
+                                    </label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio"
+                                           name="TipoMovimiento" id="tipoSalida"
+                                           value="@((int)TipoMovimiento.Salida)"
+                                           @(Model.TipoMovimiento == TipoMovimiento.Salida ? "checked" : "") />
+                                    <label class="form-check-label text-danger fw-semibold" for="tipoSalida">
+                                        <i class="bi bi-arrow-up-circle me-1"></i>Salida
+                                    </label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio"
+                                           name="TipoMovimiento" id="tipoAjuste"
+                                           value="@((int)TipoMovimiento.Ajuste)"
+                                           @(Model.TipoMovimiento == TipoMovimiento.Ajuste ? "checked" : "") />
+                                    <label class="form-check-label text-warning fw-semibold" for="tipoAjuste">
+                                        <i class="bi bi-sliders me-1"></i>Ajuste
+                                    </label>
+                                </div>
+                            </div>
+                            @Html.ValidationMessageFor(m => m.TipoMovimiento, "", new { @class = "text-danger small" })
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(m => m.Cantidad, new { @class = "form-label fw-semibold" })
+                            <span class="text-danger">*</span>
+                            <div id="ayudaCantidad" class="form-text text-muted mb-1">
+                                Para Entrada y Salida ingresa un valor positivo.
+                                Para Ajuste puedes ingresar un valor negativo (reduce stock) o positivo (aumenta stock).
+                            </div>
+                            @Html.TextBoxFor(m => m.Cantidad, new { @class = "form-control", type = "number", step = "1" })
+                            @Html.ValidationMessageFor(m => m.Cantidad, "", new { @class = "text-danger small" })
+                        </div>
+
+                        <div class="mb-4">
+                            @Html.LabelFor(m => m.Motivo, new { @class = "form-label fw-semibold" })
+                            <span class="text-danger">*</span>
+                            @Html.TextAreaFor(m => m.Motivo, 3, 0, new { @class = "form-control", placeholder = "Describe el motivo del movimiento..." })
+                            @Html.ValidationMessageFor(m => m.Motivo, "", new { @class = "text-danger small" })
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-lg me-1"></i>Registrar movimiento
+                            </button>
+                            <a href="@Url.Action("Index", "Inventario")" class="btn btn-outline-secondary">
+                                Cancelar
+                            </a>
+                        </div>
+                    }
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

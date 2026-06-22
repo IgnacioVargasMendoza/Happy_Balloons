@@ -1,6 +1,7 @@
 using HappyTimesBalloons.Abstraccion.DTOs;
 using HappyTimesBalloons.Abstraccion.Interfaces.Repositorios;
 using HappyTimesBalloons.AccesoADatos.Contexto;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
@@ -90,6 +91,46 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
                 ValorTotalInventario = valorTotal,
                 AlertasReabastecimiento = alertas
             };
+        }
+
+        public async Task<InventarioDTO> ObtenerPorProductoIdAsync(int productoId)
+        {
+            return await _ctx.Inventario
+                .Include(i => i.Producto)
+                .Include(i => i.Producto.Categoria)
+                .Where(i => i.ProductoId == productoId)
+                .Select(i => new InventarioDTO
+                {
+                    Id = i.Id,
+                    ProductoId = i.ProductoId,
+                    ProductoNombre = i.Producto.Nombre,
+                    CategoriaNombre = i.Producto.Categoria.Nombre,
+                    StockActual = i.StockActual,
+                    StockMinimo = i.StockMinimo,
+                    FechaUltimaActualizacion = i.FechaUltimaActualizacion,
+                    UsuarioUltimaActualizacionId = i.UsuarioUltimaActualizacionId
+                })
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<int?> ObtenerStockActualAsync(int productoId)
+        {
+            var inventario = await _ctx.Inventario
+                .FirstOrDefaultAsync(i => i.ProductoId == productoId);
+            return inventario?.StockActual;
+        }
+
+        public async Task ActualizarStockAsync(int productoId, int nuevoStock, string usuarioId)
+        {
+            var inventario = await _ctx.Inventario
+                .FirstOrDefaultAsync(i => i.ProductoId == productoId);
+            if (inventario == null)
+                return;
+
+            inventario.StockActual = nuevoStock;
+            inventario.FechaUltimaActualizacion = DateTime.UtcNow;
+            inventario.UsuarioUltimaActualizacionId = usuarioId;
+            await _ctx.SaveChangesAsync();
         }
     }
 }

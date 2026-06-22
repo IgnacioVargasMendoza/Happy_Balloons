@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -22,5 +23,8 @@ namespace HappyTimesBalloons.AccesoADatos.Modelos
 
         [MaxLength(128)]
         public string UsuarioUltimaActualizacionId { get; set; }
+
+        public virtual ICollection<MovimientoInventario> Movimientos { get; set; }
+            = new List<MovimientoInventario>();
     }
 }
