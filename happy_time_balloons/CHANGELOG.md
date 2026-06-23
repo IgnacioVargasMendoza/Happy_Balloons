@@ -35,6 +35,32 @@ Versiones vinculadas a la rama `develop` (ASP.NET MVC 5).
 - `Controllers/PedidoController.cs` — Nuevo controlador con acciones: `Carrito` (GET, anónimo), `AgregarAlCarrito` (POST, valida stock vía `ProductoServicio`), `ActualizarCantidad` (POST), `QuitarDelCarrito` (POST), `Index` (placeholder hasta Phase 5). El carrito se persiste en `Session["Carrito"]` (`List<CarritoItemViewModel>`) y el conteo en `Session["CarritoCount"]`.
 - `Views/Pedido/Carrito.cshtml` — Vista de dos columnas: tabla de ítems con formularios inline +/- y botón de eliminar por fila; columna de resumen con subtotal, total y botón de pago (deshabilitado hasta Phase 5). Estado vacío con enlace al catálogo.
 
+#### Pago SINPE — Módulo completo con webhook automático (2026-06-22)
+- `Abstraccion/DTOs/SinpeWebhookDTO.cs` — Nuevo DTO para el payload recibido del banco: `NumeroComprobante`, `Monto`, `NombreTitular`, `TelefonoDestino`, `TokenSeguridad`.
+- `Abstraccion/DTOs/PagoSinpeDTO.cs` — Nuevo DTO de registro interno con `EstadoPago`, `MotivoRechazo`, `FechaRecepcion` y `FechaProcesamiento`.
+- `Abstraccion/Enums/EstadoPagoSinpe.cs` — Nuevo enum: `Pendiente=1`, `Aprobado=2`, `Rechazado=3`, `Duplicado=4`.
+- `Abstraccion/Enums/EstadoPedido.cs` — Agrega `PagoPendiente = 6`; estado inicial de pedidos creados con MetodoPago = "SINPE".
+- `Abstraccion/Enums/TipoOperacion.cs` — Agrega `ProcesarPagoSinpe`, `RechazarPagoSinpe`, `PagoDuplicadoSinpe` para auditoría granular de pagos.
+- `Abstraccion/Interfaces/Repositorios/ISinpeRepositorio.cs` — Interfaz con `RegistrarAsync`, `ExisteComprobanteAsync`, `ObtenerTodosAsync`, `ObtenerPorIdAsync`.
+- `Abstraccion/Interfaces/Repositorios/IPedidoRepositorio.cs` — Agrega `BuscarPorSinpeAsync(comprobante, monto)`: query SQL que busca pedidos en estado `PagoPendiente` con MetodoPago = "SINPE" por número de comprobante o monto, evitando carga en memoria.
+- `Abstraccion/Interfaces/Servicios/ISinpeServicio.cs` — Interfaz con `ProcesarWebhookAsync`, `ObtenerPagosAsync`, `ObtenerPorIdAsync`.
+- `AccesoADatos/Modelos/PagoSinpe.cs` — Modelo EF6 para tabla `[PagosSinpe]` con FK a `Pedidos` (no-cascade).
+- `AccesoADatos/Migraciones/202506220002_AgregarTablaPagosSinpe.cs` — Migración EF6: crea tabla `PagosSinpe` con índice ÚNICO en `NumeroComprobante` (barrera de duplicados en BD) e índice en `PedidoId`.
+- `AccesoADatos/Repositorios/SinpeRepositorio.cs` — Implementación de `ISinpeRepositorio` con EF6. `ExisteComprobanteAsync` filtra solo comprobantes `Aprobado` para no bloquear reintentos de rechazados.
+- `AccesoADatos/Repositorios/PedidoRepositorio.cs` — Implementa `BuscarPorSinpeAsync`; corrige `CrearAsync` para asignar `EstadoPedido.PagoPendiente` cuando `MetodoPago == "SINPE"` en lugar de `Pendiente`.
+- `AccesoADatos/Contexto/ApplicationDbContext.cs` — Agrega `DbSet<PagoSinpe> PagosSinpe`.
+- `LogicaNegocio/Servicios/SinpeServicio.cs` — Implementa `ProcesarWebhookAsync` con flujo completo: (1) validación de token via `AppSettings["Sinpe:TokenSeguridad"]`, (2) detección de duplicados, (3) búsqueda de pedido en BD con `BuscarPorSinpeAsync`, (4) validación de monto exacto, (5) aprobación con actualización de estado a `Procesando`; cada paso registra en `BitacoraAuditoria`. Siempre retorna HTTP 200 al banco.
+- `Web/Controllers/SinpeController.cs` — Endpoint público `[HttpPost] RecibirWebhook` para recibir webhooks del banco; vistas admin `Index` y `Detalle` con `[Authorize(Roles = "Administrador,Operador")]`.
+- `Web/Models/ViewModels/SinpeViewModel.cs` — `SinpeViewModel` (lista) y `SinpeDetalleViewModel` (detalle individual).
+- `Web/Views/Sinpe/Index.cshtml` — Vista admin con tabla de pagos SINPE, badges de estado por color y modal Bootstrap para ver detalle sin salir de la lista.
+- `Web/Views/Sinpe/_DetallePago.cshtml` — Partial cargado vía AJAX en el modal de detalle.
+- `Web/Content/Sinpe.css` — Estilos del módulo SINPE y checkout (badges de estado, panel SINPE, layout de cards de pago).
+- `Web/Scripts/Sinpe.js` — Lógica de checkout: mostrar/ocultar panel de instrucciones SINPE al seleccionar método de pago; carga de detalle de pago en modal via `$.get()`.
+- `Web/Views/Pedido/Checkout.cshtml` — Agrega opción "SINPE Móvil" en selector de método de pago con panel de instrucciones (teléfono configurable via `AppSettings["Sinpe:TelefonoNegocio"]`). CSS y JS extraídos a archivos externos.
+- `Web/App_Start/AutofacConfig.cs` — Registra `SinpeRepositorio → ISinpeRepositorio` y `SinpeServicio → ISinpeServicio` con `InstancePerRequest`.
+- `HappyTimesBalloons.Tests/Sinpe/SinpeServicioTests.cs` — 5 tests unitarios (MSTest + Moq): token válido aprobado, comprobante duplicado, monto incorrecto, token inválido, pedido no encontrado.
+- `connectionStrings.config` — Eliminado del seguimiento de git (`git rm --cached`); el archivo es local por máquina y ya estaba en `.gitignore`.
+
 #### Inventario — Configurar stock mínimo (2026-06-22)
 - `Abstraccion/DTOs/InventarioDTO.cs` — Agrega `[Required]` y `[Range(0, int.MaxValue)]` sobre `StockActual` y `StockMinimo`; agrega referencia a `System.ComponentModel.DataAnnotations` en el `.csproj` de Abstraccion.
 - `Abstraccion/Interfaces/Repositorios/IInventarioRepositorio.cs` — Nuevo método `ActualizarStockMinimoAsync(int inventarioId, int nuevoStockMinimo, string usuarioId)`.
