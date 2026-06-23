@@ -1,0 +1,105 @@
+@model HappyTimesBalloons.Web.Models.ViewModels.SinpeViewModel
+@using HappyTimesBalloons.Abstraccion.Enums
+@{
+    ViewBag.Title = "Pagos SINPE";
+}
+
+<link rel="stylesheet" href="@Url.Content("~/Content/Sinpe.css")" />
+
+<div class="d-flex align-items-center mb-4">
+    <h2 class="mb-0">
+        <i class="bi bi-phone me-2 text-brand"></i>Pagos SINPE
+    </h2>
+</div>
+
+@if (!Model.Pagos.Any())
+{
+    <div class="alert alert-info">
+        No hay pagos SINPE registrados.
+    </div>
+}
+else
+{
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Pedido</th>
+                            <th>Comprobante</th>
+                            <th>Monto</th>
+                            <th>Titular</th>
+                            <th>Estado</th>
+                            <th>Recibido</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var pago in Model.Pagos)
+                        {
+                            <tr>
+                                <td>@pago.Id</td>
+                                <td>@pago.NumeroPedido</td>
+                                <td class="font-monospace">@pago.NumeroComprobante</td>
+                                <td>₡@pago.Monto.ToString("N0")</td>
+                                <td>@pago.NombreTitular</td>
+                                <td>
+                                    @if (pago.EstadoPago == EstadoPagoSinpe.Aprobado)
+                                    {
+                                        <span class="badge badge-sinpe-aprobado">Aprobado</span>
+                                    }
+                                    else if (pago.EstadoPago == EstadoPagoSinpe.Rechazado)
+                                    {
+                                        <span class="badge badge-sinpe-rechazado">Rechazado</span>
+                                    }
+                                    else if (pago.EstadoPago == EstadoPagoSinpe.Duplicado)
+                                    {
+                                        <span class="badge badge-sinpe-duplicado">Duplicado</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-sinpe-pendiente">Pendiente</span>
+                                    }
+                                </td>
+                                <td>@pago.FechaRecepcion.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-primary"
+                                            data-sinpe-id="@pago.Id"
+                                            title="Ver detalle">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="modal fade" id="modalDetalle" tabindex="-1" aria-labelledby="modalDetalleLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalDetalleLabel">
+                    <i class="bi bi-phone me-2"></i>Detalle del pago SINPE
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body" id="modalDetalleCuerpo">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="@Url.Content("~/Scripts/Sinpe.js")"></script>
+    <script>Sinpe.init();</script>
+}

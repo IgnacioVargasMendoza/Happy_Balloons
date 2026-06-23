@@ -62,5 +62,7 @@ namespace HappyTimesBalloons.AccesoADatos.Contexto
         public DbSet<CodigoVerificacion2FA> CodigosVerificacion2FA { get; set; }
 
         public DbSet<MovimientoInventario> MovimientosInventario { get; set; }
+
+        public DbSet<PagoSinpe> PagosSinpe { get; set; }
     }
 }

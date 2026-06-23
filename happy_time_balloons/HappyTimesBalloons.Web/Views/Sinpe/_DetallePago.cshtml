@@ -1,0 +1,61 @@
+@model HappyTimesBalloons.Web.Models.ViewModels.SinpeDetalleViewModel
+@using HappyTimesBalloons.Abstraccion.Enums
+
+@{
+    var pago = Model.Pago;
+}
+
+<dl class="row mb-0">
+    <dt class="col-sm-4">ID</dt>
+    <dd class="col-sm-8">@pago.Id</dd>
+
+    <dt class="col-sm-4">Pedido</dt>
+    <dd class="col-sm-8">@pago.NumeroPedido</dd>
+
+    <dt class="col-sm-4">Comprobante</dt>
+    <dd class="col-sm-8 font-monospace">@pago.NumeroComprobante</dd>
+
+    <dt class="col-sm-4">Monto</dt>
+    <dd class="col-sm-8">₡@pago.Monto.ToString("N0")</dd>
+
+    <dt class="col-sm-4">Titular</dt>
+    <dd class="col-sm-8">@pago.NombreTitular</dd>
+
+    <dt class="col-sm-4">Teléfono destino</dt>
+    <dd class="col-sm-8">@pago.TelefonoDestino</dd>
+
+    <dt class="col-sm-4">Estado</dt>
+    <dd class="col-sm-8">
+        @if (pago.EstadoPago == EstadoPagoSinpe.Aprobado)
+        {
+            <span class="badge badge-sinpe-aprobado">Aprobado</span>
+        }
+        else if (pago.EstadoPago == EstadoPagoSinpe.Rechazado)
+        {
+            <span class="badge badge-sinpe-rechazado">Rechazado</span>
+        }
+        else if (pago.EstadoPago == EstadoPagoSinpe.Duplicado)
+        {
+            <span class="badge badge-sinpe-duplicado">Duplicado</span>
+        }
+        else
+        {
+            <span class="badge badge-sinpe-pendiente">Pendiente</span>
+        }
+    </dd>
+
+    @if (!string.IsNullOrEmpty(pago.MotivoRechazo))
+    {
+        <dt class="col-sm-4">Motivo de rechazo</dt>
+        <dd class="col-sm-8 text-danger">@pago.MotivoRechazo</dd>
+    }
+
+    <dt class="col-sm-4">Fecha recepción</dt>
+    <dd class="col-sm-8">@pago.FechaRecepcion.ToString("dd/MM/yyyy HH:mm:ss") UTC</dd>
+
+    @if (pago.FechaProcesamiento.HasValue)
+    {
+        <dt class="col-sm-4">Fecha procesamiento</dt>
+        <dd class="col-sm-8">@pago.FechaProcesamiento.Value.ToString("dd/MM/yyyy HH:mm:ss") UTC</dd>
+    }
+</dl>

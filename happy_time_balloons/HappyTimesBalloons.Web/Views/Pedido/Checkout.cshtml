@@ -4,6 +4,8 @@
     ViewBag.Title = "Checkout";
 }
 
+<link rel="stylesheet" href="@Url.Content("~/Content/Sinpe.css")" />
+
 <div class="d-flex align-items-center mb-4">
     <h2 class="mb-0">
         <i class="bi bi-bag-check me-2 text-brand"></i>Confirmar pedido
@@ -108,12 +110,23 @@
                     </div>
                     @Html.ValidationMessageFor(m => m.MetodoPago, "", new { @class = "text-danger small" })
 
+                    <%-- display inicial determinado por el servidor según Model.MetodoPago; Sinpe.Checkout.bindMetodosPago() toma el control tras carga --%>
                     <div class="mb-3" id="panelSinpe" style="@(Model.MetodoPago == "Tarjeta" ? "display:none;" : "")">
+                        <div class="p-3 rounded mb-3 sinpe-info-panel">
+                            <div class="fw-semibold mb-1">
+                                <i class="bi bi-info-circle me-1"></i>Realiza tu transferencia SINPE al siguiente número:
+                            </div>
+                            <div class="fs-4 fw-bold">
+                                @(System.Configuration.ConfigurationManager.AppSettings["Sinpe:TelefonoNegocio"] ?? "8888-8888")
+                            </div>
+                            <div class="text-muted small mt-1">Happy Times Balloons</div>
+                        </div>
                         <label class="form-label fw-semibold">Número de comprobante SINPE</label>
                         @Html.TextBoxFor(m => m.NumeroReferencia, new { @class = "form-control", placeholder = "Ej: 123456789" })
-                        <div class="form-text">Ingresa el número de comprobante de tu transferencia SINPE.</div>
+                        <div class="form-text">Ingresa el número de comprobante de tu transferencia SINPE Móvil.</div>
                     </div>
 
+                    <%-- display inicial determinado por el servidor según Model.MetodoPago; Sinpe.Checkout.bindMetodosPago() toma el control tras carga --%>
                     <div class="mb-3" id="panelTarjeta" style="@(Model.MetodoPago != "Tarjeta" ? "display:none;" : "")">
                         <label class="form-label fw-semibold">Nombre en la tarjeta</label>
                         @Html.TextBoxFor(m => m.NumeroReferencia, new { @class = "form-control", placeholder = "Nombre completo tal como aparece en la tarjeta" })
@@ -132,7 +145,7 @@
 
         @* ── Columna derecha: resumen ── *@
         <div class="col-lg-4">
-            <div class="card shadow-sm border-0 sticky-top" style="top: 16px;">
+            <div class="card shadow-sm border-0 sticky-top checkout-sticky-summary">
                 <div class="card-header bg-white fw-semibold">
                     <i class="bi bi-receipt me-2 text-brand"></i>Resumen del pedido
                 </div>
@@ -144,11 +157,11 @@
                                 @if (!string.IsNullOrEmpty(item.ImagenUrl))
                                 {
                                     <img src="@item.ImagenUrl" alt="@item.Nombre"
-                                         class="rounded" style="width:40px;height:40px;object-fit:cover;" />
+                                         class="rounded checkout-item-thumb" />
                                 }
                                 <div>
                                     <div class="small fw-semibold">@item.Nombre</div>
-                                    <div class="text-muted" style="font-size:0.75rem;">x@item.Cantidad — ₡@item.PrecioEfectivo.ToString("N0")</div>
+                                    <div class="text-muted checkout-item-price">x@item.Cantidad — ₡@item.PrecioEfectivo.ToString("N0")</div>
                                 </div>
                             </div>
                             <span class="small fw-semibold">₡@item.Subtotal.ToString("N0")</span>
@@ -187,51 +200,6 @@
 }
 
 @section scripts {
-<style>
-    .cursor-pointer { cursor: pointer; }
-    .border-brand { border-color: #e91e8c !important; border-width: 2px !important; }
-    .zona-card:hover, .pago-card:hover { border-color: #e91e8c; }
-</style>
-<script>
-    (function () {
-        var subtotal = parseFloat(document.getElementById('hfSubtotal').value) || 0;
-
-        function formatColones(num) {
-            return '₡' + Math.round(num).toLocaleString('es-CR');
-        }
-
-        function actualizarTotal() {
-            var radio = document.querySelector('.zona-radio:checked');
-            if (!radio) return;
-            var costo = parseFloat(radio.closest('label').dataset.costo) || 0;
-            document.getElementById('lblCostoEnvio').textContent = formatColones(costo);
-            document.getElementById('lblTotal').textContent = formatColones(subtotal + costo);
-        }
-
-        document.querySelectorAll('.zona-radio').forEach(function (r) {
-            r.addEventListener('change', function () {
-                document.querySelectorAll('.zona-card').forEach(function (c) {
-                    c.classList.remove('border-brand');
-                });
-                this.closest('label').classList.add('border-brand');
-                actualizarTotal();
-            });
-        });
-
-        document.querySelectorAll('.pago-radio').forEach(function (r) {
-            r.addEventListener('change', function () {
-                document.querySelectorAll('.pago-card').forEach(function (c) {
-                    c.classList.remove('border-brand');
-                });
-                this.closest('label').classList.add('border-brand');
-
-                var esSinpe = this.value === 'SINPE';
-                document.getElementById('panelSinpe').style.display = esSinpe ? '' : 'none';
-                document.getElementById('panelTarjeta').style.display = esSinpe ? 'none' : '';
-            });
-        });
-
-        actualizarTotal();
-    })();
-</script>
+    <script src="@Url.Content("~/Scripts/Sinpe.js")"></script>
+    <script>Sinpe.Checkout.init();</script>
 }
