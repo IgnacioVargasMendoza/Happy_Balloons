@@ -101,6 +101,7 @@
     <Compile Include="Controllers\SinpeController.cs" />
     <Compile Include="Controllers\PromocionController.cs" />
     <Compile Include="Controllers\ReportesController.cs" />
+    <Compile Include="Controllers\ZonasEntregaController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -193,6 +194,9 @@
     <Content Include="Views\Reportes\Ventas.cshtml" />
     <Content Include="Views\Reportes\_SinResultados.cshtml" />
     <Content Include="Views\Reportes\Inventario.cshtml" />
+    <Content Include="Views\ZonasEntrega\Index.cshtml" />
+    <Content Include="Views\ZonasEntrega\Crear.cshtml" />
+    <Content Include="Views\ZonasEntrega\Editar.cshtml" />
     <Content Include="Content\Sinpe.css" />
     <Content Include="Scripts\Sinpe.js" />
     <Content Include="Scripts\Rol\rol-index.js" />
