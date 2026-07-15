@@ -1,0 +1,126 @@
+@model HappyTimesBalloons.Web.Models.ViewModels.ZonasEntregaIndexViewModel
+
+@{
+    ViewBag.Title = "Zonas de Entrega";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-0">
+            <i class="bi bi-geo-alt me-2 text-brand"></i>Zonas de Entrega
+        </h2>
+        <p class="text-muted small mb-0">Gestión de zonas de entrega y tarifas</p>
+    </div>
+
+    <a href="@Url.Action("Crear", "ZonasEntrega")" class="btn btn-brand">
+        <i class="bi bi-plus-lg me-1"></i> Nueva Zona
+    </a>
+</div>
+
+@Html.Partial("~/Views/Shared/_Mensajes.cshtml")
+
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th class="ps-4">Nombre</th>
+                    <th>Descripción</th>
+                    <th>Costo de envío</th>
+                    <th>Estado</th>
+                    <th>Fecha creación</th>
+                    <th class="text-end pe-4">Acciones</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (Model.Zonas == null || !Model.Zonas.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-5">
+                            <i class="bi bi-geo-alt fs-3 d-block mb-2 opacity-25"></i>
+                            <span>No hay zonas de entrega registradas</span>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var zona in Model.Zonas)
+                    {
+                        <tr>
+                            <td class="ps-4 fw-semibold">@zona.Nombre</td>
+
+                            <td class="text-muted">
+                                @(string.IsNullOrWhiteSpace(zona.Descripcion) ? "—" : zona.Descripcion)
+                            </td>
+
+                            <td>@zona.CostoEnvio.ToString("C")</td>
+
+                            <td>
+                                @if (zona.EsDisponible)
+                                {
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle">
+                                        <i class="bi bi-check-circle me-1"></i>Disponible
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle">
+                                        <i class="bi bi-x-circle me-1"></i>No disponible
+                                    </span>
+                                }
+                            </td>
+
+                            <td class="small text-muted">
+                                @zona.FechaCreacion.ToString("dd/MM/yyyy")
+                            </td>
+
+                            <td class="text-end pe-4">
+                                <a href="@Url.Action("Editar", "ZonasEntrega", new { id = zona.Id })"
+                                   class="btn btn-sm btn-outline-primary me-1"
+                                   title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+
+                                <form action="@Url.Action("CambiarDisponibilidad", "ZonasEntrega")" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@zona.Id" />
+                                    <input type="hidden" name="esDisponible" value="@(!zona.EsDisponible ? "true" : "false")" />
+                                    <button type="button"
+                                            class="btn btn-sm @(zona.EsDisponible ? "btn-outline-warning" : "btn-outline-success") btn-toggle"
+                                            data-nombre="@Html.AttributeEncode(zona.Nombre)"
+                                            data-accion="@(zona.EsDisponible ? "desactivar" : "activar")"
+                                            title="@(zona.EsDisponible ? "Desactivar" : "Activar")">
+                                        <i class="bi @(zona.EsDisponible ? "bi-eye-slash" : "bi-eye")"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (Model.Zonas != null && Model.Zonas.Any())
+    {
+        <div class="card-footer text-muted small">
+            @Model.Zonas.Count zona(s) registrada(s) &mdash;
+            @Model.Zonas.Count(z => z.EsDisponible) disponible(s)
+        </div>
+    }
+</div>
+
+@section scripts {
+    <script>
+        document.querySelectorAll('.btn-toggle').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var accion = this.dataset.accion;
+                var nombre = this.dataset.nombre;
+                if (confirm('¿Deseas ' + accion + ' la zona "' + nombre + '"?')) {
+                    this.closest('form').submit();
+                }
+            });
+        });
+    </script>
+}
