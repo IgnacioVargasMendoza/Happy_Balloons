@@ -1,3 +1,5 @@
+using System;
+
 namespace HappyTimesBalloons.Abstraccion.DTOs
 {
     public class ZonaEntregaDTO
@@ -7,5 +9,6 @@ namespace HappyTimesBalloons.Abstraccion.DTOs
         public string Descripcion { get; set; }
         public decimal CostoEnvio { get; set; }
         public bool EsDisponible { get; set; }
+        public DateTime FechaCreacion { get; set; }
     }
 }
