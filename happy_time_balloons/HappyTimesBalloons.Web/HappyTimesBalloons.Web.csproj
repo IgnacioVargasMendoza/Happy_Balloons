@@ -100,6 +100,7 @@
     <Compile Include="Controllers\MovimientosInventarioController.cs" />
     <Compile Include="Controllers\SinpeController.cs" />
     <Compile Include="Controllers\PromocionController.cs" />
+    <Compile Include="Controllers\ReportesController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -134,6 +135,7 @@
     <Compile Include="Models\ViewModels\InventarioViewModel.cs" />
     <Compile Include="Models\ViewModels\MovimientoInventarioViewModel.cs" />
     <Compile Include="Models\ViewModels\SinpeViewModel.cs" />
+    <Compile Include="Models\ViewModels\ReporteVentasViewModel.cs" />
     <Compile Include="Models\ViewModels\ZonaEntregaViewModel.cs" />
     <Compile Include="Models\ViewModels\OlvideContrasenaViewModel.cs" />
     <Compile Include="Models\ViewModels\RestablecerContrasenaViewModel.cs" />
@@ -187,6 +189,8 @@
     <Content Include="Views\MovimientosInventario\Historial.cshtml" />
     <Content Include="Views\Sinpe\Index.cshtml" />
     <Content Include="Views\Sinpe\_DetallePago.cshtml" />
+    <Content Include="Views\Reportes\Ventas.cshtml" />
+    <Content Include="Views\Reportes\_SinResultados.cshtml" />
     <Content Include="Content\Sinpe.css" />
     <Content Include="Scripts\Sinpe.js" />
     <Content Include="Scripts\Rol\rol-index.js" />
