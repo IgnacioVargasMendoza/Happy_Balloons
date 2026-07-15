@@ -43,7 +43,18 @@
       "PowerShell(& \"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\2022\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\MSBuild.exe\" \"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\\\\HappyTimesBalloons.slnx\" /p:Configuration=Debug /t:Build /v:minimal /nologo)",
       "PowerShell(& \"C:\\\\Program Files \\(x86\\)\\\\Microsoft Visual Studio\\\\2022\\\\BuildTools\\\\MSBuild\\\\Current\\\\Bin\\\\MSBuild.exe\" \"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\\\\HappyTimesBalloons.slnx\" /p:Configuration=Debug /t:Build /v:minimal /nologo)",
       "Bash(dotnet build *)",
-      "Bash(dotnet test *)"
+      "Bash(dotnet test *)",
+      "Bash(not exist *)",
+      "Skill(update-config)",
+      "Bash(./migrate.exe HappyTimesBalloons.AccesoADatos.dll /connectionString=\"Data Source=Nacho\\\\SQLEXPRESS;Initial Catalog=HappyTimesBalloons;Integrated Security=True;MultipleActiveResultSets=True\" /connectionProviderName=\"System.Data.SqlClient\" /startupDirectory=\".\" /verbose)",
+      "Bash(Get-ChildItem -Path \"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\" -Recurse -Directory)",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(Sort-Object)",
+      "Bash(echo \"EXIT_CODE=$?\")",
+      "Bash(vstest.console.exe \"TestBin/HappyTimesBalloons.Tests.dll\" /TestCaseFilter:\"FullyQualifiedName~ReporteVentas\")",
+      "Bash(vstest.console.exe *)",
+      "Bash(msbuild \"HappyTimesBalloons.Web/HappyTimesBalloons.Web.csproj\" /t:Build /p:Configuration=Debug /v:minimal /nologo)",
+      "Bash(\"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\2022\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\MSBuild.exe\" \"HappyTimesBalloons.Web/HappyTimesBalloons.Web.csproj\" /t:Build /p:Configuration=Debug /v:minimal /nologo)"
     ]
   },
   "hooks": {
