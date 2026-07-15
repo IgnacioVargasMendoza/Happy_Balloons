@@ -136,6 +136,7 @@
     <Compile Include="Models\ViewModels\MovimientoInventarioViewModel.cs" />
     <Compile Include="Models\ViewModels\SinpeViewModel.cs" />
     <Compile Include="Models\ViewModels\ReporteVentasViewModel.cs" />
+    <Compile Include="Models\ViewModels\ReporteInventarioViewModel.cs" />
     <Compile Include="Models\ViewModels\ZonaEntregaViewModel.cs" />
     <Compile Include="Models\ViewModels\OlvideContrasenaViewModel.cs" />
     <Compile Include="Models\ViewModels\RestablecerContrasenaViewModel.cs" />
@@ -191,6 +192,7 @@
     <Content Include="Views\Sinpe\_DetallePago.cshtml" />
     <Content Include="Views\Reportes\Ventas.cshtml" />
     <Content Include="Views\Reportes\_SinResultados.cshtml" />
+    <Content Include="Views\Reportes\Inventario.cshtml" />
     <Content Include="Content\Sinpe.css" />
     <Content Include="Scripts\Sinpe.js" />
     <Content Include="Scripts\Rol\rol-index.js" />
