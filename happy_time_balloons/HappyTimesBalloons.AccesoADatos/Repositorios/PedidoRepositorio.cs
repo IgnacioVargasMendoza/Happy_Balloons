@@ -29,7 +29,7 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
                 Numero = "TEMP",
                 UserId = dto.UserId,
                 FechaPedido = DateTime.UtcNow,
-                EstadoPedido = EstadoPedido.Pendiente,
+                EstadoPedido = dto.MetodoPago == "SINPE" ? EstadoPedido.PagoPendiente : EstadoPedido.Pendiente,
                 MetodoPago = dto.MetodoPago,
                 NumeroReferencia = dto.NumeroReferencia,
                 ZonaEntregaId = dto.ZonaEntregaId,
@@ -225,6 +225,21 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
                 PedidosHoy = pedidosHoy,
                 VentasTotales = ventasTotales
             };
+        }
+
+        public async Task<PedidoDTO> BuscarPorSinpeAsync(string numeroComprobante, decimal monto)
+        {
+            var pedido = await _ctx.Pedidos
+                .Include(x => x.ZonaEntrega)
+                .Include(x => x.Usuario)
+                .Where(x =>
+                    x.EstadoPedido == EstadoPedido.PagoPendiente &&
+                    x.MetodoPago == "SINPE" &&
+                    (x.NumeroReferencia == numeroComprobante || x.Total == monto))
+                .OrderByDescending(x => x.FechaPedido)
+                .FirstOrDefaultAsync();
+
+            return pedido == null ? null : MapearDTO(pedido);
         }
 
         // ── Helpers privados ─────────────────────────────────────────────────

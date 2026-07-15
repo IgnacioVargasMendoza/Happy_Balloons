@@ -15,6 +15,9 @@ namespace HappyTimesBalloons.Abstraccion.Enums
         AsignarRol,
         RevocarRol,
         EditarPerfil,
-        CambiarContrasena
+        CambiarContrasena,
+        ProcesarPagoSinpe,
+        RechazarPagoSinpe,
+        PagoDuplicadoSinpe
     }
 }
