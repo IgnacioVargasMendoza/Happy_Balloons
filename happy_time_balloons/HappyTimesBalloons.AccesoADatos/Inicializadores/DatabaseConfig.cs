@@ -59,6 +59,18 @@ namespace HappyTimesBalloons.AccesoADatos.Inicializadores
                 context.ZonasEntrega.AddRange(zonas);
             }
 
+            // Horarios de entrega semilla
+            if (!context.HorariosEntrega.Any())
+            {
+                var horarios = new[]
+                {
+                    new HorarioEntrega { Etiqueta = "Mañana",   HoraInicio = "08:00", HoraFin = "12:00", CapacidadMaxima = 10, EsActivo = true },
+                    new HorarioEntrega { Etiqueta = "Tarde",    HoraInicio = "12:00", HoraFin = "17:00", CapacidadMaxima = 10, EsActivo = true },
+                    new HorarioEntrega { Etiqueta = "Noche",    HoraInicio = "17:00", HoraFin = "20:00", CapacidadMaxima = 5,  EsActivo = true },
+                };
+                context.HorariosEntrega.AddRange(horarios);
+            }
+
             context.SaveChanges();
         }
     }

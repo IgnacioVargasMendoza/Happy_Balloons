@@ -1,0 +1,101 @@
+@model HappyTimesBalloons.Web.Models.ViewModels.ProgramacionEntregaIndexViewModel
+@using HappyTimesBalloons.Abstraccion.Enums
+
+@{
+    ViewBag.Title = "Programación de Entregas";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@Html.Partial("~/Views/Shared/_Mensajes.cshtml")
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">
+        <i class="bi bi-calendar-check me-2 text-primary"></i>Programación de Entregas
+    </h2>
+</div>
+
+@if (!Model.Programaciones.Any())
+{
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle me-2"></i>
+        No hay entregas programadas todavía. Puedes programar una entrega desde la pantalla de <strong>Pedidos</strong>.
+    </div>
+}
+else
+{
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Pedido</th>
+                            <th>Fecha de Entrega</th>
+                            <th>Horario</th>
+                            <th>Estado</th>
+                            <th>Programado por</th>
+                            <th>Notas</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var p in Model.Programaciones)
+                        {
+                            <tr>
+                                <td>
+                                    <span class="fw-semibold">@p.NumeroPedido</span>
+                                </td>
+                                <td>@p.FechaEntrega.ToString("dd/MM/yyyy")</td>
+                                <td>@p.EtiquetaHorario</td>
+                                <td>
+                                    @{
+                                        string badgeClass;
+                                        switch (p.EstadoProgramacion)
+                                        {
+                                            case EstadoProgramacionEntrega.Confirmada:
+                                                badgeClass = "bg-success";
+                                                break;
+                                            case EstadoProgramacionEntrega.Entregada:
+                                                badgeClass = "bg-primary";
+                                                break;
+                                            case EstadoProgramacionEntrega.Cancelada:
+                                                badgeClass = "bg-secondary";
+                                                break;
+                                            default:
+                                                badgeClass = "bg-warning text-dark";
+                                                break;
+                                        }
+                                    }
+                                    <span class="badge @badgeClass">@p.EstadoProgramacion</span>
+                                </td>
+                                <td>@p.NombreUsuario</td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(p.Notas))
+                                    {
+                                        <span class="text-muted small" title="@p.Notas">
+                                            @(p.Notas.Length > 40 ? p.Notas.Substring(0, 40) + "…" : p.Notas)
+                                        </span>
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    @if (p.EstadoProgramacion != EstadoProgramacionEntrega.Cancelada
+                                         && p.EstadoProgramacion != EstadoProgramacionEntrega.Entregada)
+                                    {
+                                        <form action="@Url.Action("Cancelar", "ProgramacionEntrega")" method="post" class="d-inline"
+                                              onsubmit="return confirm('¿Cancelar esta programación de entrega?');">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@p.Id" />
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Cancelar entrega">
+                                                <i class="bi bi-x-circle"></i> Cancelar
+                                            </button>
+                                        </form>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}

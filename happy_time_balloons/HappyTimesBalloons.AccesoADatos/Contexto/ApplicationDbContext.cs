@@ -64,5 +64,9 @@ namespace HappyTimesBalloons.AccesoADatos.Contexto
         public DbSet<MovimientoInventario> MovimientosInventario { get; set; }
 
         public DbSet<PagoSinpe> PagosSinpe { get; set; }
+
+        public DbSet<HorarioEntrega> HorariosEntrega { get; set; }
+
+        public DbSet<ProgramacionEntrega> ProgramacionesEntrega { get; set; }
     }
 }
