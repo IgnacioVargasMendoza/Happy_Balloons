@@ -1,0 +1,21 @@
+/* ranking-productos.css — estilos del módulo Ranking de Productos */
+
+/* Columna de posición en la tabla de ranking */
+.ranking-col-posicion {
+    width: 60px;
+}
+
+/* Columna de barra de progreso en la tabla de ranking */
+.ranking-col-progreso {
+    width: 180px;
+}
+
+/* Barra de progreso compacta del ranking */
+.ranking-progress {
+    height: 10px;
+}
+
+/* Badge de medalla de bronce (posición 3) */
+.ranking-badge-bronce {
+    background-color: #cd7f32;
+}
