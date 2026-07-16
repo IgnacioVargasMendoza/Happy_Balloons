@@ -105,6 +105,7 @@
     <Compile Include="Controllers\ProgramacionEntregaController.cs" />
     <Compile Include="Controllers\RankingProductosController.cs" />
     <Compile Include="Controllers\ReglasOperativasController.cs" />
+    <Compile Include="Controllers\PrediccionDemandaController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -146,6 +147,8 @@
     <Compile Include="Models\ViewModels\ProgramacionEntregaFormViewModel.cs" />
     <Compile Include="Models\ViewModels\RankingProductosViewModel.cs" />
     <Compile Include="Models\ViewModels\ReglasOperativasViewModel.cs" />
+    <Compile Include="Models\ViewModels\PrediccionDemandaViewModel.cs" />
+    <Compile Include="Models\ViewModels\PrediccionDemandaDetalleViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
@@ -206,6 +209,8 @@
     <Content Include="Views\ProgramacionEntrega\Programar.cshtml" />
     <Content Include="Views\RankingProductos\Index.cshtml" />
     <Content Include="Views\ReglasOperativas\Index.cshtml" />
+    <Content Include="Views\PrediccionDemanda\Index.cshtml" />
+    <Content Include="Views\PrediccionDemanda\Detalle.cshtml" />
     <Content Include="Views\ReglasOperativas\Editar.cshtml" />
     <Content Include="Scripts\ProgramacionEntrega\programar-entrega.js" />
     <Content Include="Content\Sinpe.css" />
@@ -213,6 +218,8 @@
     <Content Include="Scripts\Rol\rol-index.js" />
     <Content Include="Content\ranking-productos.css" />
     <Content Include="Scripts\ranking-productos.js" />
+    <Content Include="Content\prediccion-demanda.css" />
+    <Content Include="Scripts\prediccion-demanda.js" />
     <Content Include="Views\Shared\_NavBar.cshtml" />
     <Content Include="Views\Shared\_TarjetaProducto.cshtml" />
     <Content Include="Views\Web.config" />
