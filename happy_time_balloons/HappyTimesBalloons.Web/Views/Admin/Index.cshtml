@@ -1,6 +1,11 @@
 @model HappyTimesBalloons.Web.Models.ViewModels.AdminDashboardViewModel
+@using Newtonsoft.Json
 @{
     ViewBag.Title = "Dashboard";
+    var ventasLabels = JsonConvert.SerializeObject(Model.VentasUltimos7Dias.Select(v => v.Fecha).ToList());
+    var ventasTotalesData = JsonConvert.SerializeObject(Model.VentasUltimos7Dias.Select(v => v.Total).ToList());
+    int stockOk = Model.TotalProductos - Model.ProductosStockBajoInventario - Model.ProductosSinStock;
+    if (stockOk < 0) { stockOk = 0; }
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -8,21 +13,26 @@
         <h2 class="mb-0"><i class="bi bi-speedometer2 me-2 text-brand"></i>Dashboard</h2>
         <p class="text-muted small mb-0">Panel de administración</p>
     </div>
-    <span class="text-muted small"><i class="bi bi-clock me-1"></i>@DateTime.Now.ToString("dd/MM/yyyy HH:mm")</span>
+    <div class="text-end">
+        <span class="text-muted small"><i class="bi bi-clock me-1"></i>@DateTime.Now.ToString("dd/MM/yyyy HH:mm")</span>
+        <div id="refresh-status" class="text-muted" style="font-size:.7rem;">
+            <i class="bi bi-arrow-clockwise me-1"></i>Actualización automática activa
+        </div>
+    </div>
 </div>
 
-@* ── Tarjetas de estadísticas ── *@
-<div class="row g-3 mb-4">
+@* ── Fila 1: KPIs de Pedidos y Ventas ── *@
+<div class="row g-3 mb-3">
     <div class="col-sm-6 col-xl-3">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-body d-flex align-items-center gap-3">
-                <div class="rounded-3 p-3 bg-brand-soft text-brand fs-4">
-                    <i class="bi bi-box-seam"></i>
+                <div class="rounded-3 p-3 bg-success bg-opacity-10 text-success fs-4">
+                    <i class="bi bi-bag-check"></i>
                 </div>
                 <div>
-                    <div class="fs-3 fw-bold lh-1">@Model.TotalProductos</div>
-                    <div class="text-muted small">Productos</div>
-                    <div class="text-success" style="font-size:.75rem;">@Model.ProductosActivos activos</div>
+                    <div id="kpi-pedidos-hoy" class="fs-3 fw-bold lh-1">@Model.PedidosHoy</div>
+                    <div class="text-muted small">Pedidos hoy</div>
+                    <div class="text-muted" style="font-size:.75rem;"><span id="kpi-total-pedidos">@Model.TotalPedidos</span> en total</div>
                 </div>
             </div>
         </div>
@@ -30,13 +40,27 @@
     <div class="col-sm-6 col-xl-3">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-body d-flex align-items-center gap-3">
-                <div class="rounded-3 p-3 bg-warning bg-opacity-10 text-warning fs-4">
-                    <i class="bi bi-exclamation-triangle"></i>
+                <div class="rounded-3 p-3 text-white fs-4" style="background-color:#e91e8c;">
+                    <i class="bi bi-currency-dollar"></i>
                 </div>
                 <div>
-                    <div class="fs-3 fw-bold lh-1">@Model.ProductosConBajoStock</div>
-                    <div class="text-muted small">Bajo stock</div>
-                    <div class="text-muted" style="font-size:.75rem;">5 unidades o menos</div>
+                    <div id="kpi-ventas-totales" class="fs-4 fw-bold lh-1">₡@Model.VentasTotales.ToString("N0")</div>
+                    <div class="text-muted small">Ventas totales</div>
+                    <div class="text-success" style="font-size:.75rem;">Acumulado histórico</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="rounded-3 p-3 bg-primary bg-opacity-10 text-primary fs-4">
+                    <i class="bi bi-box-seam"></i>
+                </div>
+                <div>
+                    <div class="fs-3 fw-bold lh-1">@Model.TotalProductos</div>
+                    <div class="text-muted small">Productos</div>
+                    <div class="text-success" style="font-size:.75rem;">@Model.ProductosActivos activos</div>
                 </div>
             </div>
         </div>
@@ -55,16 +79,79 @@
             </div>
         </div>
     </div>
-    <div class="col-sm-6 col-xl-3">
+</div>
+
+@* ── Fila 2: KPIs de Inventario ── *@
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-4">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-body d-flex align-items-center gap-3">
-                <div class="rounded-3 p-3 bg-success bg-opacity-10 text-success fs-4">
-                    <i class="bi bi-bag-check"></i>
+                <div class="rounded-3 p-3 bg-warning bg-opacity-10 text-warning fs-4">
+                    <i class="bi bi-exclamation-triangle"></i>
                 </div>
                 <div>
-                    <div class="fs-3 fw-bold lh-1">@Model.PedidosHoy</div>
-                    <div class="text-muted small">Pedidos hoy</div>
-                    <div class="text-muted" style="font-size:.75rem;">@Model.TotalPedidos en total</div>
+                    <div id="kpi-bajo-stock" class="fs-3 fw-bold lh-1">@Model.ProductosConBajoStock</div>
+                    <div class="text-muted small">Bajo stock</div>
+                    <div class="text-muted" style="font-size:.75rem;">5 unidades o menos</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="rounded-3 p-3 bg-danger bg-opacity-10 text-danger fs-4">
+                    <i class="bi bi-x-circle"></i>
+                </div>
+                <div>
+                    <div id="kpi-sin-stock" class="fs-3 fw-bold lh-1">@Model.ProductosSinStock</div>
+                    <div class="text-muted small">Sin stock</div>
+                    <div class="text-danger" style="font-size:.75rem;">Requieren reabastecimiento</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-12 col-xl-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="rounded-3 p-3 bg-secondary bg-opacity-10 text-secondary fs-4">
+                    <i class="bi bi-archive"></i>
+                </div>
+                <div>
+                    <div id="kpi-valor-inventario" class="fs-4 fw-bold lh-1">₡@Model.ValorTotalInventario.ToString("N0")</div>
+                    <div class="text-muted small">Valor del inventario</div>
+                    <div class="text-muted" style="font-size:.75rem;">Costo total en stock</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* ── Gráficas ── *@
+<div class="row g-4 mb-4">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white border-bottom d-flex align-items-center gap-2">
+                <i class="bi bi-graph-up text-brand"></i>
+                <span class="fw-semibold">Ventas últimos 7 días</span>
+            </div>
+            <div class="card-body">
+                <canvas id="ventasChart" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white border-bottom d-flex align-items-center gap-2">
+                <i class="bi bi-pie-chart text-brand"></i>
+                <span class="fw-semibold">Estado del inventario</span>
+            </div>
+            <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                <canvas id="inventarioChart" style="max-height:220px;"></canvas>
+                <div class="d-flex gap-3 mt-3 flex-wrap justify-content-center" style="font-size:.8rem;">
+                    <span><span class="badge" style="background:#20c997;">&nbsp;</span> OK (@stockOk)</span>
+                    <span><span class="badge bg-warning">&nbsp;</span> Bajo (@Model.ProductosStockBajoInventario)</span>
+                    <span><span class="badge bg-danger">&nbsp;</span> Sin stock (@Model.ProductosSinStock)</span>
                 </div>
             </div>
         </div>
@@ -113,7 +200,7 @@
                                             if (entrada.Accion == "Crear") { badgeCss = "bg-success"; }
                                             else if (entrada.Accion == "Actualizar") { badgeCss = "bg-primary"; }
                                             else if (entrada.Accion == "Eliminar") { badgeCss = "bg-danger"; }
-                                            else { badgeCss = "bg-secondary"; }                                 
+                                            else { badgeCss = "bg-secondary"; }
                                         }
                                         <span class="badge @badgeCss">@entrada.Accion</span>
                                     </td>
@@ -158,7 +245,99 @@
 
                 @Html.ActionLink("Promociones y descuentos", "Index", "Promocion",
                     null, new { @class = "btn btn-outline-danger text-start w-100 d-flex align-items-center gap-2" })
+
+                @Html.ActionLink("Reportes de ventas", "Ventas", "Reportes",
+                    null, new { @class = "btn btn-outline-primary text-start w-100 d-flex align-items-center gap-2" })
+
+                @Html.ActionLink("Reporte de inventario", "Inventario", "Reportes",
+                    null, new { @class = "btn btn-outline-primary text-start w-100 d-flex align-items-center gap-2" })
             </div>
         </div>
     </div>
 </div>
+
+@section scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        // ── Gráfica de ventas por día ──
+        var ventasLabels = @Html.Raw(ventasLabels);
+        var ventasTotalesData = @Html.Raw(ventasTotalesData);
+
+        var ventasCtx = document.getElementById('ventasChart').getContext('2d');
+        var ventasChart = new Chart(ventasCtx, {
+            type: 'line',
+            data: {
+                labels: ventasLabels,
+                datasets: [{
+                    label: 'Ventas (₡)',
+                    data: ventasTotalesData,
+                    borderColor: '#e91e8c',
+                    backgroundColor: 'rgba(233,30,140,0.08)',
+                    borderWidth: 2,
+                    pointBackgroundColor: '#e91e8c',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function (v) { return '₡' + v.toLocaleString('es-CR'); }
+                        }
+                    }
+                }
+            }
+        });
+
+        // ── Gráfica de estado de inventario ──
+        var invCtx = document.getElementById('inventarioChart').getContext('2d');
+        var inventarioChart = new Chart(invCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Stock OK', 'Bajo stock', 'Sin stock'],
+                datasets: [{
+                    data: [@stockOk, @Model.ProductosStockBajoInventario, @Model.ProductosSinStock],
+                    backgroundColor: ['#20c997', '#ffc107', '#dc3545'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                cutout: '65%',
+                plugins: { legend: { display: false } }
+            }
+        });
+
+        // ── Auto-refresh cada 60 segundos ──
+        function actualizarDatos() {
+            fetch('@Url.Action("DatosJson", "Admin")')
+                .then(function (r) { return r.json(); })
+                .then(function (d) {
+                    document.getElementById('kpi-pedidos-hoy').textContent = d.pedidosHoy;
+                    document.getElementById('kpi-total-pedidos').textContent = d.totalPedidos;
+                    document.getElementById('kpi-ventas-totales').textContent = '₡' + Math.round(d.ventasTotales).toLocaleString('es-CR');
+                    document.getElementById('kpi-bajo-stock').textContent = d.productosConBajoStock;
+                    document.getElementById('kpi-sin-stock').textContent = d.productosSinStock;
+                    document.getElementById('kpi-valor-inventario').textContent = '₡' + Math.round(d.valorTotalInventario).toLocaleString('es-CR');
+
+                    var nuevasTotales = d.ventasDiarias.map(function (v) { return v.Total; });
+                    ventasChart.data.datasets[0].data = nuevasTotales;
+                    ventasChart.update('none');
+
+                    document.getElementById('refresh-status').innerHTML =
+                        '<i class="bi bi-check-circle-fill text-success me-1"></i>Actualizado: ' +
+                        new Date().toLocaleTimeString('es-CR');
+                })
+                .catch(function () {
+                    document.getElementById('refresh-status').innerHTML =
+                        '<i class="bi bi-exclamation-circle text-warning me-1"></i>Sin conexión';
+                });
+        }
+
+        setInterval(actualizarDatos, 60000);
+    </script>
+}

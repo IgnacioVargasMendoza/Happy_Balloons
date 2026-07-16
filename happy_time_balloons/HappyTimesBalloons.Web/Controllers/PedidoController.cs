@@ -381,8 +381,9 @@ namespace HappyTimesBalloons.Web.Controllers
                 case EstadoPedido.Procesando: return "Procesando";
                 case EstadoPedido.Enviado: return "Enviado";
                 case EstadoPedido.Entregado: return "Entregado";
-                case EstadoPedido.Cancelado: return "Cancelado";
-                default: return estado.ToString();
+                case EstadoPedido.Cancelado:      return "Cancelado";
+                case EstadoPedido.PagoPendiente: return "Pago pendiente";
+                default:                         return estado.ToString();
             }
         }
     }

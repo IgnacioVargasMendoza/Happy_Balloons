@@ -1,3 +1,4 @@
+using HappyTimesBalloons.Abstraccion.DTOs;
 using System;
 using System.Collections.Generic;
 
@@ -15,6 +16,12 @@ namespace HappyTimesBalloons.Web.Models.ViewModels
         public int TotalPedidos { get; set; }
         public int PedidosHoy { get; set; }
         public decimal VentasTotales { get; set; }
+
+        public int ProductosSinStock { get; set; }
+        public int ProductosStockBajoInventario { get; set; }
+        public decimal ValorTotalInventario { get; set; }
+
+        public List<VentaDiariaDTO> VentasUltimos7Dias { get; set; } = new List<VentaDiariaDTO>();
 
         public List<BitacoraResumenViewModel> ActividadReciente { get; set; }
             = new List<BitacoraResumenViewModel>();
