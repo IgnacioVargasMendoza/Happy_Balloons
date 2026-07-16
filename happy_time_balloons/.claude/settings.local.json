@@ -60,7 +60,18 @@
       "PowerShell(Get-ChildItem \"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\\\\HappyTimesBalloons.Abstraccion\\\\Interfaces\\\\Servicios\\\\\" | Where-Object { $_.Name -match 'Inventario|Reporte' } | Select-Object Name)",
       "PowerShell(vstest.console.exe \"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\\\\TestBin\\\\HappyTimesBalloons.Tests.dll\" 2>&1 | Select-Object -Last 10)",
       "Bash(findstr -i zona)",
-      "Bash(Get-ChildItem \"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\\\\HappyTimesBalloons.Web\\\\Controllers\\\\ConfiguracionController.cs\")"
+      "Bash(Get-ChildItem \"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\\\\HappyTimesBalloons.Web\\\\Controllers\\\\ConfiguracionController.cs\")",
+      "Bash(New-Item -ItemType Directory -Force \"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\\\\HappyTimesBalloons.Web\\\\Views\\\\ReglasOperativas\")",
+      "Bash(Out-Null)",
+      "Bash(Write-Output \"OK\")",
+      "Bash(msbuild \"HappyTimesBalloons.AccesoADatos/HappyTimesBalloons.AccesoADatos.csproj\" /p:Configuration=Debug /nologo /v:minimal)",
+      "Bash(Select-String -Pattern \"Admin|Dashboard|Reporte|Home\")",
+      "Bash(msbuild HappyTimesBalloons.sln /p:Configuration=Debug /t:Build /v:minimal)",
+      "Bash(Select-String \"ranking-productos\")",
+      "Bash(\"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\2022\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\MSBuild.exe\" HappyTimesBalloons.sln /p:Configuration=Debug /t:Build /v:minimal)",
+      "PowerShell($sln = \"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\\\\HappyTimesBalloons.sln\"; MSBuild.exe $sln /p:Configuration=Debug /t:Build /v:minimal 2>&1 | Select-Object -Last 50)",
+      "PowerShell(cmd /c \"dir /b \"\"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\\\\\"\"\")",
+      "PowerShell(MSBuild.exe \"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\\\\HappyTimesBalloons.slnx\" /p:Configuration=Debug /t:Build /v:minimal 2>&1 | Select-Object -Last 60)"
     ]
   },
   "hooks": {

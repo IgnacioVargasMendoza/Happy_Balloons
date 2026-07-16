@@ -83,7 +83,7 @@
     }
     else
     {
-        <%-- Contenedor de datos para Chart.js; los valores Razor se pasan via data-* al JS externo --%>
+        @* Contenedor de datos para Chart.js; los valores Razor se pasan via data-* al JS externo *@
         <div id="ranking-charts-data" class="d-none"
              data-etiquetas="@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Ranking.GraficoEtiquetas))"
              data-unidades="@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Ranking.GraficoUnidades))"
@@ -149,7 +149,7 @@
                 </div>
             </div>
         </div>
-
+    
         <div class="card">
             <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
                 <span><i class="bi bi-list-ol me-2"></i>Ranking completo</span>
@@ -201,7 +201,7 @@
                                         <div class="d-flex align-items-center gap-2">
                                             <div class="progress flex-grow-1 ranking-progress">
                                                 <div class="progress-bar bg-primary"
-                                                     style="width:@item.PorcentajeUnidades.ToString("F1", System.Globalization.CultureInfo.InvariantCulture)%"
+                                                     style="width:@(item.PorcentajeUnidades.ToString("F1", System.Globalization.CultureInfo.InvariantCulture))%"
                                                      role="progressbar"
                                                      aria-valuenow="@item.PorcentajeUnidades"
                                                      aria-valuemin="0"
