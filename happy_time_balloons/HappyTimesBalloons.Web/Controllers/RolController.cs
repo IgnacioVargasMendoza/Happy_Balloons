@@ -59,7 +59,7 @@ namespace HappyTimesBalloons.Web.Controllers
                 return View(model);
             }
 
-            TempData["Mensaje"] = resultado.Mensaje;
+            TempData["Exito"] = resultado.Mensaje;
             return RedirectToAction("Index");
         }
 
@@ -95,7 +95,7 @@ namespace HappyTimesBalloons.Web.Controllers
                 return View(model);
             }
 
-            TempData["Mensaje"] = resultado.Mensaje;
+            TempData["Exito"] = resultado.Mensaje;
             return RedirectToAction("Index");
         }
 
@@ -109,7 +109,7 @@ namespace HappyTimesBalloons.Web.Controllers
 
             var resultado = await _rolServicio.EliminarAsync(id, adminId, adminNombre, ip);
 
-            TempData[resultado.Exito ? "Mensaje" : "Error"] = resultado.Mensaje;
+            TempData[resultado.Exito ? "Exito" : "Error"] = resultado.Mensaje;
             return RedirectToAction("Index");
         }
 
@@ -149,7 +149,7 @@ namespace HappyTimesBalloons.Web.Controllers
 
             var resultado = await _rolServicio.AsignarRolAsync(usuarioId, rolNombre, adminId, adminNombre, ip);
 
-            TempData[resultado.Exito ? "Mensaje" : "Error"] = resultado.Mensaje;
+            TempData[resultado.Exito ? "Exito" : "Error"] = resultado.Mensaje;
             return RedirectToAction("Usuarios");
         }
 
@@ -163,7 +163,7 @@ namespace HappyTimesBalloons.Web.Controllers
 
             var resultado = await _rolServicio.RevocarRolAsync(usuarioId, rolNombre, adminId, adminNombre, ip);
 
-            TempData[resultado.Exito ? "Mensaje" : "Error"] = resultado.Mensaje;
+            TempData[resultado.Exito ? "Exito" : "Error"] = resultado.Mensaje;
             return RedirectToAction("Usuarios");
         }
     }
