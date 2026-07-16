@@ -1,0 +1,30 @@
+.prediccion-fila-atenuada {
+    opacity: 0.55;
+}
+
+.prediccion-metrica-card {
+    border: 1px solid #dee2e6;
+    transition: box-shadow 0.2s ease;
+}
+
+.prediccion-metrica-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.prediccion-tendencia-alta {
+    background-color: #198754;
+    color: #fff;
+    font-size: 0.85rem;
+}
+
+.prediccion-tendencia-baja {
+    background-color: #dc3545;
+    color: #fff;
+    font-size: 0.85rem;
+}
+
+.prediccion-tendencia-estable {
+    background-color: #6c757d;
+    color: #fff;
+    font-size: 0.85rem;
+}
