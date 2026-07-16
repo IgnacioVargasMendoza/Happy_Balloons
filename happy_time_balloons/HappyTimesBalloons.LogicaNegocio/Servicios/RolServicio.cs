@@ -99,6 +99,9 @@ namespace HappyTimesBalloons.LogicaNegocio.Servicios
             if (string.IsNullOrEmpty(usuarioId) || string.IsNullOrEmpty(rolNombre))
                 return ResultadoOperacionDTO.Fallo("Usuario o rol no válido.", CodigoResultado.DatosInvalidos);
 
+            if (await _rolRepo.TieneRolAsync(usuarioId, rolNombre))
+                return ResultadoOperacionDTO.Fallo($"El usuario ya tiene el rol '{rolNombre}'.", CodigoResultado.DatosInvalidos);
+
             var ok = await _rolRepo.AsignarRolAsync(usuarioId, rolNombre);
             if (!ok)
                 return ResultadoOperacionDTO.Fallo("No se pudo asignar el rol.", CodigoResultado.Error);

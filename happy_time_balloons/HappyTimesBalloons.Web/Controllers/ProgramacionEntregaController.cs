@@ -76,9 +76,10 @@ namespace HappyTimesBalloons.Web.Controllers
                 return Json(new { error = "Fecha inválida." }, JsonRequestBehavior.AllowGet);
             }
 
-            if (!_servicio.EsFechaPermitida(fechaParsed, out var mensajeError))
+            var validacion = await _servicio.EsFechaPermitidaAsync(fechaParsed);
+            if (!validacion.Exito)
             {
-                return Json(new { error = mensajeError }, JsonRequestBehavior.AllowGet);
+                return Json(new { error = validacion.Mensaje }, JsonRequestBehavior.AllowGet);
             }
 
             var horarios = await _servicio.ObtenerHorariosDisponiblesAsync(fechaParsed);
@@ -133,6 +134,27 @@ namespace HappyTimesBalloons.Web.Controllers
             model.FechaMaxima = DateTime.Today.AddDays(30);
             model.HorariosDisponibles = await _servicio.ObtenerHorariosDisponiblesAsync(model.FechaEntrega);
             return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> MarcarEntregada(int id)
+        {
+            var usuarioId = User.Identity.GetUserId();
+            var nombreUsuario = User.Identity.Name;
+
+            var resultado = await _servicio.MarcarEntregadaAsync(id, usuarioId, nombreUsuario);
+
+            if (resultado.Exito)
+            {
+                TempData["Exito"] = resultado.Mensaje;
+            }
+            else
+            {
+                TempData["Error"] = resultado.Mensaje;
+            }
+
+            return RedirectToAction("Index");
         }
 
         // Tarea 5: cancelar libera el cupo

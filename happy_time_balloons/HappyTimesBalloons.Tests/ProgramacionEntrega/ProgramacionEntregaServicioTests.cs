@@ -1,6 +1,6 @@
 using HappyTimesBalloons.Abstraccion.DTOs;
-using HappyTimesBalloons.Abstraccion.Enums;
 using HappyTimesBalloons.Abstraccion.Interfaces.Repositorios;
+using HappyTimesBalloons.Abstraccion.Interfaces.Servicios;
 using HappyTimesBalloons.LogicaNegocio.Servicios;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -15,6 +15,7 @@ namespace HappyTimesBalloons.Tests.ProgramacionEntrega
     {
         private Mock<IProgramacionEntregaRepositorio> _repoMock;
         private Mock<IHorarioEntregaRepositorio> _horarioRepoMock;
+        private Mock<IConfiguracionServicio> _configuracionMock;
         private ProgramacionEntregaServicio _servicio;
 
         [TestInitialize]
@@ -22,56 +23,71 @@ namespace HappyTimesBalloons.Tests.ProgramacionEntrega
         {
             _repoMock = new Mock<IProgramacionEntregaRepositorio>();
             _horarioRepoMock = new Mock<IHorarioEntregaRepositorio>();
-            _servicio = new ProgramacionEntregaServicio(_repoMock.Object, _horarioRepoMock.Object);
+            _configuracionMock = new Mock<IConfiguracionServicio>();
+
+            _configuracionMock
+                .Setup(c => c.ObtenerIntAsync("EntregaDiasMinimosAdelante", 1))
+                .ReturnsAsync(1);
+            _configuracionMock
+                .Setup(c => c.ObtenerIntAsync("EntregaDiasMaximosAdelante", 30))
+                .ReturnsAsync(30);
+            _configuracionMock
+                .Setup(c => c.ObtenerListaEnteroAsync("EntregaDiasHabilitados", It.IsAny<List<int>>()))
+                .ReturnsAsync(new List<int> { 1, 2, 3, 4, 5, 6 });
+
+            _servicio = new ProgramacionEntregaServicio(
+                _repoMock.Object,
+                _horarioRepoMock.Object,
+                _configuracionMock.Object);
         }
 
-        // ── Tarea 4: Validación de fechas ─────────────────────────────────────
+        // ── Validación de fechas ─────────────────────────────────────
 
         [TestMethod]
-        public void EsFechaPermitida_FechaHoy_RetornaFalse()
+        public async Task EsFechaPermitidaAsync_FechaHoy_RetornaFallo()
         {
-            var resultado = _servicio.EsFechaPermitida(DateTime.Today, out var error);
+            var resultado = await _servicio.EsFechaPermitidaAsync(DateTime.Today);
 
-            Assert.IsFalse(resultado);
-            Assert.IsNotNull(error);
-            StringAssert.Contains(error, "mañana");
+            Assert.IsFalse(resultado.Exito);
+            Assert.IsNotNull(resultado.Mensaje);
+            StringAssert.Contains(resultado.Mensaje, "día(s)");
         }
 
         [TestMethod]
-        public void EsFechaPermitida_FechaPasada_RetornaFalse()
+        public async Task EsFechaPermitidaAsync_FechaPasada_RetornaFallo()
         {
-            var resultado = _servicio.EsFechaPermitida(DateTime.Today.AddDays(-3), out var error);
+            var resultado = await _servicio.EsFechaPermitidaAsync(DateTime.Today.AddDays(-3));
 
-            Assert.IsFalse(resultado);
-            Assert.IsNotNull(error);
+            Assert.IsFalse(resultado.Exito);
+            Assert.IsNotNull(resultado.Mensaje);
         }
 
         [TestMethod]
-        public void EsFechaPermitida_Domingo_RetornaFalse()
+        public async Task EsFechaPermitidaAsync_Domingo_RetornaFallo()
         {
             var domingo = ObtenerProximoDomingo();
 
-            var resultado = _servicio.EsFechaPermitida(domingo, out var error);
+            var resultado = await _servicio.EsFechaPermitidaAsync(domingo);
 
-            Assert.IsFalse(resultado);
-            Assert.IsNotNull(error);
-            StringAssert.Contains(error, "domingo");
+            Assert.IsFalse(resultado.Exito);
+            Assert.IsNotNull(resultado.Mensaje);
+            StringAssert.Contains(resultado.Mensaje, "semana");
         }
 
         [TestMethod]
-        public void EsFechaPermitida_MasDe30Dias_RetornaFalse()
+        public async Task EsFechaPermitidaAsync_MasDe30Dias_RetornaFallo()
         {
             var fecha = DateTime.Today.AddDays(31);
 
-            var resultado = _servicio.EsFechaPermitida(fecha, out var error);
+            var resultado = await _servicio.EsFechaPermitidaAsync(fecha);
 
-            Assert.IsFalse(resultado);
-            Assert.IsNotNull(error);
-            StringAssert.Contains(error, "30");
+            Assert.IsFalse(resultado.Exito);
+            Assert.IsNotNull(resultado.Mensaje);
+            StringAssert.Contains(resultado.Mensaje, "30");
         }
 
         [TestMethod]
-        public void EsFechaPermitida_MananaNoEsDomingo_RetornaTrue()
+        public async Task EsFechaPermitidaAsync_MananaNoEsDomingo_RetornaExito()
         {
             var manana = DateTime.Today.AddDays(1);
             if (manana.DayOfWeek == DayOfWeek.Sunday)
@@ -79,13 +95,12 @@ namespace HappyTimesBalloons.Tests.ProgramacionEntrega
                 manana = manana.AddDays(1);
             }
 
-            var resultado = _servicio.EsFechaPermitida(manana, out var error);
+            var resultado = await _servicio.EsFechaPermitidaAsync(manana);
 
-            Assert.IsTrue(resultado);
-            Assert.IsNull(error);
+            Assert.IsTrue(resultado.Exito);
         }
 
-        // ── Tarea 3: Registro de programación ────────────────────────────────
+        // ── Registro de programación ────────────────────────────────────
 
         [TestMethod]
         public async Task RegistrarAsync_PedidoYaProgramado_RetornaFallo()
@@ -111,7 +126,7 @@ namespace HappyTimesBalloons.Tests.ProgramacionEntrega
         public async Task RegistrarAsync_SinCuposDisponibles_RetornaFallo()
         {
             var fecha = DateTime.Today.AddDays(2);
-            if (fecha.DayOfWeek == DayOfWeek.Sunday) fecha = fecha.AddDays(1);
+            if (fecha.DayOfWeek == DayOfWeek.Sunday) { fecha = fecha.AddDays(1); }
 
             var dto = new ProgramacionEntregaDTO
             {
@@ -144,7 +159,7 @@ namespace HappyTimesBalloons.Tests.ProgramacionEntrega
         public async Task RegistrarAsync_DatosValidos_RetornaExito()
         {
             var fecha = DateTime.Today.AddDays(2);
-            if (fecha.DayOfWeek == DayOfWeek.Sunday) fecha = fecha.AddDays(1);
+            if (fecha.DayOfWeek == DayOfWeek.Sunday) { fecha = fecha.AddDays(1); }
 
             var dto = new ProgramacionEntregaDTO
             {
@@ -176,7 +191,7 @@ namespace HappyTimesBalloons.Tests.ProgramacionEntrega
             StringAssert.Contains(resultado.Mensaje, "correctamente");
         }
 
-        // ── Tarea 2: Horarios disponibles ────────────────────────────────────
+        // ── Horarios disponibles ────────────────────────────────────
 
         [TestMethod]
         public async Task ObtenerHorariosDisponiblesAsync_FechaValida_RetornaListaDeHorarios()
@@ -184,9 +199,9 @@ namespace HappyTimesBalloons.Tests.ProgramacionEntrega
             var fecha = DateTime.Today.AddDays(1);
             var horariosMock = new List<HorarioDisponibleDTO>
             {
-                new HorarioDisponibleDTO { HorarioEntregaId = 1, Etiqueta = "Mañana",  CapacidadMaxima = 10, ReservasActuales = 3 },
-                new HorarioDisponibleDTO { HorarioEntregaId = 2, Etiqueta = "Tarde",   CapacidadMaxima = 10, ReservasActuales = 10 },
-                new HorarioDisponibleDTO { HorarioEntregaId = 3, Etiqueta = "Noche",   CapacidadMaxima = 5,  ReservasActuales = 0 }
+                new HorarioDisponibleDTO { HorarioEntregaId = 1, Etiqueta = "Mañana", CapacidadMaxima = 10, ReservasActuales = 3 },
+                new HorarioDisponibleDTO { HorarioEntregaId = 2, Etiqueta = "Tarde",  CapacidadMaxima = 10, ReservasActuales = 10 },
+                new HorarioDisponibleDTO { HorarioEntregaId = 3, Etiqueta = "Noche",  CapacidadMaxima = 5,  ReservasActuales = 0 }
             };
 
             _horarioRepoMock.Setup(r => r.ObtenerDisponiblesParaFechaAsync(fecha))
@@ -201,7 +216,7 @@ namespace HappyTimesBalloons.Tests.ProgramacionEntrega
             Assert.IsTrue(resultado[2].TieneCupo);
         }
 
-        // ── Tarea 5: Cancelación y actualización de disponibilidad ────────────
+        // ── Cancelación ────────────────────────────────────
 
         [TestMethod]
         public async Task CancelarAsync_ProgramacionExistente_LlamaAlRepositorioYRetornaExito()
