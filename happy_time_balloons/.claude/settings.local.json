@@ -54,7 +54,13 @@
       "Bash(vstest.console.exe \"TestBin/HappyTimesBalloons.Tests.dll\" /TestCaseFilter:\"FullyQualifiedName~ReporteVentas\")",
       "Bash(vstest.console.exe *)",
       "Bash(msbuild \"HappyTimesBalloons.Web/HappyTimesBalloons.Web.csproj\" /t:Build /p:Configuration=Debug /v:minimal /nologo)",
-      "Bash(\"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\2022\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\MSBuild.exe\" \"HappyTimesBalloons.Web/HappyTimesBalloons.Web.csproj\" /t:Build /p:Configuration=Debug /v:minimal /nologo)"
+      "Bash(\"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\2022\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\MSBuild.exe\" \"HappyTimesBalloons.Web/HappyTimesBalloons.Web.csproj\" /t:Build /p:Configuration=Debug /v:minimal /nologo)",
+      "Bash(Get-ChildItem -Path \"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\" -Directory)",
+      "Bash(Select-Object Name)",
+      "PowerShell(Get-ChildItem \"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\\\\HappyTimesBalloons.Abstraccion\\\\Interfaces\\\\Servicios\\\\\" | Where-Object { $_.Name -match 'Inventario|Reporte' } | Select-Object Name)",
+      "PowerShell(vstest.console.exe \"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\\\\TestBin\\\\HappyTimesBalloons.Tests.dll\" 2>&1 | Select-Object -Last 10)",
+      "Bash(findstr -i zona)",
+      "Bash(Get-ChildItem \"C:\\\\GitHub\\\\Happy Balloons\\\\RepoCodigoProd\\\\happy_time_balloons\\\\HappyTimesBalloons.Web\\\\Controllers\\\\ConfiguracionController.cs\")"
     ]
   },
   "hooks": {

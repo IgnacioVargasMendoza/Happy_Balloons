@@ -37,6 +37,24 @@ namespace HappyTimesBalloons.AccesoADatos.Contexto
                 .WithMany()
                 .HasForeignKey(m => m.UsuarioId)
                 .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<ProgramacionEntrega>()
+                .HasRequired(p => p.Pedido)
+                .WithMany()
+                .HasForeignKey(p => p.PedidoId)
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<ProgramacionEntrega>()
+                .HasRequired(p => p.HorarioEntrega)
+                .WithMany()
+                .HasForeignKey(p => p.HorarioEntregaId)
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<ProgramacionEntrega>()
+                .HasRequired(p => p.Usuario)
+                .WithMany()
+                .HasForeignKey(p => p.UsuarioId)
+                .WillCascadeOnDelete(false);
         }
 
         public DbSet<BitacoraAuditoria> BitacoraAuditoria { get; set; }
@@ -64,5 +82,11 @@ namespace HappyTimesBalloons.AccesoADatos.Contexto
         public DbSet<MovimientoInventario> MovimientosInventario { get; set; }
 
         public DbSet<PagoSinpe> PagosSinpe { get; set; }
+
+        public DbSet<HorarioEntrega> HorariosEntrega { get; set; }
+
+        public DbSet<ProgramacionEntrega> ProgramacionesEntrega { get; set; }
+
+        public DbSet<ConfiguracionSistema> ConfiguracionesSistema { get; set; }
     }
 }

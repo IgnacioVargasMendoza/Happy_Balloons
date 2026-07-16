@@ -59,6 +59,75 @@ namespace HappyTimesBalloons.AccesoADatos.Inicializadores
                 context.ZonasEntrega.AddRange(zonas);
             }
 
+            // Horarios de entrega semilla
+            if (!context.HorariosEntrega.Any())
+            {
+                var horarios = new[]
+                {
+                    new HorarioEntrega { Etiqueta = "Mañana",   HoraInicio = "08:00", HoraFin = "12:00", CapacidadMaxima = 10, EsActivo = true },
+                    new HorarioEntrega { Etiqueta = "Tarde",    HoraInicio = "12:00", HoraFin = "17:00", CapacidadMaxima = 10, EsActivo = true },
+                    new HorarioEntrega { Etiqueta = "Noche",    HoraInicio = "17:00", HoraFin = "20:00", CapacidadMaxima = 5,  EsActivo = true },
+                };
+                context.HorariosEntrega.AddRange(horarios);
+            }
+
+            // Configuraciones del sistema (reglas operativas)
+            if (!context.ConfiguracionesSistema.Any())
+            {
+                var configuraciones = new[]
+                {
+                    new ConfiguracionSistema
+                    {
+                        Clave = "EntregaDiasMinimosAdelante",
+                        Valor = "1",
+                        Descripcion = "Mínimo de días de anticipación para programar una entrega",
+                        FechaUltimaModificacion = DateTime.UtcNow,
+                        UsuarioUltimaModificacion = "Sistema"
+                    },
+                    new ConfiguracionSistema
+                    {
+                        Clave = "EntregaDiasMaximosAdelante",
+                        Valor = "30",
+                        Descripcion = "Máximo de días en el futuro para programar una entrega",
+                        FechaUltimaModificacion = DateTime.UtcNow,
+                        UsuarioUltimaModificacion = "Sistema"
+                    },
+                    new ConfiguracionSistema
+                    {
+                        Clave = "EntregaDiasHabilitados",
+                        Valor = "1,2,3,4,5,6",
+                        Descripcion = "Días de entrega habilitados (valores DayOfWeek: 0=Dom, 1=Lun, 2=Mar, 3=Mié, 4=Jue, 5=Vie, 6=Sáb)",
+                        FechaUltimaModificacion = DateTime.UtcNow,
+                        UsuarioUltimaModificacion = "Sistema"
+                    },
+                    new ConfiguracionSistema
+                    {
+                        Clave = "PedidoHorasMaximasCancelacion",
+                        Valor = "24",
+                        Descripcion = "Horas desde la creación del pedido en las que el cliente puede cancelar",
+                        FechaUltimaModificacion = DateTime.UtcNow,
+                        UsuarioUltimaModificacion = "Sistema"
+                    },
+                    new ConfiguracionSistema
+                    {
+                        Clave = "PedidoMontoMinimo",
+                        Valor = "0",
+                        Descripcion = "Monto mínimo en colones (0 = sin mínimo)",
+                        FechaUltimaModificacion = DateTime.UtcNow,
+                        UsuarioUltimaModificacion = "Sistema"
+                    },
+                    new ConfiguracionSistema
+                    {
+                        Clave = "AtencionHoraCorte",
+                        Valor = "17:00",
+                        Descripcion = "Hora límite para aceptar pedidos nuevos (HH:mm, formato 24h)",
+                        FechaUltimaModificacion = DateTime.UtcNow,
+                        UsuarioUltimaModificacion = "Sistema"
+                    }
+                };
+                context.ConfiguracionesSistema.AddRange(configuraciones);
+            }
+
             context.SaveChanges();
         }
     }

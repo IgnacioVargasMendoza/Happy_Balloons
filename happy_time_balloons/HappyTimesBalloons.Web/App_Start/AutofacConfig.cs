@@ -37,6 +37,9 @@ namespace HappyTimesBalloons.Web.App_Start
             builder.RegisterType<MovimientoInventarioRepositorio>().As<IMovimientoInventarioRepositorio>().InstancePerRequest();
             builder.RegisterType<SinpeRepositorio>().As<ISinpeRepositorio>().InstancePerRequest();
             builder.RegisterType<ReporteVentasRepositorio>().As<IReporteVentasRepositorio>().InstancePerRequest();
+            builder.RegisterType<HorarioEntregaRepositorio>().As<IHorarioEntregaRepositorio>().InstancePerRequest();
+            builder.RegisterType<ProgramacionEntregaRepositorio>().As<IProgramacionEntregaRepositorio>().InstancePerRequest();
+            builder.RegisterType<ConfiguracionRepositorio>().As<IConfiguracionRepositorio>().InstancePerRequest();
 
             // Servicios
             builder.RegisterType<CategoriaServicio>().As<ICategoriaServicio>().InstancePerRequest();
@@ -54,6 +57,8 @@ namespace HappyTimesBalloons.Web.App_Start
             builder.RegisterType<SinpeServicio>().As<ISinpeServicio>().InstancePerRequest();
             builder.RegisterType<ReporteVentasServicio>().As<IReporteVentasServicio>().InstancePerRequest();
             builder.RegisterType<ReporteInventarioServicio>().As<IReporteInventarioServicio>().InstancePerRequest();
+            builder.RegisterType<ProgramacionEntregaServicio>().As<IProgramacionEntregaServicio>().InstancePerRequest();
+            builder.RegisterType<ConfiguracionServicio>().As<IConfiguracionServicio>().InstancePerRequest();
 
             var container = builder.Build();
             DependencyResolver.SetResolver(new AutofacDependencyResolver(container));

@@ -102,6 +102,8 @@
     <Compile Include="Controllers\PromocionController.cs" />
     <Compile Include="Controllers\ReportesController.cs" />
     <Compile Include="Controllers\ZonasEntregaController.cs" />
+    <Compile Include="Controllers\ProgramacionEntregaController.cs" />
+    <Compile Include="Controllers\ReglasOperativasController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -139,8 +141,9 @@
     <Compile Include="Models\ViewModels\ReporteVentasViewModel.cs" />
     <Compile Include="Models\ViewModels\ReporteInventarioViewModel.cs" />
     <Compile Include="Models\ViewModels\ZonaEntregaViewModel.cs" />
-    <Compile Include="Models\ViewModels\OlvideContrasenaViewModel.cs" />
-    <Compile Include="Models\ViewModels\RestablecerContrasenaViewModel.cs" />
+    <Compile Include="Models\ViewModels\ProgramacionEntregaIndexViewModel.cs" />
+    <Compile Include="Models\ViewModels\ProgramacionEntregaFormViewModel.cs" />
+    <Compile Include="Models\ViewModels\ReglasOperativasViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
@@ -197,6 +200,11 @@
     <Content Include="Views\ZonasEntrega\Index.cshtml" />
     <Content Include="Views\ZonasEntrega\Crear.cshtml" />
     <Content Include="Views\ZonasEntrega\Editar.cshtml" />
+    <Content Include="Views\ProgramacionEntrega\Index.cshtml" />
+    <Content Include="Views\ProgramacionEntrega\Programar.cshtml" />
+    <Content Include="Views\ReglasOperativas\Index.cshtml" />
+    <Content Include="Views\ReglasOperativas\Editar.cshtml" />
+    <Content Include="Scripts\ProgramacionEntrega\programar-entrega.js" />
     <Content Include="Content\Sinpe.css" />
     <Content Include="Scripts\Sinpe.js" />
     <Content Include="Scripts\Rol\rol-index.js" />

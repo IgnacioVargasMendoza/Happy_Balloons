@@ -134,6 +134,15 @@
 
                                 <li>
                                     @Html.ActionLink(
+                                        "Programación de Entregas",
+                                        "Index",
+                                        "ProgramacionEntrega",
+                                        null,
+                                        new { @class = "dropdown-item" })
+                                </li>
+
+                                <li>
+                                    @Html.ActionLink(
                                         "Roles",
                                         "Index",
                                         "Rol",
@@ -146,6 +155,17 @@
                                         "Usuarios",
                                         "Usuarios",
                                         "Rol",
+                                        null,
+                                        new { @class = "dropdown-item" })
+                                </li>
+
+                                <li><hr class="dropdown-divider" /></li>
+
+                                <li>
+                                    @Html.ActionLink(
+                                        "Reglas Operativas",
+                                        "Index",
+                                        "ReglasOperativas",
                                         null,
                                         new { @class = "dropdown-item" })
                                 </li>

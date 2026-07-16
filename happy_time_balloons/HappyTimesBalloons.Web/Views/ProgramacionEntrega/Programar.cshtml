@@ -1,0 +1,110 @@
+@model HappyTimesBalloons.Web.Models.ViewModels.ProgramacionEntregaFormViewModel
+
+@{
+    ViewBag.Title = "Programar Entrega";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="mb-3">
+    <a href="@Url.Action("Index", "ProgramacionEntrega")" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-chevron-left"></i> Volver
+    </a>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-calendar-plus me-2 text-primary"></i>
+                    Programar Entrega — Pedido <strong>@Model.NumeroPedido</strong>
+                </h5>
+            </div>
+            <div class="card-body">
+
+                @using (Html.BeginForm("Programar", "ProgramacionEntrega", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.HiddenFor(m => m.PedidoId)
+                    @Html.HiddenFor(m => m.NumeroPedido)
+
+                    <div class="mb-3">
+                        @Html.LabelFor(m => m.FechaEntrega, "Fecha de entrega", new { @class = "form-label fw-semibold" })
+                        @Html.TextBoxFor(m => m.FechaEntrega, "{0:yyyy-MM-dd}", new
+                        {
+                            @class = "form-control",
+                            type = "date",
+                            id = "fechaEntrega",
+                            min = Model.FechaMinima.ToString("yyyy-MM-dd"),
+                            max = Model.FechaMaxima.ToString("yyyy-MM-dd")
+                        })
+                        @Html.ValidationMessageFor(m => m.FechaEntrega, "", new { @class = "text-danger small" })
+                        <div id="fechaError" class="text-danger small mt-1" style="display:none;"></div>
+                        <div class="form-text text-muted">
+                            <i class="bi bi-info-circle me-1"></i>
+                            No realizamos entregas los domingos. Rango: mañana hasta @Model.FechaMaxima.ToString("dd/MM/yyyy").
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Horario de entrega</label>
+                        <div id="contenedorHorarios">
+                            @if (!Model.HorariosDisponibles.Any())
+                            {
+                                <p class="text-muted small">Selecciona una fecha para ver los horarios disponibles.</p>
+                            }
+                            else
+                            {
+                                foreach (var h in Model.HorariosDisponibles)
+                                {
+                                    <div class="form-check border rounded p-3 mb-2 @(h.TieneCupo ? "" : "opacity-50")">
+                                        <input class="form-check-input"
+                                               type="radio"
+                                               name="HorarioEntregaId"
+                                               id="h@(h.HorarioEntregaId)"
+                                               value="@h.HorarioEntregaId"
+                                               @(h.TieneCupo ? "" : "disabled") />
+                                        <label class="form-check-label w-100" for="h@(h.HorarioEntregaId)">
+                                            <strong>@h.Etiqueta</strong>
+                                            <span class="text-muted ms-2">@h.HoraInicio – @h.HoraFin</span>
+                                            <span class="float-end badge @(h.TieneCupo ? "bg-success" : "bg-secondary")">
+                                                @h.CuposRestantes cupos disponibles
+                                            </span>
+                                        </label>
+                                    </div>
+                                }
+                            }
+                        </div>
+                        @Html.ValidationMessageFor(m => m.HorarioEntregaId, "", new { @class = "text-danger small" })
+                        <div id="horariosError" class="text-danger small mt-1" style="display:none;"></div>
+                    </div>
+
+                    <div class="mb-4">
+                        @Html.LabelFor(m => m.Notas, "Notas adicionales (opcional)", new { @class = "form-label fw-semibold" })
+                        @Html.TextAreaFor(m => m.Notas, 3, 0, new { @class = "form-control", placeholder = "Instrucciones especiales para el repartidor…" })
+                        @Html.ValidationMessageFor(m => m.Notas, "", new { @class = "text-danger small" })
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-calendar-check me-1"></i> Confirmar programación
+                        </button>
+                        <a href="@Url.Action("Index", "ProgramacionEntrega")" class="btn btn-outline-secondary">
+                            Cancelar
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/Scripts/ProgramacionEntrega/programar-entrega.js"></script>
+    <script>
+        ProgramarEntrega.init({
+            urlHorarios: '@Url.Action("HorariosDisponibles", "ProgramacionEntrega")',
+            fechaInicial: '@Model.FechaEntrega.ToString("yyyy-MM-dd")'
+        });
+    </script>
+}

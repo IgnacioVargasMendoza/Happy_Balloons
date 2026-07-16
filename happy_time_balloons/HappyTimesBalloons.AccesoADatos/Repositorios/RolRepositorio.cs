@@ -100,6 +100,11 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
             }).ToList();
         }
 
+        public async Task<bool> TieneRolAsync(string usuarioId, string rolNombre)
+        {
+            return await _userManager.IsInRoleAsync(usuarioId, rolNombre);
+        }
+
         public async Task<bool> AsignarRolAsync(string usuarioId, string rolNombre)
         {
             var resultado = await _userManager.AddToRoleAsync(usuarioId, rolNombre);

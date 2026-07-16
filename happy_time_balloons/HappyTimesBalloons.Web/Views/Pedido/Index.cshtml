@@ -94,6 +94,12 @@
                                         data-estado-actual="@((int)p.EstadoPedido)">
                                     <i class="bi bi-arrow-repeat me-1"></i>Estado
                                 </button>
+
+                                <a href="@Url.Action("Programar", "ProgramacionEntrega", new { pedidoId = p.Id })"
+                                   class="btn btn-sm btn-outline-success ms-1"
+                                   title="Programar entrega">
+                                    <i class="bi bi-calendar-plus"></i>
+                                </a>
                             </td>
                         </tr>
                     }
