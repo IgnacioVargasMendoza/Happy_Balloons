@@ -135,6 +135,7 @@
                     <input type="hidden" name="id" id="modalPedidoId" value="" />
                     <label class="form-label fw-semibold">Nuevo estado</label>
                     <select name="estado" id="selectEstado" class="form-select">
+                        <option value="@((int)EstadoPedido.PagoPendiente)">Pago pendiente</option>
                         <option value="@((int)EstadoPedido.Pendiente)">Pendiente</option>
                         <option value="@((int)EstadoPedido.Procesando)">Procesando</option>
                         <option value="@((int)EstadoPedido.Enviado)">Enviado</option>

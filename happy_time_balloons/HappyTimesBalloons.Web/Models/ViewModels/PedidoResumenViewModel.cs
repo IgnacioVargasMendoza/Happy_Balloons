@@ -23,8 +23,9 @@ namespace HappyTimesBalloons.Web.Models.ViewModels
                     case EstadoPedido.Procesando: return "Procesando";
                     case EstadoPedido.Enviado:    return "Enviado";
                     case EstadoPedido.Entregado:  return "Entregado";
-                    case EstadoPedido.Cancelado:  return "Cancelado";
-                    default:                      return EstadoPedido.ToString();
+                    case EstadoPedido.Cancelado:      return "Cancelado";
+                    case EstadoPedido.PagoPendiente: return "Pago pendiente";
+                    default:                         return EstadoPedido.ToString();
                 }
             }
         }
@@ -35,12 +36,13 @@ namespace HappyTimesBalloons.Web.Models.ViewModels
             {
                 switch (EstadoPedido)
                 {
-                    case EstadoPedido.Pendiente:  return "bg-warning text-dark";
-                    case EstadoPedido.Procesando: return "bg-info text-dark";
-                    case EstadoPedido.Enviado:    return "bg-primary";
-                    case EstadoPedido.Entregado:  return "bg-success";
-                    case EstadoPedido.Cancelado:  return "bg-danger";
-                    default:                      return "bg-secondary";
+                    case EstadoPedido.Pendiente:     return "bg-warning text-dark";
+                    case EstadoPedido.Procesando:    return "bg-info text-dark";
+                    case EstadoPedido.Enviado:       return "bg-primary";
+                    case EstadoPedido.Entregado:     return "bg-success";
+                    case EstadoPedido.Cancelado:     return "bg-danger";
+                    case EstadoPedido.PagoPendiente: return "bg-dark";
+                    default:                         return "bg-secondary";
                 }
             }
         }

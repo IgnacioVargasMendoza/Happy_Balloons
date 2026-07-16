@@ -227,6 +227,34 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
             };
         }
 
+        public async Task<List<VentaDiariaDTO>> ObtenerVentasPorDiaAsync(int dias)
+        {
+            var desde = DateTime.UtcNow.Date.AddDays(-(dias - 1));
+            var hasta = DateTime.UtcNow.Date.AddDays(1);
+
+            var datos = await _ctx.Pedidos
+                .Where(p => p.FechaPedido >= desde && p.FechaPedido < hasta)
+                .Select(p => new { FechaDia = DbFunctions.TruncateTime(p.FechaPedido), p.Total })
+                .GroupBy(p => p.FechaDia)
+                .Select(g => new { Fecha = g.Key, Total = g.Sum(x => x.Total), Cantidad = g.Count() })
+                .OrderBy(x => x.Fecha)
+                .ToListAsync();
+
+            var resultado = new List<VentaDiariaDTO>();
+            for (int i = 0; i < dias; i++)
+            {
+                var fecha = desde.AddDays(i);
+                var entrada = datos.FirstOrDefault(d => d.Fecha == fecha);
+                resultado.Add(new VentaDiariaDTO
+                {
+                    Fecha = fecha.ToString("dd/MM"),
+                    Total = entrada != null ? entrada.Total : 0m,
+                    Cantidad = entrada != null ? entrada.Cantidad : 0
+                });
+            }
+            return resultado;
+        }
+
         public async Task<PedidoDTO> BuscarPorSinpeAsync(string numeroComprobante, decimal monto)
         {
             var pedido = await _ctx.Pedidos

@@ -15,5 +15,6 @@ namespace HappyTimesBalloons.Abstraccion.Interfaces.Repositorios
         Task<int> ContarPorEstadoAsync(EstadoPedido estado);
         Task<PedidoEstadisticasDTO> ObtenerEstadisticasAsync();
         Task<PedidoDTO> BuscarPorSinpeAsync(string numeroComprobante, decimal monto);
+        Task<List<VentaDiariaDTO>> ObtenerVentasPorDiaAsync(int dias);
     }
 }

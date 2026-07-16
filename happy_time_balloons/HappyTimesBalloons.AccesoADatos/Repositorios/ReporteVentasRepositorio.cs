@@ -28,7 +28,7 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
                 .Include(p => p.Usuario)
                 .Include(p => p.DetallesPedido.Select(d => d.Producto.Categoria))
                 .Where(p =>
-                    p.EstadoPedido == EstadoPedido.Entregado &&
+                    p.EstadoPedido != EstadoPedido.Cancelado &&
                     p.FechaPedido >= fechaInicio.Date &&
                     p.FechaPedido < hasta)
                 .OrderByDescending(p => p.FechaPedido)
