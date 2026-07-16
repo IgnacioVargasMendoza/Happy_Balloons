@@ -28,7 +28,7 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
             {
                 Numero = "TEMP",
                 UserId = dto.UserId,
-                FechaPedido = DateTime.UtcNow,
+                FechaPedido = DateTime.Now,
                 EstadoPedido = dto.MetodoPago == "SINPE" ? EstadoPedido.PagoPendiente : EstadoPedido.Pendiente,
                 MetodoPago = dto.MetodoPago,
                 NumeroReferencia = dto.NumeroReferencia,
@@ -212,7 +212,7 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
 
         public async Task<PedidoEstadisticasDTO> ObtenerEstadisticasAsync()
         {
-            var hoy = DateTime.UtcNow.Date;
+            var hoy = DateTime.Today;
             var manana = hoy.AddDays(1);
 
             var total = await _ctx.Pedidos.CountAsync();
@@ -229,8 +229,8 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
 
         public async Task<List<VentaDiariaDTO>> ObtenerVentasPorDiaAsync(int dias)
         {
-            var desde = DateTime.UtcNow.Date.AddDays(-(dias - 1));
-            var hasta = DateTime.UtcNow.Date.AddDays(1);
+            var desde = DateTime.Today.AddDays(-(dias - 1));
+            var hasta = DateTime.Today.AddDays(1);
 
             var datos = await _ctx.Pedidos
                 .Where(p => p.FechaPedido >= desde && p.FechaPedido < hasta)
