@@ -71,7 +71,7 @@
         }
     };
 
-    $(document).ready(function () {
+    document.addEventListener('DOMContentLoaded', function () {
         RankingProductos.init();
     });
 
