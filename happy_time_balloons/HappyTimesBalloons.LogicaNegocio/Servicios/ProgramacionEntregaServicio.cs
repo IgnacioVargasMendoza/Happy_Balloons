@@ -1,4 +1,5 @@
 using HappyTimesBalloons.Abstraccion.DTOs;
+using HappyTimesBalloons.Abstraccion.Enums;
 using HappyTimesBalloons.Abstraccion.Interfaces.Repositorios;
 using HappyTimesBalloons.Abstraccion.Interfaces.Servicios;
 using System;
@@ -11,19 +12,21 @@ namespace HappyTimesBalloons.LogicaNegocio.Servicios
     {
         private readonly IProgramacionEntregaRepositorio _repo;
         private readonly IHorarioEntregaRepositorio _horarioRepo;
-
-        private const int DiasMinimosAdelante = 1;
-        private const int DiasMaximosAdelante = 30;
+        private readonly IConfiguracionServicio _configuracionServicio;
+        private readonly IPedidoRepositorio _pedidoRepo;
 
         public ProgramacionEntregaServicio(
             IProgramacionEntregaRepositorio repo,
-            IHorarioEntregaRepositorio horarioRepo)
+            IHorarioEntregaRepositorio horarioRepo,
+            IConfiguracionServicio configuracionServicio,
+            IPedidoRepositorio pedidoRepo)
         {
             _repo = repo;
             _horarioRepo = horarioRepo;
+            _configuracionServicio = configuracionServicio;
+            _pedidoRepo = pedidoRepo;
         }
 
-        // Tarea 2: retorna los horarios con cupos reales para una fecha dada
         public Task<List<HorarioDisponibleDTO>> ObtenerHorariosDisponiblesAsync(DateTime fecha)
             => _horarioRepo.ObtenerDisponiblesParaFechaAsync(fecha);
 
@@ -36,19 +39,17 @@ namespace HappyTimesBalloons.LogicaNegocio.Servicios
         public Task<ProgramacionEntregaDTO> ObtenerPorPedidoIdAsync(int pedidoId)
             => _repo.ObtenerPorPedidoIdAsync(pedidoId);
 
-        // Tarea 3 + 4: registrar con validación completa antes de persistir
         public async Task<ResultadoOperacionDTO> RegistrarAsync(
             ProgramacionEntregaDTO dto,
             string usuarioId,
             string nombreUsuario)
         {
-            // Tarea 4: validar la fecha antes de continuar
-            if (!EsFechaPermitida(dto.FechaEntrega, out var mensajeError))
+            var validacion = await EsFechaPermitidaAsync(dto.FechaEntrega);
+            if (!validacion.Exito)
             {
-                return ResultadoOperacionDTO.Fallo(mensajeError);
+                return validacion;
             }
 
-            // Verificar que el pedido no tenga ya una programación activa
             var existente = await _repo.ObtenerPorPedidoIdAsync(dto.PedidoId);
             if (existente != null)
             {
@@ -56,7 +57,6 @@ namespace HappyTimesBalloons.LogicaNegocio.Servicios
                     "Este pedido ya tiene una entrega programada. Cancélala primero para reprogramar.");
             }
 
-            // Tarea 5: verificar que el horario tenga cupo disponible
             var reservas = await _repo.ContarReservasPorHorarioYFechaAsync(
                 dto.HorarioEntregaId, dto.FechaEntrega);
 
@@ -72,38 +72,79 @@ namespace HappyTimesBalloons.LogicaNegocio.Servicios
                     $"El horario '{horario.Etiqueta}' no tiene cupos disponibles para esa fecha.");
             }
 
-            return await _repo.RegistrarAsync(dto, usuarioId, nombreUsuario);
+            var resultado = await _repo.RegistrarAsync(dto, usuarioId, nombreUsuario);
+            if (resultado.Exito)
+            {
+                await _pedidoRepo.ActualizarEstadoAsync(dto.PedidoId, EstadoPedido.Procesando);
+            }
+
+            return resultado;
         }
 
-        public Task<ResultadoOperacionDTO> CancelarAsync(int id, string usuarioId, string nombreUsuario)
-            => _repo.CancelarAsync(id, usuarioId, nombreUsuario);
-
-        // Tarea 4: reglas de negocio para fechas permitidas
-        public bool EsFechaPermitida(DateTime fecha, out string mensajeError)
+        public async Task<ResultadoOperacionDTO> CancelarAsync(int id, string usuarioId, string nombreUsuario)
         {
+            var programacion = await _repo.ObtenerPorIdAsync(id);
+            if (programacion == null)
+            {
+                return ResultadoOperacionDTO.Fallo("La programación de entrega no existe.");
+            }
+
+            var resultado = await _repo.CancelarAsync(id, usuarioId, nombreUsuario);
+            if (resultado.Exito)
+            {
+                await _pedidoRepo.ActualizarEstadoAsync(programacion.PedidoId, EstadoPedido.Procesando);
+            }
+
+            return resultado;
+        }
+
+        public async Task<ResultadoOperacionDTO> MarcarEntregadaAsync(int id, string usuarioId, string nombreUsuario)
+        {
+            var programacion = await _repo.ObtenerPorIdAsync(id);
+            if (programacion == null)
+            {
+                return ResultadoOperacionDTO.Fallo("La programación de entrega no existe.");
+            }
+
+            var resultado = await _repo.MarcarEntregadaAsync(id, usuarioId, nombreUsuario);
+            if (resultado.Exito)
+            {
+                await _pedidoRepo.ActualizarEstadoAsync(programacion.PedidoId, EstadoPedido.Entregado);
+                return ResultadoOperacionDTO.Ok("Entrega completada. El pedido fue actualizado a Entregado.");
+            }
+
+            return resultado;
+        }
+
+        public async Task<ResultadoOperacionDTO> EsFechaPermitidaAsync(DateTime fecha)
+        {
+            var diasMinimos = await _configuracionServicio.ObtenerIntAsync("EntregaDiasMinimosAdelante", 1);
+            var diasMaximos = await _configuracionServicio.ObtenerIntAsync("EntregaDiasMaximosAdelante", 30);
+            var diasHabilitados = await _configuracionServicio.ObtenerListaEnteroAsync(
+                "EntregaDiasHabilitados", new List<int> { 1, 2, 3, 4, 5, 6 });
+
             var hoy = DateTime.Today;
             var fechaSolo = fecha.Date;
 
-            if (fechaSolo < hoy.AddDays(DiasMinimosAdelante))
+            if (fechaSolo < hoy.AddDays(diasMinimos))
             {
-                mensajeError = "La fecha de entrega debe ser al menos mañana.";
-                return false;
+                return ResultadoOperacionDTO.Fallo(
+                    $"La fecha de entrega debe ser al menos {diasMinimos} día(s) desde hoy.");
             }
 
-            if (fechaSolo > hoy.AddDays(DiasMaximosAdelante))
+            if (fechaSolo > hoy.AddDays(diasMaximos))
             {
-                mensajeError = $"La fecha de entrega no puede ser más de {DiasMaximosAdelante} días en el futuro.";
-                return false;
+                return ResultadoOperacionDTO.Fallo(
+                    $"La fecha de entrega no puede ser más de {diasMaximos} días en el futuro.");
             }
 
-            if (fechaSolo.DayOfWeek == DayOfWeek.Sunday)
+            if (!diasHabilitados.Contains((int)fechaSolo.DayOfWeek))
             {
-                mensajeError = "No realizamos entregas los domingos. Por favor elige otro día.";
-                return false;
+                return ResultadoOperacionDTO.Fallo(
+                    "No realizamos entregas ese día de la semana. Por favor elige otro día.");
             }
 
-            mensajeError = null;
-            return true;
+            return ResultadoOperacionDTO.Ok("Fecha permitida.");
         }
     }
 }

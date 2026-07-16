@@ -1,0 +1,97 @@
+@model HappyTimesBalloons.Web.Models.ViewModels.ReglasOperativasIndexViewModel
+
+@{
+    ViewBag.Title = "Reglas Operativas";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-0">
+            <i class="bi bi-sliders me-2 text-brand"></i>Reglas Operativas y Logística
+        </h2>
+        <p class="text-muted small mb-0">Configuración del comportamiento operativo del sistema</p>
+    </div>
+</div>
+
+@Html.Partial("~/Views/Shared/_Mensajes.cshtml")
+
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th class="ps-4">Clave</th>
+                    <th>Valor actual</th>
+                    <th>Descripción</th>
+                    <th>Última modificación</th>
+                    <th>Modificado por</th>
+                    <th class="text-end pe-4">Acciones</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (Model.Configuraciones == null || !Model.Configuraciones.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-5">
+                            <i class="bi bi-sliders fs-3 d-block mb-2 opacity-25"></i>
+                            <span>No hay configuraciones registradas</span>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var item in Model.Configuraciones)
+                    {
+                        <tr>
+                            <td class="ps-4">
+                                <code class="text-dark fw-semibold">@item.Clave</code>
+                            </td>
+
+                            <td>
+                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1">
+                                    @item.Valor
+                                </span>
+                            </td>
+
+                            <td class="text-muted small">
+                                @(string.IsNullOrWhiteSpace(item.Descripcion) ? "—" : item.Descripcion)
+                            </td>
+
+                            <td class="small text-muted">
+                                @if (item.FechaUltimaModificacion == default(System.DateTime))
+                                {
+                                    <span>—</span>
+                                }
+                                else
+                                {
+                                    @item.FechaUltimaModificacion.ToString("dd/MM/yyyy HH:mm")
+                                    <span class="text-muted"> UTC</span>
+                                }
+                            </td>
+
+                            <td class="small text-muted">
+                                @(string.IsNullOrWhiteSpace(item.UsuarioUltimaModificacion) ? "—" : item.UsuarioUltimaModificacion)
+                            </td>
+
+                            <td class="text-end pe-4">
+                                <a href="@Url.Action("Editar", "ReglasOperativas", new { id = item.Id })"
+                                   class="btn btn-sm btn-outline-primary"
+                                   title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (Model.Configuraciones != null && Model.Configuraciones.Any())
+    {
+        <div class="card-footer text-muted small">
+            @Model.Configuraciones.Count configuración(es) registrada(s)
+        </div>
+    }
+</div>

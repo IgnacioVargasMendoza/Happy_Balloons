@@ -22,8 +22,6 @@
             </div>
             <div class="card-body">
 
-                @Html.Partial("~/Views/Shared/_Mensajes.cshtml")
-
                 @using (Html.BeginForm("Programar", "ProgramacionEntrega", FormMethod.Post))
                 {
                     @Html.AntiForgeryToken()

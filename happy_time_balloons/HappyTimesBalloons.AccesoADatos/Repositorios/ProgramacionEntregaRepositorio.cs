@@ -140,6 +140,40 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
             return ResultadoOperacionDTO.Ok("Entrega programada correctamente.");
         }
 
+        public async Task<ResultadoOperacionDTO> MarcarEntregadaAsync(int id, string usuarioId, string nombreUsuario)
+        {
+            var programacion = await _ctx.ProgramacionesEntrega.FindAsync(id);
+            if (programacion == null)
+            {
+                return ResultadoOperacionDTO.Fallo("La programación de entrega no existe.");
+            }
+
+            if (programacion.EstadoProgramacion == EstadoProgramacionEntrega.Entregada)
+            {
+                return ResultadoOperacionDTO.Fallo("La entrega ya fue marcada como entregada.");
+            }
+
+            if (programacion.EstadoProgramacion == EstadoProgramacionEntrega.Cancelada)
+            {
+                return ResultadoOperacionDTO.Fallo("No se puede marcar como entregada una programación cancelada.");
+            }
+
+            programacion.EstadoProgramacion = EstadoProgramacionEntrega.Entregada;
+            await _ctx.SaveChangesAsync();
+
+            await _bitacora.GuardarAsync(new BitacoraEntradaDTO
+            {
+                UsuarioId = usuarioId,
+                NombreUsuario = nombreUsuario,
+                Accion = TipoOperacion.Actualizar,
+                TablaAfectada = "ProgramacionesEntrega",
+                RegistroId = programacion.Id,
+                Detalle = $"Entregada: Pedido {programacion.PedidoId}"
+            });
+
+            return ResultadoOperacionDTO.Ok("Entrega marcada como entregada.");
+        }
+
         // Tarea 5: cancelar libera el cupo automáticamente (el conteo baja)
         public async Task<ResultadoOperacionDTO> CancelarAsync(int id, string usuarioId, string nombreUsuario)
         {
