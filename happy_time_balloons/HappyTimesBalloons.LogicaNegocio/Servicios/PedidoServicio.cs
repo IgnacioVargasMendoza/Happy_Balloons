@@ -113,6 +113,9 @@ namespace HappyTimesBalloons.LogicaNegocio.Servicios
         public Task<PedidoEstadisticasDTO> ObtenerEstadisticasAsync()
             => _pedidoRepo.ObtenerEstadisticasAsync();
 
+        public Task<List<VentaDiariaDTO>> ObtenerVentasPorDiaAsync(int dias)
+            => _pedidoRepo.ObtenerVentasPorDiaAsync(dias);
+
         public int AjustarCantidad(int cantidadSolicitada, int stockDisponible)
             => Math.Min(cantidadSolicitada > 0 ? cantidadSolicitada : 1, stockDisponible);
     }
