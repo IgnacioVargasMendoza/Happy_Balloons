@@ -176,6 +176,10 @@ Cuando trabajes en una pantalla o módulo, SIEMPRE completa el ciclo completo:
 8. Controlador en Web/Controllers con constructor injection
 9. Vista Razor con Bootstrap 5 en Web/Views/{Modulo}/
 10. **Registrar** el nuevo repositorio e interfaz de servicio en `AutofacConfig.cs`
+11. **Agregar entrada en el navbar** `Web/Views/Shared/_NavBar.cshtml` con `Html.ActionLink` en la sección que corresponda al rol del controlador:
+    - `[Authorize(Roles = "Administrador")]` → dentro del bloque `@if (User.IsInRole("Administrador"))`
+    - `[Authorize(Roles = "Administrador,Operador")]` → dentro del bloque `(User.IsInRole("Administrador") || User.IsInRole("Operador"))` pero fuera del sub-bloque Administrador-only
+    - Sin restricción de rol → en el primer `<ul class="navbar-nav me-auto">` junto al Catálogo
 
 No dejes capas incompletas. Si una pantalla requiere datos de otra entidad,
 crea también esos DTOs e interfaces aunque sea mínimamente.

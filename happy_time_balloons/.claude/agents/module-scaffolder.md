@@ -93,8 +93,38 @@ El proyecto Web **no** es SDK-style; los archivos nuevos no se incluyen automát
 
 Los proyectos `Abstraccion`, `AccesoADatos` y `LogicaNegocio` son SDK-style y auto-incluyen sus archivos — no requieren este paso.
 
+### Paso 9c — Agregar entrada en el navbar (`Web/Views/Shared/_NavBar.cshtml`)
+
+**OBLIGATORIO.** Todo módulo nuevo debe ser accesible desde el menú. Lee el archivo antes de editar para respetar el orden existente.
+
+**Plantilla del item:**
+```html
+<li>
+    @Html.ActionLink(
+        "Nombre en Menú",
+        "Index",
+        "NombreController",
+        null,
+        new { @class = "dropdown-item" })
+</li>
+```
+
+**Reglas de ubicación según rol del controlador:**
+
+| Rol en `[Authorize]` | Dónde insertar |
+|---|---|
+| `"Administrador"` | Dentro del bloque `@if (User.IsInRole("Administrador"))`, agrupado por categoría (reportes con reportes, gestión con gestión, config al final antes de Reglas Operativas) |
+| `"Administrador,Operador"` o `"Operador"` | Dentro del bloque `(User.IsInRole("Administrador") \|\| User.IsInRole("Operador"))` pero **fuera** del sub-bloque `@if (User.IsInRole("Administrador"))` |
+| Sin `[Authorize]` o acceso público | En el primer `<ul class="navbar-nav me-auto">`, junto a "Catálogo" |
+
+**Reglas de agrupación dentro del dropdown Administración:**
+- Gestión operativa (Categorías, Productos, Pedidos, Inventario) → antes del primer `<hr class="dropdown-divider" />`
+- Reportes y estadísticas (Reporte de Ventas, Reporte de Inventario, Ranking Productos) → después del primer divider, en el bloque Administrador-only
+- Configuración del sistema (Zonas de Entrega, Programación de Entregas, Roles, Usuarios) → después de los reportes, antes del segundo divider
+- Configuración avanzada (Reglas Operativas) → después del segundo `<hr class="dropdown-divider" />`, al final
+
 ### Paso 10 — Registrar en AutofacConfig
-Al finalizar los pasos 1-9, notificar explícitamente al usuario que debe ejecutar el agente `di-registrar` para registrar `IXxxRepositorio` e `IXxxServicio` en `AutofacConfig.cs`.
+Al finalizar los pasos 1-9c, notificar explícitamente al usuario que debe ejecutar el agente `di-registrar` para registrar `IXxxRepositorio` e `IXxxServicio` en `AutofacConfig.cs`.
 
 ---
 
@@ -196,6 +226,7 @@ Crea los archivos en orden (pasos 1–9), **incluyendo solo los métodos y vista
 ### Fase 3 — Cierre
 Al terminar, informa claramente:
 - Qué archivos fueron creados
+- Qué entry se agregó en `_NavBar.cshtml` y en qué sección del menú
 - Qué operaciones quedaron fuera del alcance (para que el usuario sepa qué falta si lo necesita después)
 - Recordar ejecutar el agente `di-registrar` para completar el paso 10
 
