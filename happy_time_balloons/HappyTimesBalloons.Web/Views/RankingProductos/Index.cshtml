@@ -85,10 +85,10 @@
     {
         @* Contenedor de datos para Chart.js; los valores Razor se pasan via data-* al JS externo *@
         <div id="ranking-charts-data" class="d-none"
-             data-etiquetas="@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Ranking.GraficoEtiquetas))"
-             data-unidades="@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Ranking.GraficoUnidades))"
-             data-dona-etiquetas="@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Ranking.DonaEtiquetas))"
-             data-dona-valores="@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Ranking.DonaValores))">
+             data-etiquetas="@Newtonsoft.Json.JsonConvert.SerializeObject(Model.Ranking.GraficoEtiquetas)"
+             data-unidades="@Newtonsoft.Json.JsonConvert.SerializeObject(Model.Ranking.GraficoUnidades)"
+             data-dona-etiquetas="@Newtonsoft.Json.JsonConvert.SerializeObject(Model.Ranking.DonaEtiquetas)"
+             data-dona-valores="@Newtonsoft.Json.JsonConvert.SerializeObject(Model.Ranking.DonaValores)">
         </div>
 
         <div class="row g-3 mb-4">
