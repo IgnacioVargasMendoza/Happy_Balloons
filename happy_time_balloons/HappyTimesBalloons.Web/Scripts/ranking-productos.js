@@ -73,6 +73,6 @@
 
     document.addEventListener('DOMContentLoaded', function () {
         RankingProductos.init();
-    }
+    });
 
 })();
