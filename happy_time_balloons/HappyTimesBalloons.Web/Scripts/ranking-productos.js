@@ -71,10 +71,7 @@
         }
     };
 
-    // Sin jQuery en este proyecto — el script se carga al final del body, DOM ya disponible
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function () { RankingProductos.init(); });
-    } else {
+    document.addEventListener('DOMContentLoaded', function () {
         RankingProductos.init();
     }
 
