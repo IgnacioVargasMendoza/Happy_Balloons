@@ -16,6 +16,7 @@ namespace HappyTimesBalloons.Tests.ProgramacionEntrega
         private Mock<IProgramacionEntregaRepositorio> _repoMock;
         private Mock<IHorarioEntregaRepositorio> _horarioRepoMock;
         private Mock<IConfiguracionServicio> _configuracionMock;
+        private Mock<IPedidoRepositorio> _pedidoRepoMock;
         private ProgramacionEntregaServicio _servicio;
 
         [TestInitialize]
@@ -24,6 +25,7 @@ namespace HappyTimesBalloons.Tests.ProgramacionEntrega
             _repoMock = new Mock<IProgramacionEntregaRepositorio>();
             _horarioRepoMock = new Mock<IHorarioEntregaRepositorio>();
             _configuracionMock = new Mock<IConfiguracionServicio>();
+            _pedidoRepoMock = new Mock<IPedidoRepositorio>();
 
             _configuracionMock
                 .Setup(c => c.ObtenerIntAsync("EntregaDiasMinimosAdelante", 1))
@@ -38,7 +40,8 @@ namespace HappyTimesBalloons.Tests.ProgramacionEntrega
             _servicio = new ProgramacionEntregaServicio(
                 _repoMock.Object,
                 _horarioRepoMock.Object,
-                _configuracionMock.Object);
+                _configuracionMock.Object,
+                _pedidoRepoMock.Object);
         }
 
         // ── Validación de fechas ─────────────────────────────────────

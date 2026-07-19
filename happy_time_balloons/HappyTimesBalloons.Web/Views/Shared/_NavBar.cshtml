@@ -101,6 +101,17 @@
                                     new { @class = "dropdown-item" })
                             </li>
 
+                            <li><hr class="dropdown-divider" /></li>
+
+                            <li>
+                                @Html.ActionLink(
+                                    "Predicción de Demanda",
+                                    "Index",
+                                    "PrediccionDemanda",
+                                    null,
+                                    new { @class = "dropdown-item" })
+                            </li>
+
                             @if (User.IsInRole("Administrador"))
                             {
                                 <li><hr class="dropdown-divider" /></li>
