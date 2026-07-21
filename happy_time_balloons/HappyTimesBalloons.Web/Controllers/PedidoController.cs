@@ -20,17 +20,20 @@ namespace HappyTimesBalloons.Web.Controllers
         private readonly IProductoServicio _productoServicio;
         private readonly IZonaEntregaServicio _zonaServicio;
         private readonly IAuditoriaServicio _auditoriaServicio;
+        private readonly INotificacionPedidoServicio _notificacionServicio;
 
         public PedidoController(
             IPedidoServicio pedidoServicio,
             IProductoServicio productoServicio,
             IZonaEntregaServicio zonaServicio,
-            IAuditoriaServicio auditoriaServicio)
+            IAuditoriaServicio auditoriaServicio,
+            INotificacionPedidoServicio notificacionServicio)
         {
             _pedidoServicio = pedidoServicio;
             _productoServicio = productoServicio;
             _zonaServicio = zonaServicio;
             _auditoriaServicio = auditoriaServicio;
+            _notificacionServicio = notificacionServicio;
         }
 
         // ═══════════════════════════════════════════════════════════════════
@@ -206,6 +209,22 @@ namespace HappyTimesBalloons.Web.Controllers
                 registroId: resultado.Datos,
                 detalle: $"Pedido creado por {User.Identity.GetUserId()}",
                 ip: Request.UserHostAddress);
+
+            var pedidoCompleto = await _pedidoServicio.ObtenerPorIdAsync(resultado.Datos);
+            if (pedidoCompleto != null)
+            {
+                var resultadoCorreo = await _notificacionServicio.EnviarConfirmacionAsync(
+                    pedidoCompleto, User.Identity.Name);
+
+                await _auditoriaServicio.RegistrarAsync(
+                    User.Identity.Name, User.Identity.Name,
+                    TipoOperacion.EnviarNotificacionPedido, "NotificacionCorreo",
+                    registroId: resultado.Datos,
+                    detalle: resultadoCorreo.Exito
+                        ? $"Correo de confirmación enviado a {User.Identity.Name}"
+                        : $"Fallo al enviar correo: {resultadoCorreo.Mensaje}",
+                    ip: Request.UserHostAddress);
+            }
 
             LimpiarCarrito();
             TempData["Exito"] = "¡Tu pedido fue confirmado exitosamente!";
