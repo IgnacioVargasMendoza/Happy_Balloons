@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Threading.Tasks;
 using HappyTimesBalloons.Abstraccion.DTOs;
+using HappyTimesBalloons.Abstraccion.Enums;
 using HappyTimesBalloons.LogicaNegocio.Servicios;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -176,6 +177,131 @@ namespace HappyTimesBalloons.Tests.ConfirmacionPedido
             StringAssert.Contains(html, "****-****-****-1111");
             Assert.IsFalse(html.Contains("4111111111111111"),
                 "El HTML no debe exponer el número completo de tarjeta.");
+        }
+
+        // ── T1: Plantilla de cambio de estado contiene número de pedido ───────
+
+        [TestMethod]
+        public void GenerarHtmlCambioEstado_ContienNumeroPedido()
+        {
+            var pedido = PedidoEjemplo();
+
+            var html = NotificacionPedidoServicio.GenerarHtmlCambioEstado(pedido, EstadoPedido.Procesando);
+
+            StringAssert.Contains(html, pedido.Numero);
+        }
+
+        // ── T1: Plantilla de Enviado tiene texto de camino ───────────────────
+
+        [TestMethod]
+        public void GenerarHtmlCambioEstado_EstadoEnviado_ContieneTextoEnCamino()
+        {
+            var html = NotificacionPedidoServicio.GenerarHtmlCambioEstado(PedidoEjemplo(), EstadoPedido.Enviado);
+
+            StringAssert.Contains(html, "en camino");
+        }
+
+        // ── T1: Plantilla de Entregado tiene texto de entregado ──────────────
+
+        [TestMethod]
+        public void GenerarHtmlCambioEstado_EstadoEntregado_ContieneTextoEntregado()
+        {
+            var html = NotificacionPedidoServicio.GenerarHtmlCambioEstado(PedidoEjemplo(), EstadoPedido.Entregado);
+
+            StringAssert.Contains(html, "entregado");
+        }
+
+        // ── T1: Plantilla de Cancelado contiene la palabra cancelado ─────────
+
+        [TestMethod]
+        public void GenerarHtmlCambioEstado_EstadoCancelado_ContieneTextoCancelado()
+        {
+            var html = NotificacionPedidoServicio.GenerarHtmlCambioEstado(PedidoEjemplo(), EstadoPedido.Cancelado);
+
+            StringAssert.Contains(html, "cancelado");
+        }
+
+        // ── T1: Plantilla de cambio de estado contiene total del pedido ───────
+
+        [TestMethod]
+        public void GenerarHtmlCambioEstado_ContieneTotalPedido()
+        {
+            var pedido = PedidoEjemplo();
+
+            var html = NotificacionPedidoServicio.GenerarHtmlCambioEstado(pedido, EstadoPedido.Procesando);
+
+            StringAssert.Contains(html, pedido.Total.ToString("N0"));
+        }
+
+        // ── T3: EnviarCambioEstado sin SMTP configurado retorna fallo ─────────
+
+        [TestMethod]
+        public async Task EnviarCambioEstado_SinSmtpConfigurado_RetornaFalloSinExcepcion()
+        {
+            ConfigurationManager.AppSettings["Smtp:Host"] = "";
+            ConfigurationManager.AppSettings["Smtp:Usuario"] = "";
+
+            var resultado = await _servicio.EnviarCambioEstadoAsync(
+                PedidoEjemplo(), "cliente@test.com", EstadoPedido.Enviado);
+
+            Assert.IsFalse(resultado.Exito);
+            Assert.AreEqual(CodigoResultado.Error, resultado.Codigo);
+        }
+
+        // ── T5: Transición válida Pendiente → Procesando ──────────────────────
+
+        [TestMethod]
+        public void TransicionValida_PendienteAProcesando_RetornaTrue()
+        {
+            Assert.IsTrue(PedidoServicio.TransicionValida(EstadoPedido.Pendiente, EstadoPedido.Procesando));
+        }
+
+        // ── T5: Transición válida Procesando → Enviado ────────────────────────
+
+        [TestMethod]
+        public void TransicionValida_ProcesandoAEnviado_RetornaTrue()
+        {
+            Assert.IsTrue(PedidoServicio.TransicionValida(EstadoPedido.Procesando, EstadoPedido.Enviado));
+        }
+
+        // ── T5: Transición válida Enviado → Entregado ─────────────────────────
+
+        [TestMethod]
+        public void TransicionValida_EnviadoAEntregado_RetornaTrue()
+        {
+            Assert.IsTrue(PedidoServicio.TransicionValida(EstadoPedido.Enviado, EstadoPedido.Entregado));
+        }
+
+        // ── T4/T5: Transición inválida Entregado → Procesando ─────────────────
+
+        [TestMethod]
+        public void TransicionValida_EntregadoAProcesando_RetornaFalse()
+        {
+            Assert.IsFalse(PedidoServicio.TransicionValida(EstadoPedido.Entregado, EstadoPedido.Procesando));
+        }
+
+        // ── T4/T5: Estado terminal Cancelado no admite cambios ────────────────
+
+        [TestMethod]
+        public void TransicionValida_CanceladoAEnviado_RetornaFalse()
+        {
+            Assert.IsFalse(PedidoServicio.TransicionValida(EstadoPedido.Cancelado, EstadoPedido.Enviado));
+        }
+
+        // ── T5: Cualquier estado puede cancelarse (excepto terminales) ─────────
+
+        [TestMethod]
+        public void TransicionValida_ProcesandoACancelado_RetornaTrue()
+        {
+            Assert.IsTrue(PedidoServicio.TransicionValida(EstadoPedido.Procesando, EstadoPedido.Cancelado));
+        }
+
+        // ── T5: PagoPendiente puede pasar a Pendiente ─────────────────────────
+
+        [TestMethod]
+        public void TransicionValida_PagoPendienteAPendiente_RetornaTrue()
+        {
+            Assert.IsTrue(PedidoServicio.TransicionValida(EstadoPedido.PagoPendiente, EstadoPedido.Pendiente));
         }
     }
 }

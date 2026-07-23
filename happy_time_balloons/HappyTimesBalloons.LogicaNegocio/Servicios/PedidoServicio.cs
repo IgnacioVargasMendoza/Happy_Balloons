@@ -103,11 +103,39 @@ namespace HappyTimesBalloons.LogicaNegocio.Servicios
 
         public async Task<ResultadoOperacionDTO> ActualizarEstadoAsync(int id, EstadoPedido nuevoEstado)
         {
-            var ok = await _pedidoRepo.ActualizarEstadoAsync(id, nuevoEstado);
-            if (!ok)
+            var pedido = await _pedidoRepo.ObtenerPorIdAsync(id);
+            if (pedido == null)
                 return ResultadoOperacionDTO.Fallo("Pedido no encontrado.", CodigoResultado.Error);
 
-            return ResultadoOperacionDTO.Ok("Estado del pedido actualizado.");
+            if (pedido.EstadoPedido == nuevoEstado)
+                return ResultadoOperacionDTO.Fallo("El pedido ya se encuentra en ese estado.", CodigoResultado.DatosInvalidos);
+
+            if (!TransicionValida(pedido.EstadoPedido, nuevoEstado))
+                return ResultadoOperacionDTO.Fallo(
+                    $"No se puede cambiar el estado de '{pedido.EstadoPedido}' a '{nuevoEstado}'.",
+                    CodigoResultado.DatosInvalidos);
+
+            var ok = await _pedidoRepo.ActualizarEstadoAsync(id, nuevoEstado);
+            return ok
+                ? ResultadoOperacionDTO.Ok("Estado del pedido actualizado.")
+                : ResultadoOperacionDTO.Fallo("No se pudo actualizar el estado.", CodigoResultado.Error);
+        }
+
+        public static bool TransicionValida(EstadoPedido actual, EstadoPedido nuevo)
+        {
+            switch (actual)
+            {
+                case EstadoPedido.PagoPendiente:
+                    return nuevo == EstadoPedido.Pendiente || nuevo == EstadoPedido.Cancelado;
+                case EstadoPedido.Pendiente:
+                    return nuevo == EstadoPedido.Procesando || nuevo == EstadoPedido.Cancelado;
+                case EstadoPedido.Procesando:
+                    return nuevo == EstadoPedido.Enviado || nuevo == EstadoPedido.Cancelado;
+                case EstadoPedido.Enviado:
+                    return nuevo == EstadoPedido.Entregado || nuevo == EstadoPedido.Cancelado;
+                default:
+                    return false;
+            }
         }
 
         public Task<PedidoEstadisticasDTO> ObtenerEstadisticasAsync()

@@ -19,6 +19,7 @@ namespace HappyTimesBalloons.Abstraccion.Enums
         ProcesarPagoSinpe,
         RechazarPagoSinpe,
         PagoDuplicadoSinpe,
-        EnviarNotificacionPedido
+        EnviarNotificacionPedido,
+        EnviarNotificacionCambioEstado
     }
 }

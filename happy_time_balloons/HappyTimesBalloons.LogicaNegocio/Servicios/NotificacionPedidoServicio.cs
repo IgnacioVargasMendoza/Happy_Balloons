@@ -1,4 +1,5 @@
 using HappyTimesBalloons.Abstraccion.DTOs;
+using HappyTimesBalloons.Abstraccion.Enums;
 using HappyTimesBalloons.Abstraccion.Interfaces.Servicios;
 using System;
 using System.Configuration;
@@ -45,6 +46,135 @@ namespace HappyTimesBalloons.LogicaNegocio.Servicios
             catch
             {
                 return ResultadoOperacionDTO.Fallo("No se pudo enviar el correo de confirmación.");
+            }
+        }
+
+        public async Task<ResultadoOperacionDTO> EnviarCambioEstadoAsync(PedidoDTO pedido, string emailDestinatario, EstadoPedido nuevoEstado)
+        {
+            var host = ConfigurationManager.AppSettings["Smtp:Host"];
+            var usuario = ConfigurationManager.AppSettings["Smtp:Usuario"];
+
+            if (string.IsNullOrWhiteSpace(host) || string.IsNullOrWhiteSpace(usuario))
+                return ResultadoOperacionDTO.Fallo("SMTP no configurado.");
+
+            try
+            {
+                var port = int.Parse(ConfigurationManager.AppSettings["Smtp:Port"] ?? "587");
+                var clave = ConfigurationManager.AppSettings["Smtp:Contrasena"];
+
+                using (var cliente = new SmtpClient(host, port))
+                {
+                    cliente.EnableSsl = true;
+                    cliente.Credentials = new NetworkCredential(usuario, clave);
+
+                    var mensaje = new MailMessage
+                    {
+                        From = new MailAddress(usuario, "Happy Times Balloons"),
+                        Subject = $"Actualización de tu pedido {pedido.Numero}",
+                        IsBodyHtml = true,
+                        Body = GenerarHtmlCambioEstado(pedido, nuevoEstado)
+                    };
+                    mensaje.To.Add(emailDestinatario);
+                    await cliente.SendMailAsync(mensaje);
+                }
+
+                return ResultadoOperacionDTO.Ok("Correo de cambio de estado enviado.");
+            }
+            catch
+            {
+                return ResultadoOperacionDTO.Fallo("No se pudo enviar el correo de actualización.");
+            }
+        }
+
+        public static string GenerarHtmlCambioEstado(PedidoDTO pedido, EstadoPedido nuevoEstado)
+        {
+            string titulo = ObtenerTituloEstado(nuevoEstado);
+            string subtitulo = ObtenerSubtituloEstado(nuevoEstado);
+            string colorBadge = ObtenerColorEstado(nuevoEstado);
+
+            var sb = new StringBuilder();
+            sb.Append($@"
+<div style='font-family:Arial,sans-serif;max-width:600px;margin:auto;color:#333;border:1px solid #eee;border-radius:6px;overflow:hidden'>
+  <div style='background:#e91e8c;padding:20px 24px;text-align:center'>
+    <h1 style='color:#fff;margin:0;font-size:22px'>Happy Times Balloons</h1>
+    <p style='color:#fce4ec;margin:4px 0 0'>{Encode(subtitulo)}</p>
+  </div>
+  <div style='padding:24px'>
+    <div style='text-align:center;margin-bottom:20px'>
+      <span style='display:inline-block;padding:8px 20px;background:{colorBadge};color:#fff;border-radius:20px;font-size:15px;font-weight:bold'>{Encode(titulo)}</span>
+    </div>
+    <table style='width:100%;border-collapse:collapse;margin-bottom:16px'>
+      <tr>
+        <td style='padding:4px 0'><strong>Número de pedido:</strong></td>
+        <td style='padding:4px 0;text-align:right'>{Encode(pedido.Numero)}</td>
+      </tr>
+      <tr>
+        <td style='padding:4px 0'><strong>Fecha original:</strong></td>
+        <td style='padding:4px 0;text-align:right'>{pedido.FechaPedido:dd/MM/yyyy HH:mm}</td>
+      </tr>
+      <tr>
+        <td style='padding:4px 0'><strong>Total:</strong></td>
+        <td style='padding:4px 0;text-align:right;color:#e91e8c;font-weight:bold'>₡{pedido.Total:N0}</td>
+      </tr>
+    </table>
+    <hr style='border:none;border-top:1px solid #eee;margin:0 0 16px'/>
+    <h3 style='margin:0 0 12px;font-size:15px;color:#e91e8c'>Entrega</h3>
+    <table style='width:100%;border-collapse:collapse;font-size:14px'>
+      <tr>
+        <td style='padding:4px 0'><strong>Zona:</strong></td>
+        <td style='padding:4px 0;text-align:right'>{Encode(pedido.NombreZona)}</td>
+      </tr>
+      <tr>
+        <td style='padding:4px 0'><strong>Dirección:</strong></td>
+        <td style='padding:4px 0;text-align:right'>{Encode(pedido.DireccionEntrega)}</td>
+      </tr>
+    </table>
+    <div style='margin-top:24px;padding:12px;background:#f9fbe7;border-radius:4px;font-size:13px;color:#555'>
+      Ante cualquier consulta comunícate con nosotros respondiendo este correo o visitando nuestra tienda.
+    </div>
+  </div>
+  <div style='background:#f5f5f5;padding:12px 24px;text-align:center;font-size:12px;color:#999'>
+    © {DateTime.Now.Year} Happy Times Balloons — Costa Rica
+  </div>
+</div>");
+
+            return sb.ToString();
+        }
+
+        private static string ObtenerTituloEstado(EstadoPedido estado)
+        {
+            switch (estado)
+            {
+                case EstadoPedido.Pendiente:    return "Pedido recibido";
+                case EstadoPedido.Procesando:   return "Pedido en preparación";
+                case EstadoPedido.Enviado:      return "Pedido en camino";
+                case EstadoPedido.Entregado:    return "Pedido entregado";
+                case EstadoPedido.Cancelado:    return "Pedido cancelado";
+                default:                        return estado.ToString();
+            }
+        }
+
+        private static string ObtenerSubtituloEstado(EstadoPedido estado)
+        {
+            switch (estado)
+            {
+                case EstadoPedido.Pendiente:    return "Tu pedido está siendo revisado";
+                case EstadoPedido.Procesando:   return "¡Estamos preparando tu pedido!";
+                case EstadoPedido.Enviado:      return "¡Tu pedido está en camino!";
+                case EstadoPedido.Entregado:    return "¡Tu pedido fue entregado!";
+                case EstadoPedido.Cancelado:    return "Tu pedido fue cancelado";
+                default:                        return "Actualización de tu pedido";
+            }
+        }
+
+        private static string ObtenerColorEstado(EstadoPedido estado)
+        {
+            switch (estado)
+            {
+                case EstadoPedido.Enviado:      return "#1976d2";
+                case EstadoPedido.Entregado:    return "#388e3c";
+                case EstadoPedido.Cancelado:    return "#d32f2f";
+                default:                        return "#e91e8c";
             }
         }
 

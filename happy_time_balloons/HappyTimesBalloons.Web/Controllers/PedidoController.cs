@@ -345,20 +345,35 @@ namespace HappyTimesBalloons.Web.Controllers
         {
             var resultado = await _pedidoServicio.ActualizarEstadoAsync(id, estado);
 
-            if (resultado.Exito)
-            {
-                await _auditoriaServicio.RegistrarAsync(
-                    User.Identity.Name, User.Identity.Name,
-                    TipoOperacion.Actualizar, "Pedidos",
-                    registroId: id, detalle: $"Estado cambiado a {estado}",
-                    ip: Request.UserHostAddress);
-                TempData["Exito"] = resultado.Mensaje;
-            }
-            else
+            if (!resultado.Exito)
             {
                 TempData["Error"] = resultado.Mensaje;
+                return RedirectToAction("Index");
             }
 
+            await _auditoriaServicio.RegistrarAsync(
+                User.Identity.Name, User.Identity.Name,
+                TipoOperacion.Actualizar, "Pedidos",
+                registroId: id, detalle: $"Estado cambiado a {estado}",
+                ip: Request.UserHostAddress);
+
+            var pedido = await _pedidoServicio.ObtenerPorIdAsync(id);
+            if (pedido != null && !string.IsNullOrWhiteSpace(pedido.EmailCliente))
+            {
+                var resultadoCorreo = await _notificacionServicio.EnviarCambioEstadoAsync(
+                    pedido, pedido.EmailCliente, estado);
+
+                await _auditoriaServicio.RegistrarAsync(
+                    User.Identity.Name, User.Identity.Name,
+                    TipoOperacion.EnviarNotificacionCambioEstado, "NotificacionCorreo",
+                    registroId: id,
+                    detalle: resultadoCorreo.Exito
+                        ? $"Notificación de estado '{estado}' enviada a {pedido.EmailCliente}"
+                        : $"Fallo al enviar notificación de estado '{estado}': {resultadoCorreo.Mensaje}",
+                    ip: Request.UserHostAddress);
+            }
+
+            TempData["Exito"] = resultado.Mensaje;
             return RedirectToAction("Index");
         }
 
