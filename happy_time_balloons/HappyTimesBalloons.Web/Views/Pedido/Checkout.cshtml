@@ -110,7 +110,7 @@
                     </div>
                     @Html.ValidationMessageFor(m => m.MetodoPago, "", new { @class = "text-danger small" })
 
-                    <%-- display inicial determinado por el servidor según Model.MetodoPago; Sinpe.Checkout.bindMetodosPago() toma el control tras carga --%>
+                    
                     <div class="mb-3" id="panelSinpe" style="@(Model.MetodoPago == "Tarjeta" ? "display:none;" : "")">
                         <div class="p-3 rounded mb-3 sinpe-info-panel">
                             <div class="fw-semibold mb-1">
@@ -126,7 +126,7 @@
                         <div class="form-text">Ingresa el número de comprobante de tu transferencia SINPE Móvil.</div>
                     </div>
 
-                    <%-- display inicial determinado por el servidor según Model.MetodoPago; Sinpe.Checkout.bindMetodosPago() toma el control tras carga --%>
+                    
                     <div class="mb-3" id="panelTarjeta" style="@(Model.MetodoPago != "Tarjeta" ? "display:none;" : "")">
                         <label class="form-label fw-semibold">Nombre en la tarjeta</label>
                         @Html.TextBoxFor(m => m.NumeroReferencia, new { @class = "form-control", placeholder = "Nombre completo tal como aparece en la tarjeta" })

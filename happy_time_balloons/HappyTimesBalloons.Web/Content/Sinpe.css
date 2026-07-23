@@ -19,8 +19,8 @@
 }
 
 .sinpe-info-panel {
-    border-left: 4px solid #0d6efd;
-    background-color: #f0f6ff;
+    border-left: 4px solid #e91e8c;
+    background-color: #fff0f6;
 }
 
 /* ── Checkout ── */
@@ -33,9 +33,15 @@
     border-width: 2px !important;
 }
 
+.zona-card,
+.pago-card {
+    transition: border-color 0.15s ease;
+}
+
 .zona-card:hover,
 .pago-card:hover {
     border-color: #e91e8c;
+    border-width: 2px !important;
 }
 
 .checkout-sticky-summary {

@@ -11,6 +11,7 @@ namespace HappyTimesBalloons.Abstraccion.DTOs
         public string Numero { get; set; }
         public string UserId { get; set; }
         public string NombreUsuario { get; set; }
+        public string EmailCliente { get; set; }
         public DateTime FechaPedido { get; set; }
         public EstadoPedido EstadoPedido { get; set; }
         public string MetodoPago { get; set; }
