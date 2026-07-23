@@ -20,17 +20,20 @@ namespace HappyTimesBalloons.Web.Controllers
         private readonly IProductoServicio _productoServicio;
         private readonly IZonaEntregaServicio _zonaServicio;
         private readonly IAuditoriaServicio _auditoriaServicio;
+        private readonly INotificacionPedidoServicio _notificacionServicio;
 
         public PedidoController(
             IPedidoServicio pedidoServicio,
             IProductoServicio productoServicio,
             IZonaEntregaServicio zonaServicio,
-            IAuditoriaServicio auditoriaServicio)
+            IAuditoriaServicio auditoriaServicio,
+            INotificacionPedidoServicio notificacionServicio)
         {
             _pedidoServicio = pedidoServicio;
             _productoServicio = productoServicio;
             _zonaServicio = zonaServicio;
             _auditoriaServicio = auditoriaServicio;
+            _notificacionServicio = notificacionServicio;
         }
 
         // ═══════════════════════════════════════════════════════════════════
@@ -207,6 +210,22 @@ namespace HappyTimesBalloons.Web.Controllers
                 detalle: $"Pedido creado por {User.Identity.GetUserId()}",
                 ip: Request.UserHostAddress);
 
+            var pedidoCompleto = await _pedidoServicio.ObtenerPorIdAsync(resultado.Datos);
+            if (pedidoCompleto != null)
+            {
+                var resultadoCorreo = await _notificacionServicio.EnviarConfirmacionAsync(
+                    pedidoCompleto, User.Identity.Name);
+
+                await _auditoriaServicio.RegistrarAsync(
+                    User.Identity.Name, User.Identity.Name,
+                    TipoOperacion.EnviarNotificacionPedido, "NotificacionCorreo",
+                    registroId: resultado.Datos,
+                    detalle: resultadoCorreo.Exito
+                        ? $"Correo de confirmación enviado a {User.Identity.Name}"
+                        : $"Fallo al enviar correo: {resultadoCorreo.Mensaje}",
+                    ip: Request.UserHostAddress);
+            }
+
             LimpiarCarrito();
             TempData["Exito"] = "¡Tu pedido fue confirmado exitosamente!";
             return RedirectToAction("MisPedidos");
@@ -326,20 +345,35 @@ namespace HappyTimesBalloons.Web.Controllers
         {
             var resultado = await _pedidoServicio.ActualizarEstadoAsync(id, estado);
 
-            if (resultado.Exito)
-            {
-                await _auditoriaServicio.RegistrarAsync(
-                    User.Identity.Name, User.Identity.Name,
-                    TipoOperacion.Actualizar, "Pedidos",
-                    registroId: id, detalle: $"Estado cambiado a {estado}",
-                    ip: Request.UserHostAddress);
-                TempData["Exito"] = resultado.Mensaje;
-            }
-            else
+            if (!resultado.Exito)
             {
                 TempData["Error"] = resultado.Mensaje;
+                return RedirectToAction("Index");
             }
 
+            await _auditoriaServicio.RegistrarAsync(
+                User.Identity.Name, User.Identity.Name,
+                TipoOperacion.Actualizar, "Pedidos",
+                registroId: id, detalle: $"Estado cambiado a {estado}",
+                ip: Request.UserHostAddress);
+
+            var pedido = await _pedidoServicio.ObtenerPorIdAsync(id);
+            if (pedido != null && !string.IsNullOrWhiteSpace(pedido.EmailCliente))
+            {
+                var resultadoCorreo = await _notificacionServicio.EnviarCambioEstadoAsync(
+                    pedido, pedido.EmailCliente, estado);
+
+                await _auditoriaServicio.RegistrarAsync(
+                    User.Identity.Name, User.Identity.Name,
+                    TipoOperacion.EnviarNotificacionCambioEstado, "NotificacionCorreo",
+                    registroId: id,
+                    detalle: resultadoCorreo.Exito
+                        ? $"Notificación de estado '{estado}' enviada a {pedido.EmailCliente}"
+                        : $"Fallo al enviar notificación de estado '{estado}': {resultadoCorreo.Mensaje}",
+                    ip: Request.UserHostAddress);
+            }
+
+            TempData["Exito"] = resultado.Mensaje;
             return RedirectToAction("Index");
         }
 

@@ -63,6 +63,7 @@ namespace HappyTimesBalloons.Web.App_Start
             builder.RegisterType<ConfiguracionServicio>().As<IConfiguracionServicio>().InstancePerRequest();
             builder.RegisterType<RankingProductosServicio>().As<IRankingProductosServicio>().InstancePerRequest();
             builder.RegisterType<PrediccionDemandaServicio>().As<IPrediccionDemandaServicio>().InstancePerRequest();
+            builder.RegisterType<NotificacionPedidoServicio>().As<INotificacionPedidoServicio>().InstancePerRequest();
 
             var container = builder.Build();
             DependencyResolver.SetResolver(new AutofacDependencyResolver(container));
