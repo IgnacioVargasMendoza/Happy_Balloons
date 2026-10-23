@@ -28,7 +28,7 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
             {
                 Numero = "TEMP",
                 UserId = dto.UserId,
-                FechaPedido = DateTime.Now,
+                FechaPedido = DateTime.UtcNow,
                 EstadoPedido = dto.MetodoPago == "SINPE" ? EstadoPedido.PagoPendiente : EstadoPedido.Pendiente,
                 MetodoPago = dto.MetodoPago,
                 NumeroReferencia = dto.NumeroReferencia,
