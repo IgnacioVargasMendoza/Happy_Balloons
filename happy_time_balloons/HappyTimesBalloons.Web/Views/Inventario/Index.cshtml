@@ -482,6 +482,18 @@
                             Entrada y Salida: valor positivo. Ajuste: positivo (aumenta) o negativo (reduce).
                         </div>
                         <input type="number" class="form-control" id="movCantidad" name="Cantidad" step="1" />
+                        <div id="movPreviewStock" class="mt-2 d-none">
+                            <div class="d-flex align-items-center gap-2 p-2 rounded border">
+                                <i class="bi bi-arrow-right-circle text-secondary"></i>
+                                <span class="text-muted small">Stock resultante:</span>
+                                <span id="movStockResultante" class="fw-bold"></span>
+                                <span class="text-muted small">unidades</span>
+                            </div>
+                        </div>
+                        <div id="movAlertaStock" class="alert alert-danger mt-2 d-none py-2">
+                            <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                            <span id="movAlertaTexto"></span>
+                        </div>
                     </div>
 
                     <div class="mb-1">
@@ -605,24 +617,92 @@
 
 (function () {
     var modal = new bootstrap.Modal(document.getElementById('modalMovimiento'));
+    var stockActualModal = 0;
+
+    function actualizarPreview() {
+        var tipoRadio = document.querySelector('input[name="TipoMovimiento"]:checked');
+        var inputCantidad = document.getElementById('movCantidad');
+        var cantidadVal = parseInt(inputCantidad.value, 10);
+        var preview = document.getElementById('movPreviewStock');
+        var alerta = document.getElementById('movAlertaStock');
+        var resultanteEl = document.getElementById('movStockResultante');
+        var alertaTexto = document.getElementById('movAlertaTexto');
+        var btnSubmit = document.querySelector('#formMovimiento button[type="submit"]');
+
+        if (tipoRadio) {
+            var tipo = parseInt(tipoRadio.value, 10);
+            if (tipo === 0 || tipo === 1) {
+                inputCantidad.min = '1';
+            } else {
+                inputCantidad.removeAttribute('min');
+            }
+        }
+
+        if (!tipoRadio || isNaN(cantidadVal)) {
+            preview.classList.add('d-none');
+            alerta.classList.add('d-none');
+            btnSubmit.disabled = false;
+            return;
+        }
+
+        var tipo = parseInt(tipoRadio.value, 10);
+        var resultante;
+        if (tipo === 0) {
+            resultante = stockActualModal + cantidadVal;
+        } else if (tipo === 1) {
+            resultante = stockActualModal - cantidadVal;
+        } else {
+            resultante = stockActualModal + cantidadVal;
+        }
+
+        resultanteEl.textContent = resultante;
+        preview.classList.remove('d-none');
+
+        if (resultante < 0) {
+            resultanteEl.classList.remove('text-success', 'text-dark');
+            resultanteEl.classList.add('text-danger');
+            preview.classList.add('border-danger');
+            preview.classList.remove('border');
+            alertaTexto.textContent = 'Stock insuficiente. Stock actual: ' + stockActualModal + '. El movimiento resultaría en ' + resultante + ' unidades.';
+            alerta.classList.remove('d-none');
+            btnSubmit.disabled = true;
+        } else {
+            resultanteEl.classList.remove('text-danger');
+            resultanteEl.classList.add(resultante === 0 ? 'text-warning' : 'text-success');
+            preview.classList.remove('border-danger');
+            preview.classList.add('border');
+            alerta.classList.add('d-none');
+            btnSubmit.disabled = false;
+        }
+    }
+
+    document.querySelectorAll('input[name="TipoMovimiento"]').forEach(function (r) {
+        r.addEventListener('change', actualizarPreview);
+    });
+    document.getElementById('movCantidad').addEventListener('input', actualizarPreview);
 
     document.querySelectorAll('.btn-registrar-mov').forEach(function (btn) {
         btn.addEventListener('click', function () {
             var productoId = this.dataset.productoId;
             var productoNombre = this.dataset.productoNombre;
-            var stockActual = this.dataset.stockActual;
+            stockActualModal = parseInt(this.dataset.stockActual, 10) || 0;
 
             document.getElementById('movProductoId').value = productoId;
             document.getElementById('movProductoNombre').value = productoNombre;
-            document.getElementById('movStockActual').value = stockActual;
+            document.getElementById('movStockActual').value = stockActualModal;
             document.getElementById('movNombreDisplay').textContent = productoNombre;
-            document.getElementById('movStockDisplay').textContent = stockActual + ' unidades';
+            document.getElementById('movStockDisplay').textContent = stockActualModal + ' unidades';
 
             document.querySelectorAll('input[name="TipoMovimiento"]').forEach(function (r) {
                 r.checked = false;
             });
-            document.getElementById('movCantidad').value = '';
+            var inputCant = document.getElementById('movCantidad');
+            inputCant.value = '';
+            inputCant.removeAttribute('min');
             document.getElementById('movMotivo').value = '';
+            document.getElementById('movPreviewStock').classList.add('d-none');
+            document.getElementById('movAlertaStock').classList.add('d-none');
+            document.querySelector('#formMovimiento button[type="submit"]').disabled = false;
 
             modal.show();
         });
