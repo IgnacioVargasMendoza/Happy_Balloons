@@ -735,8 +735,9 @@
             alerta.classList.remove('d-none');
             btnSubmit.disabled = true;
         } else {
-            preview.classList.add('border-' + cfg.color);
-            resultanteEl.classList.add('text-' + (resultante === 0 ? 'warning' : cfg.color));
+            var colorResultante = resultante === 0 ? 'warning' : 'success';
+            preview.classList.add('border-' + colorResultante);
+            resultanteEl.classList.add('text-' + colorResultante);
             deltaEl.classList.add('bg-' + cfg.color + (cfg.color === 'warning' ? ' text-dark' : ''));
             alerta.classList.add('d-none');
             btnSubmit.disabled = false;
