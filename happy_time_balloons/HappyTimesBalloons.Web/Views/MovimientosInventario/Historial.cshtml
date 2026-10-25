@@ -62,9 +62,8 @@
                     <tr>
                         <th>Fecha</th>
                         <th>Tipo</th>
-                        <th class="text-center">Cantidad</th>
-                        <th class="text-center">Stock anterior</th>
-                        <th class="text-center">Stock nuevo</th>
+                        <th class="text-center">Cambio</th>
+                        <th class="text-center">Stock</th>
                         <th>Motivo</th>
                         <th>Usuario</th>
                     </tr>
@@ -73,7 +72,7 @@
                     @if (!Model.Movimientos.Any())
                     {
                         <tr>
-                            <td colspan="7" class="text-center text-muted py-5">
+                            <td colspan="6" class="text-center text-muted py-5">
                                 <i class="bi bi-inbox fs-3 d-block mb-2 opacity-25"></i>
                                 No hay movimientos registrados para este producto.
                             </td>
@@ -83,6 +82,13 @@
                     {
                         foreach (var m in Model.Movimientos)
                         {
+                            string stockColor = m.StockNuevo > m.StockAnterior
+                                ? "text-success"
+                                : (m.StockNuevo < m.StockAnterior ? "text-danger" : "");
+                            string ajusteSigno = m.Cantidad >= 0 ? "+" : "";
+                            string ajusteClase = m.Cantidad >= 0
+                                ? "bg-success-subtle text-success border-success-subtle"
+                                : "bg-danger-subtle text-danger border-danger-subtle";
                             <tr>
                                 <td class="text-nowrap small">
                                     @m.FechaMovimiento.ToString("dd/MM/yyyy HH:mm")
@@ -110,19 +116,30 @@
                                 <td class="text-center fw-semibold">
                                     @if (m.TipoMovimiento == TipoMovimiento.Salida)
                                     {
-                                        <span class="text-danger">-@m.Cantidad</span>
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">
+                                            − @m.Cantidad uds
+                                        </span>
                                     }
                                     else if (m.TipoMovimiento == TipoMovimiento.Entrada)
                                     {
-                                        <span class="text-success">+@m.Cantidad</span>
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
+                                            + @m.Cantidad uds
+                                        </span>
                                     }
                                     else
                                     {
-                                        @(m.Cantidad >= 0 ? "+" + m.Cantidad : m.Cantidad.ToString())
+                                        <span class="badge @ajusteClase border px-2 py-1">
+                                            @(ajusteSigno)@m.Cantidad uds
+                                        </span>
                                     }
                                 </td>
-                                <td class="text-center text-muted">@m.StockAnterior</td>
-                                <td class="text-center fw-semibold">@m.StockNuevo</td>
+                                <td class="text-center">
+                                    <div class="d-flex align-items-center justify-content-center gap-1">
+                                        <span class="text-muted small">@m.StockAnterior</span>
+                                        <i class="bi bi-arrow-right text-muted" style="font-size:.75rem"></i>
+                                        <span class="fw-bold @stockColor">@m.StockNuevo</span>
+                                    </div>
+                                </td>
                                 <td class="small">@m.Motivo</td>
                                 <td class="small text-muted">@m.NombreUsuario</td>
                             </tr>
