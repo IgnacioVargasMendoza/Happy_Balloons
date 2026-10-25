@@ -421,9 +421,10 @@
 <div class="modal fade" id="modalMovimiento" tabindex="-1" aria-labelledby="modalMovimientoLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header" id="movModalHeader">
                 <h5 class="modal-title" id="modalMovimientoLabel">
-                    <i class="bi bi-arrow-left-right me-2 text-primary"></i>Registrar movimiento
+                    <i class="bi bi-arrow-left-right me-2" id="movModalIcono"></i>
+                    <span id="movModalTitulo">Registrar movimiento</span>
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
@@ -433,57 +434,107 @@
                 <input type="hidden" id="movProductoNombre" name="ProductoNombre" />
                 <input type="hidden" id="movStockActual" name="StockActual" />
                 <div class="modal-body">
-                    <div class="alert alert-light border mb-4 d-flex align-items-center gap-3">
-                        <i class="bi bi-box-seam fs-4 text-secondary"></i>
-                        <div>
-                            <div class="text-muted small">Producto</div>
+
+                    @* Producto + stock *@
+                    <div class="rounded-3 border bg-light px-3 py-2 mb-4 d-flex align-items-center gap-3">
+                        <div class="rounded-3 p-2 bg-white border">
+                            <i class="bi bi-box-seam fs-5 text-secondary"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="text-muted" style="font-size:.75rem">Producto</div>
                             <div class="fw-semibold" id="movNombreDisplay"></div>
                         </div>
-                        <div class="ms-auto text-end">
-                            <div class="text-muted small">Stock actual</div>
-                            <div class="fs-5 fw-bold" id="movStockDisplay"></div>
+                        <div class="text-end">
+                            <div class="text-muted" style="font-size:.75rem">Stock actual</div>
+                            <div class="fs-4 fw-bold lh-1" id="movStockDisplay"></div>
+                            <div class="text-muted" style="font-size:.7rem">unidades</div>
                         </div>
                     </div>
 
+                    @* Tipo de movimiento — tarjetas *@
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">
+                        <label class="form-label fw-semibold mb-2">
                             Tipo de movimiento <span class="text-danger">*</span>
                         </label>
-                        <div class="d-flex gap-4">
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="TipoMovimiento"
-                                       id="movEntrada" value="0" />
-                                <label class="form-check-label text-success fw-semibold" for="movEntrada">
-                                    <i class="bi bi-arrow-down-circle me-1"></i>Entrada
+                        <div class="row g-2">
+                            <div class="col-4">
+                                <input type="radio" class="btn-check" name="TipoMovimiento"
+                                       id="movEntrada" value="0" autocomplete="off" />
+                                <label for="movEntrada"
+                                       class="btn btn-outline-success w-100 d-flex flex-column align-items-center py-3 gap-1">
+                                    <i class="bi bi-arrow-down-circle fs-4"></i>
+                                    <span class="fw-semibold">Entrada</span>
+                                    <small class="opacity-75">Suma al stock</small>
                                 </label>
                             </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="TipoMovimiento"
-                                       id="movSalida" value="1" />
-                                <label class="form-check-label text-danger fw-semibold" for="movSalida">
-                                    <i class="bi bi-arrow-up-circle me-1"></i>Salida
+                            <div class="col-4">
+                                <input type="radio" class="btn-check" name="TipoMovimiento"
+                                       id="movSalida" value="1" autocomplete="off" />
+                                <label for="movSalida"
+                                       class="btn btn-outline-danger w-100 d-flex flex-column align-items-center py-3 gap-1">
+                                    <i class="bi bi-arrow-up-circle fs-4"></i>
+                                    <span class="fw-semibold">Salida</span>
+                                    <small class="opacity-75">Resta del stock</small>
                                 </label>
                             </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="TipoMovimiento"
-                                       id="movAjuste" value="2" />
-                                <label class="form-check-label text-warning fw-semibold" for="movAjuste">
-                                    <i class="bi bi-sliders me-1"></i>Ajuste
+                            <div class="col-4">
+                                <input type="radio" class="btn-check" name="TipoMovimiento"
+                                       id="movAjuste" value="2" autocomplete="off" />
+                                <label for="movAjuste"
+                                       class="btn btn-outline-warning w-100 d-flex flex-column align-items-center py-3 gap-1">
+                                    <i class="bi bi-clipboard-check fs-4"></i>
+                                    <span class="fw-semibold">Corrección</span>
+                                    <small class="opacity-75">Suma al stock</small>
                                 </label>
                             </div>
                         </div>
                     </div>
 
+                    @* Cantidad *@
                     <div class="mb-3">
-                        <label for="movCantidad" class="form-label fw-semibold">
+                        <label for="movCantidad" class="form-label fw-semibold" id="movCantidadLabel">
                             Cantidad <span class="text-danger">*</span>
                         </label>
-                        <div class="form-text text-muted mb-1">
-                            Entrada y Salida: valor positivo. Ajuste: positivo (aumenta) o negativo (reduce).
+                        <div class="input-group">
+                            <span class="input-group-text" id="movCantidadPrefijo">
+                                <i class="bi bi-hash text-muted"></i>
+                            </span>
+                            <input type="number" class="form-control form-control-lg"
+                                   id="movCantidad" name="Cantidad" step="1"
+                                   placeholder="0" />
                         </div>
-                        <input type="number" class="form-control" id="movCantidad" name="Cantidad" step="1" />
+                        <div class="form-text text-muted" id="movCantidadHint">
+                            Selecciona el tipo de movimiento primero.
+                        </div>
                     </div>
 
+                    @* Preview antes → después *@
+                    <div id="movPreviewStock" class="rounded-3 border p-3 mb-3 d-none">
+                        <div class="d-flex align-items-center justify-content-between gap-3">
+                            <div class="text-center flex-fill">
+                                <div class="text-muted small mb-1">Antes</div>
+                                <div class="fs-4 fw-bold" id="movPreviewAntes"></div>
+                                <div class="text-muted" style="font-size:.7rem">unidades</div>
+                            </div>
+                            <div class="d-flex flex-column align-items-center gap-1">
+                                <span id="movDeltaBadge" class="badge fs-6 px-3"></span>
+                                <i class="bi bi-arrow-right fs-5 text-muted"></i>
+                            </div>
+                            <div class="text-center flex-fill">
+                                <div class="text-muted small mb-1">Después</div>
+                                <div class="fs-4 fw-bold" id="movStockResultante"></div>
+                                <div class="text-muted" style="font-size:.7rem">unidades</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @* Alerta stock insuficiente *@
+                    <div id="movAlertaStock" class="alert alert-danger d-none py-2 mb-3">
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                        <span id="movAlertaTexto"></span>
+                    </div>
+
+                    @* Motivo *@
                     <div class="mb-1">
                         <label for="movMotivo" class="form-label fw-semibold">
                             Motivo <span class="text-danger">*</span>
@@ -496,8 +547,9 @@
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
                         Cancelar
                     </button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-check-lg me-1"></i>Registrar movimiento
+                    <button type="submit" class="btn btn-primary" id="movBtnSubmit">
+                        <i class="bi bi-check-lg me-1"></i>
+                        <span id="movBtnTexto">Registrar movimiento</span>
                     </button>
                 </div>
             </form>
@@ -605,24 +657,127 @@
 
 (function () {
     var modal = new bootstrap.Modal(document.getElementById('modalMovimiento'));
+    var stockActualModal = 0;
+
+    var TIPOS = {
+        0: { color: 'success', icono: 'bi-arrow-down-circle', titulo: 'Registrar entrada',              btn: 'Registrar entrada',              hint: 'Ingresa la cantidad de unidades que ingresan al inventario.' },
+        1: { color: 'danger',  icono: 'bi-arrow-up-circle',   titulo: 'Registrar salida',               btn: 'Registrar salida',               hint: 'Ingresa la cantidad de unidades que salen del inventario.' },
+        2: { color: 'warning', icono: 'bi-clipboard-check',   titulo: 'Corrección de inventario',       btn: 'Registrar corrección',           hint: 'Ingresa la cantidad correcta de unidades a agregar al inventario.' }
+    };
+
+    function actualizarTipo(tipo) {
+        var cfg = TIPOS[tipo];
+        var header = document.getElementById('movModalHeader');
+        var icono = document.getElementById('movModalIcono');
+        var titulo = document.getElementById('movModalTitulo');
+        var hint = document.getElementById('movCantidadHint');
+        var btnTexto = document.getElementById('movBtnTexto');
+        var inputCantidad = document.getElementById('movCantidad');
+
+        header.className = 'modal-header bg-' + cfg.color + ' bg-opacity-10 border-' + cfg.color;
+        icono.className = 'bi ' + cfg.icono + ' me-2 text-' + cfg.color;
+        titulo.textContent = cfg.titulo;
+        hint.textContent = cfg.hint;
+        btnTexto.textContent = cfg.btn;
+
+        inputCantidad.min = '1';
+    }
+
+    function actualizarPreview() {
+        var tipoRadio = document.querySelector('input[name="TipoMovimiento"]:checked');
+        var cantidadVal = parseInt(document.getElementById('movCantidad').value, 10);
+        var preview = document.getElementById('movPreviewStock');
+        var alerta = document.getElementById('movAlertaStock');
+        var alertaTexto = document.getElementById('movAlertaTexto');
+        var resultanteEl = document.getElementById('movStockResultante');
+        var antesEl = document.getElementById('movPreviewAntes');
+        var deltaEl = document.getElementById('movDeltaBadge');
+        var btnSubmit = document.getElementById('movBtnSubmit');
+
+        if (!tipoRadio || isNaN(cantidadVal)) {
+            preview.classList.add('d-none');
+            alerta.classList.add('d-none');
+            btnSubmit.disabled = false;
+            return;
+        }
+
+        var tipo = parseInt(tipoRadio.value, 10);
+        var cfg = TIPOS[tipo];
+        var resultante;
+        if (tipo === 0) {
+            resultante = stockActualModal + cantidadVal;
+        } else if (tipo === 1) {
+            resultante = stockActualModal - cantidadVal;
+        } else {
+            resultante = stockActualModal + cantidadVal;
+        }
+
+        var delta = resultante - stockActualModal;
+        antesEl.textContent = stockActualModal;
+        resultanteEl.textContent = resultante;
+
+        var signo = delta >= 0 ? '+' : '';
+        deltaEl.textContent = signo + delta;
+
+        preview.classList.remove('d-none', 'border-success', 'border-danger', 'border-warning', 'bg-success-subtle', 'bg-danger-subtle');
+        resultanteEl.className = 'fs-4 fw-bold';
+        deltaEl.className = 'badge fs-6 px-3';
+
+        if (resultante < 0) {
+            preview.classList.add('border-danger', 'bg-danger-subtle');
+            resultanteEl.classList.add('text-danger');
+            deltaEl.classList.add('bg-danger');
+            alertaTexto.textContent = 'Stock insuficiente. Disponible: ' + stockActualModal + ' uds. No es posible registrar esta salida.';
+            alerta.classList.remove('d-none');
+            btnSubmit.disabled = true;
+        } else {
+            var colorResultante = resultante === 0 ? 'warning' : 'success';
+            preview.classList.add('border-' + colorResultante);
+            resultanteEl.classList.add('text-' + colorResultante);
+            deltaEl.classList.add('bg-' + cfg.color + (cfg.color === 'warning' ? ' text-dark' : ''));
+            alerta.classList.add('d-none');
+            btnSubmit.disabled = false;
+        }
+    }
+
+    document.querySelectorAll('input[name="TipoMovimiento"]').forEach(function (r) {
+        r.addEventListener('change', function () {
+            actualizarTipo(parseInt(this.value, 10));
+            actualizarPreview();
+        });
+    });
+    document.getElementById('movCantidad').addEventListener('input', actualizarPreview);
 
     document.querySelectorAll('.btn-registrar-mov').forEach(function (btn) {
         btn.addEventListener('click', function () {
             var productoId = this.dataset.productoId;
             var productoNombre = this.dataset.productoNombre;
-            var stockActual = this.dataset.stockActual;
+            stockActualModal = parseInt(this.dataset.stockActual, 10) || 0;
 
             document.getElementById('movProductoId').value = productoId;
             document.getElementById('movProductoNombre').value = productoNombre;
-            document.getElementById('movStockActual').value = stockActual;
+            document.getElementById('movStockActual').value = stockActualModal;
             document.getElementById('movNombreDisplay').textContent = productoNombre;
-            document.getElementById('movStockDisplay').textContent = stockActual + ' unidades';
+            document.getElementById('movStockDisplay').textContent = stockActualModal;
 
-            document.querySelectorAll('input[name="TipoMovimiento"]').forEach(function (r) {
-                r.checked = false;
-            });
-            document.getElementById('movCantidad').value = '';
+            // Reset tipo
+            document.querySelectorAll('input[name="TipoMovimiento"]').forEach(function (r) { r.checked = false; });
+            var header = document.getElementById('movModalHeader');
+            header.className = 'modal-header';
+            document.getElementById('movModalIcono').className = 'bi bi-arrow-left-right me-2';
+            document.getElementById('movModalTitulo').textContent = 'Registrar movimiento';
+            document.getElementById('movBtnTexto').textContent = 'Registrar movimiento';
+            document.getElementById('movCantidadHint').textContent = 'Selecciona el tipo de movimiento primero.';
+
+            // Reset cantidad
+            var inputCant = document.getElementById('movCantidad');
+            inputCant.value = '';
+            inputCant.min = '1';
+
             document.getElementById('movMotivo').value = '';
+            document.getElementById('movPreviewStock').classList.add('d-none');
+            document.getElementById('movAlertaStock').classList.add('d-none');
+            document.getElementById('movBtnSubmit').disabled = false;
 
             modal.show();
         });
