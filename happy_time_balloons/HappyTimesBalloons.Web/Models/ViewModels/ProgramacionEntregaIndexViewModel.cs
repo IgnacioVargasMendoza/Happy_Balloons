@@ -7,5 +7,8 @@ namespace HappyTimesBalloons.Web.Models.ViewModels
     {
         public List<ProgramacionEntregaDTO> Programaciones { get; set; }
             = new List<ProgramacionEntregaDTO>();
+
+        public List<PedidoDTO> PedidosSinProgramar { get; set; }
+            = new List<PedidoDTO>();
     }
 }

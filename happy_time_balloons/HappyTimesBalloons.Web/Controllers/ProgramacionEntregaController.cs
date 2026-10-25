@@ -28,10 +28,12 @@ namespace HappyTimesBalloons.Web.Controllers
         public async Task<ActionResult> Index()
         {
             var programaciones = await _servicio.ObtenerTodasAsync();
+            var sinProgramar = await _servicio.ObtenerPedidosSinProgramarAsync();
 
             var modelo = new ProgramacionEntregaIndexViewModel
             {
-                Programaciones = programaciones
+                Programaciones = programaciones,
+                PedidosSinProgramar = sinProgramar
             };
 
             return View(modelo);

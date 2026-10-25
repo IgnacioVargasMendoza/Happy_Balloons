@@ -12,16 +12,85 @@
     </h2>
 </div>
 
+@* Sección: pedidos que aún no tienen entrega programada (#46) *@
+@if (Model.PedidosSinProgramar.Any())
+{
+    <div class="card border-warning shadow-sm mb-4">
+        <div class="card-header bg-warning bg-opacity-10 d-flex align-items-center">
+            <i class="bi bi-exclamation-circle text-warning me-2"></i>
+            <span class="fw-semibold">Pedidos pendientes de programar (@Model.PedidosSinProgramar.Count)</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-3">Número</th>
+                            <th>Cliente</th>
+                            <th>Fecha</th>
+                            <th>Estado</th>
+                            <th class="text-end">Total</th>
+                            <th class="text-center pe-3">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var p in Model.PedidosSinProgramar)
+                        {
+                            <tr>
+                                <td class="ps-3 fw-semibold">@p.Numero</td>
+                                <td class="small">@(p.NombreUsuario ?? "—")</td>
+                                <td class="text-muted small">@p.FechaPedido.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>
+                                    @{
+                                        string estadoCss;
+                                        switch (p.EstadoPedido)
+                                        {
+                                            case EstadoPedido.Pendiente:
+                                                estadoCss = "bg-warning text-dark";
+                                                break;
+                                            case EstadoPedido.Procesando:
+                                                estadoCss = "bg-info text-dark";
+                                                break;
+                                            case EstadoPedido.PagoPendiente:
+                                                estadoCss = "bg-secondary";
+                                                break;
+                                            default:
+                                                estadoCss = "bg-light text-dark";
+                                                break;
+                                        }
+                                    }
+                                    <span class="badge @estadoCss">@p.EstadoPedido</span>
+                                </td>
+                                <td class="text-end fw-semibold">₡@p.Total.ToString("N0")</td>
+                                <td class="text-center pe-3">
+                                    <a href="@Url.Action("Programar", "ProgramacionEntrega", new { pedidoId = p.Id })"
+                                       class="btn btn-sm btn-success">
+                                        <i class="bi bi-calendar-plus me-1"></i>Programar
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+
+@* Sección: programaciones existentes *@
 @if (!Model.Programaciones.Any())
 {
     <div class="alert alert-info">
         <i class="bi bi-info-circle me-2"></i>
-        No hay entregas programadas todavía. Puedes programar una entrega desde la pantalla de <strong>Pedidos</strong>.
+        No hay entregas programadas todavía. Puedes programar una entrega desde la pantalla de <strong>Pedidos</strong> o desde la tabla de arriba.
     </div>
 }
 else
 {
     <div class="card shadow-sm">
+        <div class="card-header">
+            <span class="fw-semibold"><i class="bi bi-list-check me-2 text-primary"></i>Entregas programadas</span>
+        </div>
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
@@ -95,6 +164,14 @@ else
                                                 <i class="bi bi-x-circle"></i> Cancelar
                                             </button>
                                         </form>
+                                    }
+                                    else if (p.EstadoProgramacion == EstadoProgramacionEntrega.Cancelada)
+                                    {
+                                        <a href="@Url.Action("Programar", "ProgramacionEntrega", new { pedidoId = p.PedidoId })"
+                                           class="btn btn-sm btn-outline-primary"
+                                           title="Reprogramar entrega">
+                                            <i class="bi bi-calendar-plus me-1"></i>Reprogramar
+                                        </a>
                                     }
                                 </td>
                             </tr>

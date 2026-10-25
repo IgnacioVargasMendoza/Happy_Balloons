@@ -4,6 +4,7 @@ using HappyTimesBalloons.Abstraccion.Interfaces.Repositorios;
 using HappyTimesBalloons.Abstraccion.Interfaces.Servicios;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace HappyTimesBalloons.LogicaNegocio.Servicios
@@ -114,6 +115,23 @@ namespace HappyTimesBalloons.LogicaNegocio.Servicios
             }
 
             return resultado;
+        }
+
+        public async Task<List<PedidoDTO>> ObtenerPedidosSinProgramarAsync()
+        {
+            var programaciones = await _repo.ObtenerTodasAsync();
+            var idsConProgramacionActiva = new HashSet<int>(
+                programaciones
+                    .Where(p => p.EstadoProgramacion != EstadoProgramacionEntrega.Cancelada)
+                    .Select(p => p.PedidoId)
+            );
+
+            var todos = await _pedidoRepo.ObtenerTodosAsync();
+            return todos
+                .Where(p => !idsConProgramacionActiva.Contains(p.Id)
+                         && p.EstadoPedido != EstadoPedido.Cancelado
+                         && p.EstadoPedido != EstadoPedido.Entregado)
+                .ToList();
         }
 
         public async Task<ResultadoOperacionDTO> EsFechaPermitidaAsync(DateTime fecha)
