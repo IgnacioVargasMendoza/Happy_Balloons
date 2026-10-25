@@ -31,7 +31,7 @@ jobs:
         uses: NuGet/setup-nuget@v2
 
       - name: Restaurar paquetes NuGet
-        run: nuget restore happy_time_balloons\HappyTimesBalloons.sln
+        run: nuget restore happy_time_balloons\HappyTimesBalloons.slnx
         shell: pwsh
 
       - name: Compilar en Release
