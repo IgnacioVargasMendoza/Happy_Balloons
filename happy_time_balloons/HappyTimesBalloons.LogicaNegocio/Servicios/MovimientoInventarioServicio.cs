@@ -80,15 +80,14 @@ namespace HappyTimesBalloons.LogicaNegocio.Servicios
             }
             else
             {
-                // Ajuste: cantidad puede ser positiva o negativa
-                stockNuevo = stockAnterior + dto.Cantidad;
-
-                if (stockNuevo < 0)
+                if (dto.Cantidad <= 0)
                 {
                     return ResultadoOperacionDTO.Fallo(
-                        $"El ajuste resultaría en stock negativo. Stock actual: {stockAnterior}. Ajuste: {dto.Cantidad}.",
+                        "La cantidad de la corrección debe ser mayor que cero.",
                         CodigoResultado.DatosInvalidos);
                 }
+
+                stockNuevo = stockAnterior + dto.Cantidad;
             }
 
             dto.StockAnterior = stockAnterior;
