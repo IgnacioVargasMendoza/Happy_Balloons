@@ -110,13 +110,21 @@ jobs:
           $id         = $env:COMMAND_ID
           $instanceId = "i-09494e479f8e0a053"
           $pendientes = @('Pending', 'InProgress', 'Delayed')
+          $sinRespuesta = 0
 
           do {
             Start-Sleep -Seconds 15
             $estado = aws ssm get-command-invocation `
               --command-id $id --instance-id $instanceId `
-              --query Status --output text 2>$null
-            Write-Output "[$((Get-Date -Format 'HH:mm:ss'))] $estado"
+              --query Status --output text
+            if (-not $estado) {
+              $sinRespuesta++
+              Write-Output "[$((Get-Date -Format 'HH:mm:ss'))] (sin respuesta #$sinRespuesta)"
+              if ($sinRespuesta -ge 8) { throw "SSM no devolvio estado tras 2 min. Verifica permisos IAM (ssm:GetCommandInvocation) y que el command-id sea correcto." }
+            } else {
+              $sinRespuesta = 0
+              Write-Output "[$((Get-Date -Format 'HH:mm:ss'))] $estado"
+            }
           } while (-not $estado -or $estado -in $pendientes)
 
           Write-Output "--- Output del servidor ---"
