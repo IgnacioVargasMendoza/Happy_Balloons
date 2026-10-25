@@ -85,10 +85,6 @@
                             string stockColor = m.StockNuevo > m.StockAnterior
                                 ? "text-success"
                                 : (m.StockNuevo < m.StockAnterior ? "text-danger" : "");
-                            string ajusteSigno = m.Cantidad >= 0 ? "+" : "";
-                            string ajusteClase = m.Cantidad >= 0
-                                ? "bg-success-subtle text-success border-success-subtle"
-                                : "bg-danger-subtle text-danger border-danger-subtle";
                             <tr>
                                 <td class="text-nowrap small">
                                     @m.FechaMovimiento.ToString("dd/MM/yyyy HH:mm")
@@ -109,7 +105,7 @@
                                     else
                                     {
                                         <span class="badge bg-warning-subtle text-warning border border-warning-subtle">
-                                            <i class="bi bi-sliders me-1"></i>Ajuste
+                                            <i class="bi bi-clipboard-check me-1"></i>Corrección
                                         </span>
                                     }
                                 </td>
@@ -128,8 +124,8 @@
                                     }
                                     else
                                     {
-                                        <span class="badge @ajusteClase border px-2 py-1">
-                                            @(ajusteSigno)@m.Cantidad uds
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
+                                            + @m.Cantidad uds
                                         </span>
                                     }
                                 </td>

@@ -482,9 +482,9 @@
                                        id="movAjuste" value="2" autocomplete="off" />
                                 <label for="movAjuste"
                                        class="btn btn-outline-warning w-100 d-flex flex-column align-items-center py-3 gap-1">
-                                    <i class="bi bi-sliders fs-4"></i>
-                                    <span class="fw-semibold">Ajuste</span>
-                                    <small class="opacity-75">+ o − manual</small>
+                                    <i class="bi bi-clipboard-check fs-4"></i>
+                                    <span class="fw-semibold">Corrección</span>
+                                    <small class="opacity-75">Suma al stock</small>
                                 </label>
                             </div>
                         </div>
@@ -660,9 +660,9 @@
     var stockActualModal = 0;
 
     var TIPOS = {
-        0: { color: 'success', icono: 'bi-arrow-down-circle', titulo: 'Registrar entrada', btn: 'Registrar entrada', hint: 'Ingresa la cantidad de unidades que ingresan al inventario.', delta: '+' },
-        1: { color: 'danger',  icono: 'bi-arrow-up-circle',   titulo: 'Registrar salida',  btn: 'Registrar salida',  hint: 'Ingresa la cantidad de unidades que salen del inventario.',   delta: '-' },
-        2: { color: 'warning', icono: 'bi-sliders',           titulo: 'Registrar ajuste',  btn: 'Registrar ajuste',  hint: 'Positivo para aumentar el stock, negativo para reducirlo.',   delta: '' }
+        0: { color: 'success', icono: 'bi-arrow-down-circle', titulo: 'Registrar entrada',              btn: 'Registrar entrada',              hint: 'Ingresa la cantidad de unidades que ingresan al inventario.' },
+        1: { color: 'danger',  icono: 'bi-arrow-up-circle',   titulo: 'Registrar salida',               btn: 'Registrar salida',               hint: 'Ingresa la cantidad de unidades que salen del inventario.' },
+        2: { color: 'warning', icono: 'bi-clipboard-check',   titulo: 'Corrección de inventario',       btn: 'Registrar corrección',           hint: 'Ingresa la cantidad correcta de unidades a agregar al inventario.' }
     };
 
     function actualizarTipo(tipo) {
@@ -680,11 +680,7 @@
         hint.textContent = cfg.hint;
         btnTexto.textContent = cfg.btn;
 
-        if (tipo === 0 || tipo === 1) {
-            inputCantidad.min = '1';
-        } else {
-            inputCantidad.removeAttribute('min');
-        }
+        inputCantidad.min = '1';
     }
 
     function actualizarPreview() {
@@ -776,7 +772,7 @@
             // Reset cantidad
             var inputCant = document.getElementById('movCantidad');
             inputCant.value = '';
-            inputCant.removeAttribute('min');
+            inputCant.min = '1';
 
             document.getElementById('movMotivo').value = '';
             document.getElementById('movPreviewStock').classList.add('d-none');
