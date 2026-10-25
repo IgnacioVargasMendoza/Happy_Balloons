@@ -15,5 +15,6 @@ namespace HappyTimesBalloons.Abstraccion.Interfaces.Servicios
         Task<ResultadoOperacionDTO> CancelarAsync(int id, string usuarioId, string nombreUsuario);
         Task<ResultadoOperacionDTO> MarcarEntregadaAsync(int id, string usuarioId, string nombreUsuario);
         Task<ResultadoOperacionDTO> EsFechaPermitidaAsync(DateTime fecha);
+        Task<List<PedidoDTO>> ObtenerPedidosSinProgramarAsync();
     }
 }

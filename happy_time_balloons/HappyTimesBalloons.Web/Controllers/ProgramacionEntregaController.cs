@@ -1,4 +1,5 @@
 using HappyTimesBalloons.Abstraccion.DTOs;
+using HappyTimesBalloons.Abstraccion.Enums;
 using HappyTimesBalloons.Abstraccion.Interfaces.Servicios;
 using HappyTimesBalloons.Web.Models.ViewModels;
 using Microsoft.AspNet.Identity;
@@ -28,10 +29,19 @@ namespace HappyTimesBalloons.Web.Controllers
         public async Task<ActionResult> Index()
         {
             var programaciones = await _servicio.ObtenerTodasAsync();
+            var sinProgramar = await _servicio.ObtenerPedidosSinProgramarAsync();
 
             var modelo = new ProgramacionEntregaIndexViewModel
             {
-                Programaciones = programaciones
+                PedidosSinProgramar = sinProgramar,
+                ProgramacionesActivas = programaciones
+                    .Where(p => p.EstadoProgramacion == EstadoProgramacionEntrega.Confirmada
+                             || p.EstadoProgramacion == EstadoProgramacionEntrega.Pendiente)
+                    .ToList(),
+                ProgramacionesHistorial = programaciones
+                    .Where(p => p.EstadoProgramacion == EstadoProgramacionEntrega.Entregada
+                             || p.EstadoProgramacion == EstadoProgramacionEntrega.Cancelada)
+                    .ToList()
             };
 
             return View(modelo);
