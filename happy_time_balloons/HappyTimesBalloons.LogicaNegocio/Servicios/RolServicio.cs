@@ -3,6 +3,7 @@ using HappyTimesBalloons.Abstraccion.Enums;
 using HappyTimesBalloons.Abstraccion.Interfaces.Repositorios;
 using HappyTimesBalloons.Abstraccion.Interfaces.Servicios;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace HappyTimesBalloons.LogicaNegocio.Servicios
@@ -58,6 +59,14 @@ namespace HappyTimesBalloons.LogicaNegocio.Servicios
             if (existente == null)
                 return ResultadoOperacionDTO.Fallo("El rol no existe.", CodigoResultado.DatosInvalidos);
 
+            if (existente.Nombre == "Administrador")
+                return ResultadoOperacionDTO.Fallo("El rol 'Administrador' es un rol de sistema y no puede renombrarse.", CodigoResultado.DatosInvalidos);
+
+            if (existente.CantidadUsuarios > 0)
+                return ResultadoOperacionDTO.Fallo(
+                    $"No se puede renombrar '{existente.Nombre}': tiene {existente.CantidadUsuarios} usuario(s) asignado(s).",
+                    CodigoResultado.DatosInvalidos);
+
             if (existente.Nombre != nuevoNombre && await _rolRepo.ExisteNombreAsync(nuevoNombre))
                 return ResultadoOperacionDTO.Fallo($"Ya existe un rol con el nombre '{nuevoNombre}'.", CodigoResultado.DatosInvalidos);
 
@@ -77,6 +86,9 @@ namespace HappyTimesBalloons.LogicaNegocio.Servicios
             var rol = await _rolRepo.ObtenerPorIdAsync(id);
             if (rol == null)
                 return ResultadoOperacionDTO.Fallo("El rol no existe.", CodigoResultado.DatosInvalidos);
+
+            if (rol.Nombre == "Administrador")
+                return ResultadoOperacionDTO.Fallo("El rol 'Administrador' es un rol de sistema y no puede eliminarse.", CodigoResultado.DatosInvalidos);
 
             if (rol.CantidadUsuarios > 0)
                 return ResultadoOperacionDTO.Fallo(
@@ -117,6 +129,14 @@ namespace HappyTimesBalloons.LogicaNegocio.Servicios
         {
             if (string.IsNullOrEmpty(usuarioId) || string.IsNullOrEmpty(rolNombre))
                 return ResultadoOperacionDTO.Fallo("Usuario o rol no válido.", CodigoResultado.DatosInvalidos);
+
+            if (rolNombre == "Administrador")
+            {
+                var roles = await _rolRepo.ObtenerTodosAsync();
+                var adminRol = roles.FirstOrDefault(r => r.Nombre == "Administrador");
+                if (adminRol != null && adminRol.CantidadUsuarios <= 1)
+                    return ResultadoOperacionDTO.Fallo("No se puede revocar el rol al último administrador del sistema.", CodigoResultado.DatosInvalidos);
+            }
 
             var ok = await _rolRepo.RevocarRolAsync(usuarioId, rolNombre);
             if (!ok)

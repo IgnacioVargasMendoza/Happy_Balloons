@@ -49,13 +49,40 @@
                                 <span class="badge bg-secondary rounded-pill">@rol.CantidadUsuarios</span>
                             </td>
                             <td class="text-end align-middle">
-                                <a href="@Url.Action("Editar", "Rol", new { id = rol.Id })"
-                                   class="btn btn-sm btn-outline-primary me-1"
-                                   title="Editar">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
+                                @{
+                                    var bloqueadoEditar = rol.Nombre == "Administrador" || rol.CantidadUsuarios > 0;
+                                    var titleEditar = rol.Nombre == "Administrador"
+                                        ? "El rol 'Administrador' no puede renombrarse"
+                                        : rol.CantidadUsuarios > 0
+                                            ? "No se puede renombrar: tiene usuarios asignados"
+                                            : "Editar";
+                                }
+                                @if (bloqueadoEditar)
+                                {
+                                    <button class="btn btn-sm btn-outline-primary me-1"
+                                            disabled
+                                            title="@titleEditar">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <a href="@Url.Action("Editar", "Rol", new { id = rol.Id })"
+                                       class="btn btn-sm btn-outline-primary me-1"
+                                       title="Editar">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                }
 
-                                @if (rol.CantidadUsuarios == 0)
+                                @if (rol.Nombre == "Administrador")
+                                {
+                                    <button class="btn btn-sm btn-outline-danger"
+                                            disabled
+                                            title="El rol 'Administrador' no puede eliminarse">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                }
+                                else if (rol.CantidadUsuarios == 0)
                                 {
                                     <button type="button"
                                             class="btn btn-sm btn-outline-danger"

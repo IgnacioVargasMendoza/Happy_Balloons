@@ -119,6 +119,8 @@ namespace HappyTimesBalloons.Web.Controllers
             var usuarios = await _rolServicio.ObtenerTodosLosUsuariosAsync();
             var roles = await _rolServicio.ObtenerTodosAsync();
 
+            var adminRol = roles.FirstOrDefault(r => r.Nombre == "Administrador");
+
             var vm = new UsuariosRolViewModel
             {
                 Usuarios = usuarios.Select(u => new UsuarioRolItemViewModel
@@ -133,7 +135,8 @@ namespace HappyTimesBalloons.Web.Controllers
                     Id = r.Id,
                     Nombre = r.Nombre,
                     CantidadUsuarios = r.CantidadUsuarios
-                }).ToList()
+                }).ToList(),
+                CantidadAdministradores = adminRol?.CantidadUsuarios ?? 0
             };
 
             return View(vm);
