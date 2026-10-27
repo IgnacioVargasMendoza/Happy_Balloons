@@ -1,0 +1,64 @@
+@model IEnumerable<HappyTimesBalloons.Web.Models.ViewModels.ImagenProductoViewModel>
+
+@if (Model != null && Model.Any())
+{
+    <div class="row g-2">
+        @foreach (var img in Model)
+        {
+            <div class="col-4">
+                <div class="position-relative">
+                    <img src="@img.RutaImagen"
+                         alt="Imagen"
+                         class="img-thumbnail w-100"
+                         style="height:90px;object-fit:cover;" />
+
+                    @if (img.EsPrincipal)
+                    {
+                        <span class="position-absolute top-0 start-0 badge"
+                              style="font-size:0.6rem;background:#e91e8c;">
+                            Principal
+                        </span>
+                    }
+
+                    <div class="d-flex gap-1 mt-1">
+                        @if (!img.EsPrincipal)
+                        {
+                            <form action="@Url.Action("EstablecerPrincipal", "Producto")"
+                                  method="post"
+                                  class="d-inline form-set-principal">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="imagenId" value="@img.Id" />
+                                <input type="hidden" name="productoId" value="@img.ProductoId" />
+
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-primary w-100 btn-set-principal"
+                                        style="font-size:0.7rem;padding:1px 4px;"
+                                        title="Marcar como principal">
+                                    <i class="bi bi-star"></i>
+                                </button>
+                            </form>
+                        }
+
+                        <form action="@Url.Action("EliminarImagen", "Producto")"
+                              method="post"
+                              class="d-inline form-del-img">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="imagenId" value="@img.Id" />
+                            <input type="hidden" name="productoId" value="@img.ProductoId" />
+
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-danger w-100 btn-del-img"
+                                    style="font-size:0.7rem;padding:1px 4px;">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <p class="text-muted small mb-0">Sin imágenes</p>
+}

@@ -184,70 +184,7 @@
 @foreach (var p in Model.Productos)
 {
     <div id="imgs-@p.Id" class="d-none">
-        @if (p.Imagenes != null && p.Imagenes.Any())
-        {
-            <div class="row g-2">
-                @foreach (var img in p.Imagenes)
-                {
-                    <div class="col-4">
-                        <div class="position-relative">
-                            <img src="@img.RutaImagen"
-                                 alt="Imagen"
-                                 class="img-thumbnail w-100"
-                                 style="height:90px;object-fit:cover;" />
-
-                            @if (img.EsPrincipal)
-                            {
-                                <span class="position-absolute top-0 start-0 badge"
-                                      style="font-size:0.6rem;background:#e91e8c;">
-                                    Principal
-                                </span>
-                            }
-
-                            <div class="d-flex gap-1 mt-1">
-                                @if (!img.EsPrincipal)
-                                {
-                                    <form action="@Url.Action("EstablecerPrincipal", "Producto")"
-                                          method="post"
-                                          class="d-inline">
-                                        @Html.AntiForgeryToken()
-                                        <input type="hidden" name="imagenId" value="@img.Id" />
-                                        <input type="hidden" name="productoId" value="@p.Id" />
-                                        <input type="hidden" name="from" value="index" />
-
-                                        <button type="submit"
-                                                class="btn btn-sm btn-outline-primary w-100"
-                                                style="font-size:0.7rem;padding:1px 4px;"
-                                                title="Marcar como principal">
-                                            <i class="bi bi-star"></i>
-                                        </button>
-                                    </form>
-                                }
-
-                                <form action="@Url.Action("EliminarImagen", "Producto")"
-                                      method="post"
-                                      class="d-inline form-del-img">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="imagenId" value="@img.Id" />
-                                    <input type="hidden" name="productoId" value="@p.Id" />
-                                    <input type="hidden" name="from" value="index" />
-
-                                    <button type="button"
-                                            class="btn btn-sm btn-outline-danger w-100 btn-del-img"
-                                            style="font-size:0.7rem;padding:1px 4px;">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                }
-            </div>
-        }
-        else
-        {
-            <p class="text-muted small mb-0">Sin imágenes</p>
-        }
+        @Html.Partial("_ImagenesModal", p.Imagenes)
     </div>
 }
 
@@ -439,16 +376,82 @@
 
 @section scripts {
 <script>
-    function cablearBotonesEliminar(contenedor) {
+    var urlEliminarImagen = '@Url.Action("EliminarImagen", "Producto")';
+    var urlEstablecerPrincipal = '@Url.Action("EstablecerPrincipal", "Producto")';
+    var urlObtenerImagenesModal = '@Url.Action("ObtenerImagenesModal", "Producto")';
+
+    function refrescarImagenes(productoId) {
+        fetch(urlObtenerImagenesModal + '?productoId=' + productoId)
+            .then(function (r) { return r.text(); })
+            .then(function (html) {
+                var modalImagenes = document.getElementById('modalImagenes');
+                modalImagenes.innerHTML = html;
+                cablearBotones(modalImagenes);
+
+                var fuente = document.getElementById('imgs-' + productoId);
+                if (fuente) {
+                    fuente.innerHTML = html;
+                }
+            });
+    }
+
+    function cablearBotones(contenedor) {
 
         contenedor.querySelectorAll('.btn-del-img').forEach(function (btn) {
 
             btn.addEventListener('click', function () {
 
-                if (confirm('¿Eliminar esta imagen?')) {
+                if (!confirm('¿Eliminar esta imagen?')) return;
 
-                    this.closest('.form-del-img').submit();
-                }
+                var form = this.closest('.form-del-img');
+                var data = new FormData();
+                data.append('imagenId', form.querySelector('[name="imagenId"]').value);
+                data.append('productoId', form.querySelector('[name="productoId"]').value);
+                data.append('__RequestVerificationToken',
+                    form.querySelector('[name="__RequestVerificationToken"]').value);
+
+                var productoId = form.querySelector('[name="productoId"]').value;
+
+                fetch(urlEliminarImagen, { method: 'POST', body: data })
+                    .then(function (r) { return r.json(); })
+                    .then(function (res) {
+                        if (res.exito) {
+                            refrescarImagenes(productoId);
+                        } else {
+                            alert('No se pudo eliminar la imagen.');
+                        }
+                    })
+                    .catch(function () {
+                        alert('Error al eliminar la imagen.');
+                    });
+            });
+        });
+
+        contenedor.querySelectorAll('.btn-set-principal').forEach(function (btn) {
+
+            btn.addEventListener('click', function () {
+
+                var form = this.closest('.form-set-principal');
+                var data = new FormData();
+                data.append('imagenId', form.querySelector('[name="imagenId"]').value);
+                data.append('productoId', form.querySelector('[name="productoId"]').value);
+                data.append('__RequestVerificationToken',
+                    form.querySelector('[name="__RequestVerificationToken"]').value);
+
+                var productoId = form.querySelector('[name="productoId"]').value;
+
+                fetch(urlEstablecerPrincipal, { method: 'POST', body: data })
+                    .then(function (r) { return r.json(); })
+                    .then(function (res) {
+                        if (res.exito) {
+                            refrescarImagenes(productoId);
+                        } else {
+                            alert('No se pudo establecer la imagen principal.');
+                        }
+                    })
+                    .catch(function () {
+                        alert('Error al actualizar la imagen principal.');
+                    });
             });
         });
     }
@@ -480,7 +483,7 @@
 
             if (fuente) {
                 contenedor.innerHTML = fuente.innerHTML;
-                cablearBotonesEliminar(contenedor);
+                cablearBotones(contenedor);
             } else {
                 contenedor.innerHTML = '<p class="text-muted small mb-0">Sin imágenes</p>';
             }
