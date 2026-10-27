@@ -28,6 +28,7 @@
 
         <div class="collapse navbar-collapse" id="navMain">
 
+            @* ── Menú izquierdo: público + cliente ── *@
             <ul class="navbar-nav me-auto">
 
                 <li class="nav-item">
@@ -38,6 +39,18 @@
                         null,
                         new { @class = "nav-link" })
                 </li>
+
+                @if (Request.IsAuthenticated && User.IsInRole("Cliente"))
+                {
+                    <li class="nav-item">
+                        @Html.ActionLink(
+                            "Mis Pedidos",
+                            "MisPedidos",
+                            "Pedido",
+                            new { area = "" },
+                            new { @class = "nav-link" })
+                    </li>
+                }
 
                 @if (Request.IsAuthenticated &&
                     (User.IsInRole("Administrador") || User.IsInRole("Operador")))
@@ -58,12 +71,34 @@
 
                             <li>
                                 @Html.ActionLink(
-                                    "Dashboard",
+                                    "Estadísticas",
                                     "Index",
                                     "Admin",
                                     null,
                                     new { @class = "dropdown-item" })
                             </li>
+
+                            <li><hr class="dropdown-divider" /></li>
+
+                            <li>
+                                @Html.ActionLink(
+                                    "Pedidos",
+                                    "Index",
+                                    "Pedido",
+                                    null,
+                                    new { @class = "dropdown-item" })
+                            </li>
+
+                            <li>
+                                @Html.ActionLink(
+                                    "Programación de Entregas",
+                                    "Index",
+                                    "ProgramacionEntrega",
+                                    null,
+                                    new { @class = "dropdown-item" })
+                            </li>
+
+                            <li><hr class="dropdown-divider" /></li>
 
                             <li>
                                 @Html.ActionLink(
@@ -85,12 +120,14 @@
 
                             <li>
                                 @Html.ActionLink(
-                                    "Pedidos",
+                                    "Promociones",
                                     "Index",
-                                    "Pedido",
+                                    "Promocion",
                                     null,
                                     new { @class = "dropdown-item" })
                             </li>
+
+                            <li><hr class="dropdown-divider" /></li>
 
                             <li>
                                 @Html.ActionLink(
@@ -100,8 +137,6 @@
                                     null,
                                     new { @class = "dropdown-item" })
                             </li>
-
-                            <li><hr class="dropdown-divider" /></li>
 
                             <li>
                                 @Html.ActionLink(
@@ -143,20 +178,13 @@
                                         new { @class = "dropdown-item" })
                                 </li>
 
+                                <li><hr class="dropdown-divider" /></li>
+
                                 <li>
                                     @Html.ActionLink(
                                         "Zonas de Entrega",
                                         "Index",
                                         "ZonasEntrega",
-                                        null,
-                                        new { @class = "dropdown-item" })
-                                </li>
-
-                                <li>
-                                    @Html.ActionLink(
-                                        "Programación de Entregas",
-                                        "Index",
-                                        "ProgramacionEntrega",
                                         null,
                                         new { @class = "dropdown-item" })
                                 </li>
@@ -197,19 +225,8 @@
 
             </ul>
 
+            @* ── Menú derecho: carrito + cuenta ── *@
             <ul class="navbar-nav ms-auto align-items-center gap-1">
-
-                @if (Request.IsAuthenticated && User.IsInRole("Cliente"))
-                {
-                    <li class="nav-item">
-                        @Html.ActionLink(
-                            "Mis pedidos",
-                            "MisPedidos",
-                            "Pedido",
-                            new { area = "" },
-                            new { @class = "nav-link" })
-                    </li>
-                }
 
                 <li class="nav-item position-relative">
 
