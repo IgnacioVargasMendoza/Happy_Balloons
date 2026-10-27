@@ -126,11 +126,9 @@ namespace HappyTimesBalloons.LogicaNegocio.Servicios
                     .Select(p => p.PedidoId)
             );
 
-            var todos = await _pedidoRepo.ObtenerTodosAsync();
-            return todos
-                .Where(p => !idsConProgramacionActiva.Contains(p.Id)
-                         && p.EstadoPedido != EstadoPedido.Cancelado
-                         && p.EstadoPedido != EstadoPedido.Entregado)
+            var activos = await _pedidoRepo.ObtenerActivosAsync();
+            return activos
+                .Where(p => !idsConProgramacionActiva.Contains(p.Id))
                 .ToList();
         }
 
