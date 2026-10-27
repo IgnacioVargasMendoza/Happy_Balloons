@@ -127,20 +127,26 @@ jobs:
             }
           } while (-not $estado -or $estado -in $pendientes)
 
+          if ($estado -ne 'Success') { throw "Deploy fallido con estado: $estado" }
+
           Write-Output "--- Output del servidor ---"
-          $rawJson = (aws ssm get-command-invocation `
-            --command-id $id --instance-id $instanceId `
-            --output json 2>$null) -join "`n"
-          if ($rawJson) {
-            $inv = $rawJson | ConvertFrom-Json
-            ($inv.StandardOutputContent  -replace '[�\x{FFFD}]', '?') | Write-Output
-            if ($inv.StandardErrorContent) {
-              Write-Output "--- STDERR ---"
-              ($inv.StandardErrorContent -replace '[�\x{FFFD}]', '?') | Write-Output
+          try {
+            [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+            $rawJson = (aws ssm get-command-invocation `
+              --command-id $id --instance-id $instanceId `
+              --output json 2>$null) -join "`n"
+            if ($rawJson) {
+              $inv = $rawJson | ConvertFrom-Json -ErrorAction Stop
+              ($inv.StandardOutputContent -replace '\P{IsBasicLatin}', '?') | Write-Output
+              if ($inv.StandardErrorContent) {
+                Write-Output "--- STDERR ---"
+                ($inv.StandardErrorContent -replace '\P{IsBasicLatin}', '?') | Write-Output
+              }
             }
+          } catch {
+            Write-Output "(No se pudo leer el output del servidor: $_)"
           }
 
-          if ($estado -ne 'Success') { throw "Deploy fallido con estado: $estado" }
           Write-Output "Deploy completado: http://13.184.33.122"
         shell: pwsh
 
