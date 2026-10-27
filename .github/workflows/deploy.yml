@@ -107,6 +107,7 @@ jobs:
 
       - name: Esperar resultado del deploy en EC2
         run: |
+          $env:PYTHONIOENCODING = "utf-8"
           $id         = $env:COMMAND_ID
           $instanceId = "i-09494e479f8e0a053"
           $pendientes = @('Pending', 'InProgress', 'Delayed')
