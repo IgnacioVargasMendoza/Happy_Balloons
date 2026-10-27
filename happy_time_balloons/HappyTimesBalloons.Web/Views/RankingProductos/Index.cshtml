@@ -35,7 +35,7 @@
                 </div>
                 <div class="col-md-3">
                     <label for="zonaId" class="form-label fw-semibold">Zona de entrega</label>
-                    <select id="zonaId" name="zonaId" class="form-select">
+                    <select id="zonaId" name="zonaId" class="form-select" onchange="this.form.submit()">
                         <option value="">Todas las zonas</option>
                         @foreach (System.Web.Mvc.SelectListItem zona in Model.Zonas)
                         {
