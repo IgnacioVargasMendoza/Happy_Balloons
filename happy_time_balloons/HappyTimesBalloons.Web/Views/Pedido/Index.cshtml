@@ -25,18 +25,15 @@
         </div>
         <div class="col-md-3">
             @Html.DropDownList("filtroEstado", Model.EstadosDisponibles,
-                new { @class = "form-select" })
+                new { @class = "form-select", onchange = "this.form.submit()" })
         </div>
-        <div class="col-auto">
-            <button type="submit" class="btn btn-outline-secondary">
-                <i class="bi bi-funnel me-1"></i>Filtrar
-            </button>
-            @if (!string.IsNullOrEmpty(Model.FiltroBusqueda) || !string.IsNullOrEmpty(Model.FiltroEstado))
-            {
+        @if (!string.IsNullOrEmpty(Model.FiltroBusqueda) || !string.IsNullOrEmpty(Model.FiltroEstado))
+        {
+            <div class="col-auto">
                 @Html.ActionLink("Limpiar", "Index", "Pedido", null,
-                    new { @class = "btn btn-outline-danger ms-1" })
-            }
-        </div>
+                    new { @class = "btn btn-outline-danger" })
+            </div>
+        }
     </div>
 }
 

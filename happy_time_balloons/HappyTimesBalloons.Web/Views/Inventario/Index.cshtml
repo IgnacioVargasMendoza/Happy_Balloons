@@ -187,7 +187,7 @@
                         </div>
                         <div class="col-md-3">
                             <label class="form-label small text-muted mb-1">Categoría</label>
-                            <select name="categoriaId" class="form-select form-select-sm">
+                            <select name="categoriaId" class="form-select form-select-sm" onchange="this.form.submit()">
                                 <option value="">Todas las categorías</option>
                                 @if (Model.Categorias != null)
                                 {
@@ -203,16 +203,13 @@
                         </div>
                         <div class="col-md-2">
                             <label class="form-label small text-muted mb-1">Estado de stock</label>
-                            <select name="estadoStock" class="form-select form-select-sm">
+                            <select name="estadoStock" class="form-select form-select-sm" onchange="this.form.submit()">
                                 <option value="todos" @(Model.EstadoStock == "todos" ? "selected" : "")>Todos</option>
                                 <option value="bajo" @(Model.EstadoStock == "bajo" ? "selected" : "")>Stock bajo</option>
                                 <option value="sin_stock" @(Model.EstadoStock == "sin_stock" ? "selected" : "")>Sin stock</option>
                             </select>
                         </div>
-                        <div class="col-md-2 d-flex gap-2">
-                            <button type="submit" class="btn btn-primary btn-sm w-100">
-                                <i class="bi bi-search me-1"></i> Filtrar
-                            </button>
+                        <div class="col-auto d-flex align-items-end">
                             <a href="@Url.Action("Index", "Inventario")" class="btn btn-outline-secondary btn-sm" title="Limpiar filtros">
                                 <i class="bi bi-x-lg"></i>
                             </a>

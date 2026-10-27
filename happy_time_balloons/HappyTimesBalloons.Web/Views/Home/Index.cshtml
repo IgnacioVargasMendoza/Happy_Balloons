@@ -20,7 +20,7 @@
             </div>
         </div>
         <div class="col-md-3">
-            <select name="categoriaId" class="form-select">
+            <select name="categoriaId" class="form-select" onchange="this.form.submit()">
                 <option value="">Todas las categorías</option>
                 @foreach (var c in Model.Categorias)
                 {
@@ -29,16 +29,13 @@
                 }
             </select>
         </div>
-        <div class="col-auto">
-            <button type="submit" class="btn btn-outline-secondary">
-                <i class="bi bi-funnel me-1"></i>Filtrar
-            </button>
-            @if (!string.IsNullOrEmpty(Model.Busqueda) || Model.CategoriaId.HasValue)
-            {
+        @if (!string.IsNullOrEmpty(Model.Busqueda) || Model.CategoriaId.HasValue)
+        {
+            <div class="col-auto">
                 @Html.ActionLink("Limpiar", "Index", "Home", null,
-                    new { @class = "btn btn-outline-danger ms-1" })
-            }
-        </div>
+                    new { @class = "btn btn-outline-danger" })
+            </div>
+        }
     </div>
 }
 
