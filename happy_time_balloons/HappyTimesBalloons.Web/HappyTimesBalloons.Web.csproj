@@ -183,6 +183,7 @@
     <Content Include="Views\Pedido\Detalle.cshtml" />
     <Content Include="Views\Pedido\Index.cshtml" />
     <Content Include="Views\Pedido\MisPedidos.cshtml" />
+    <Content Include="Views\Producto\_ImagenesModal.cshtml" />
     <Content Include="Views\Producto\Crear.cshtml" />
     <Content Include="Views\Producto\Index.cshtml" />
     <Content Include="Views\Promocion\Index.cshtml" />
