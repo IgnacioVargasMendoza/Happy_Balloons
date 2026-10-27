@@ -7,7 +7,7 @@
 
 @if (!string.IsNullOrEmpty(exito))
 {
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <div class="alert alert-success alert-dismissible fade show js-auto-dismiss" role="alert">
         <i class="bi bi-check-circle-fill me-2"></i>@exito
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
     </div>
@@ -28,8 +28,21 @@
 }
 @if (!string.IsNullOrEmpty(info))
 {
-    <div class="alert alert-info alert-dismissible fade show" role="alert">
+    <div class="alert alert-info alert-dismissible fade show js-auto-dismiss" role="alert">
         <i class="bi bi-info-circle-fill me-2"></i>@info
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
     </div>
 }
+
+<script>
+    (function () {
+        var alerts = document.querySelectorAll('.js-auto-dismiss');
+        if (!alerts.length) { return; }
+        setTimeout(function () {
+            alerts.forEach(function (el) {
+                var bsAlert = bootstrap.Alert.getOrCreateInstance(el);
+                bsAlert.close();
+            });
+        }, 3000);
+    })();
+</script>
