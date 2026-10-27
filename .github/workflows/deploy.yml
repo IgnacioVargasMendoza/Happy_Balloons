@@ -128,15 +128,15 @@ jobs:
           } while (-not $estado -or $estado -in $pendientes)
 
           Write-Output "--- Output del servidor ---"
-          $rawJson = aws ssm get-command-invocation `
+          $rawJson = (aws ssm get-command-invocation `
             --command-id $id --instance-id $instanceId `
-            --output json 2>$null
+            --output json 2>$null) -join "`n"
           if ($rawJson) {
             $inv = $rawJson | ConvertFrom-Json
-            ($inv.StandardOutputContent  -replace '�', '?') | Write-Output
+            ($inv.StandardOutputContent  -replace '[�\x{FFFD}]', '?') | Write-Output
             if ($inv.StandardErrorContent) {
               Write-Output "--- STDERR ---"
-              ($inv.StandardErrorContent -replace '�', '?') | Write-Output
+              ($inv.StandardErrorContent -replace '[�\x{FFFD}]', '?') | Write-Output
             }
           }
 
