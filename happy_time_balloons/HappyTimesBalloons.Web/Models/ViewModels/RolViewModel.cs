@@ -29,6 +29,7 @@ namespace HappyTimesBalloons.Web.Models.ViewModels
     {
         public List<UsuarioRolItemViewModel> Usuarios { get; set; } = new List<UsuarioRolItemViewModel>();
         public List<RolItemViewModel> RolesDisponibles { get; set; } = new List<RolItemViewModel>();
+        public int CantidadAdministradores { get; set; }
     }
 
     public class UsuarioRolItemViewModel

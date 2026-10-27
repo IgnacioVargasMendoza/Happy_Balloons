@@ -85,13 +85,15 @@
 
                                     @foreach (var rolActual in usuario.Roles)
                                     {
+                                        var esUltimoAdmin = rolActual == "Administrador" && Model.CantidadAdministradores <= 1;
                                         <form action="@Url.Action("RevocarRol", "Rol")" method="post" class="d-inline">
                                             @Html.AntiForgeryToken()
                                             <input type="hidden" name="usuarioId" value="@usuario.Id" />
                                             <input type="hidden" name="rolNombre" value="@rolActual" />
                                             <button type="submit"
                                                     class="btn btn-sm btn-outline-danger"
-                                                    title="Revocar @rolActual">
+                                                    title="@(esUltimoAdmin ? "No se puede revocar al último administrador" : "Revocar " + rolActual)"
+                                                    @(esUltimoAdmin ? "disabled" : "")>
                                                 <i class="bi bi-x-lg"></i>
                                             </button>
                                         </form>
