@@ -59,6 +59,7 @@ namespace HappyTimesBalloons.Web.Controllers
                     Imagenes = p.Imagenes.Select(i => new ImagenProductoViewModel
                     {
                         Id = i.Id,
+                        ProductoId = p.Id,
                         RutaImagen = i.RutaImagen,
                         EsPrincipal = i.EsPrincipal,
                         Orden = i.Orden
@@ -168,6 +169,25 @@ namespace HappyTimesBalloons.Web.Controllers
             return RedirectToAction("Index");
         }
 
+        [HttpGet]
+        public async Task<ActionResult> ObtenerImagenesModal(int productoId)
+        {
+            var producto = await _productoServicio.ObtenerPorIdAsync(productoId);
+            if (producto == null)
+                return new HttpStatusCodeResult(404);
+
+            var vm = producto.Imagenes.Select(i => new ImagenProductoViewModel
+            {
+                Id = i.Id,
+                ProductoId = productoId,
+                RutaImagen = i.RutaImagen,
+                EsPrincipal = i.EsPrincipal,
+                Orden = i.Orden
+            }).ToList();
+
+            return PartialView("_ImagenesModal", vm);
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> EliminarImagen(int imagenId, int productoId)
@@ -186,9 +206,7 @@ namespace HappyTimesBalloons.Web.Controllers
                 TipoOperacion.Eliminar, "ImagenesProducto",
                 registroId: imagenId, ip: Request.UserHostAddress);
 
-            TempData["Exito"] = "Imagen eliminada.";
-
-            return RedirectToAction("Index");
+            return Json(new { exito = true });
         }
 
         [HttpPost]
@@ -196,9 +214,7 @@ namespace HappyTimesBalloons.Web.Controllers
         public async Task<ActionResult> EstablecerPrincipal(int imagenId, int productoId)
         {
             await _productoServicio.EstablecerImagenPrincipalAsync(imagenId, productoId);
-            TempData["Exito"] = "Imagen principal actualizada.";
-
-            return RedirectToAction("Index");
+            return Json(new { exito = true });
         }
 
         private async Task<ProductoFormViewModel> ConstruirFormViewModel(

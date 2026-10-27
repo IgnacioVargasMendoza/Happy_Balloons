@@ -197,6 +197,26 @@ namespace HappyTimesBalloons.AccesoADatos.Repositorios
                 .ToListAsync();
         }
 
+        public async Task<List<PedidoDTO>> ObtenerActivosAsync()
+        {
+            return await _ctx.Pedidos
+                .Include(x => x.Usuario)
+                .Where(x => x.EstadoPedido != EstadoPedido.Cancelado
+                         && x.EstadoPedido != EstadoPedido.Entregado)
+                .OrderByDescending(x => x.FechaPedido)
+                .Select(x => new PedidoDTO
+                {
+                    Id = x.Id,
+                    Numero = x.Numero,
+                    UserId = x.UserId,
+                    NombreUsuario = x.Usuario.Nombre ?? x.Usuario.Email,
+                    FechaPedido = x.FechaPedido,
+                    EstadoPedido = x.EstadoPedido,
+                    Total = x.Total
+                })
+                .ToListAsync();
+        }
+
         public async Task<bool> ActualizarEstadoAsync(int id, EstadoPedido nuevoEstado)
         {
             var pedido = await _ctx.Pedidos.FindAsync(id);
