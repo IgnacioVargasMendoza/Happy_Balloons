@@ -4,6 +4,25 @@ body {
 
 /* Navbar adapta al tema automáticamente con bg-body-tertiary */
 
+/* Cards — fondo más claro + borde + sombra para distinguirlas del body (#212529) */
+[data-bs-theme="dark"] .card {
+    --bs-card-bg: #2d333d;
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+}
+
+/* Dropdowns y modales — misma elevación visual */
+[data-bs-theme="dark"] .dropdown-menu {
+    --bs-dropdown-bg: #2d333d;
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+[data-bs-theme="dark"] .modal-content {
+    background-color: #2d333d;
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
 /* Colores de marca en modo oscuro */
 [data-bs-theme="dark"] .btn-brand {
     background-color: #e91e8c;
