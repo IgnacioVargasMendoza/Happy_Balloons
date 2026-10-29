@@ -110,14 +110,17 @@
                                     null,
                                     new { @class = "dropdown-item" })
                             </li>
-                            <li>
-                                @Html.ActionLink(
-                                    "Promociones",
-                                    "Index",
-                                    "Promocion",
-                                    null,
-                                    new { @class = "dropdown-item" })
-                            </li>
+                            @if (User.IsInRole("Administrador"))
+                            {
+                                <li>
+                                    @Html.ActionLink(
+                                        "Promociones",
+                                        "Index",
+                                        "Promocion",
+                                        null,
+                                        new { @class = "dropdown-item" })
+                                </li>
+                            }
                         </ul>
                     </li>
 
