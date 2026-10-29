@@ -1,0 +1,34 @@
+body {
+    background-color: var(--bs-body-bg);
+}
+
+/* Navbar adapta al tema automáticamente con bg-body-tertiary */
+
+/* Colores de marca en modo oscuro */
+[data-bs-theme="dark"] .btn-brand {
+    background-color: #e91e8c;
+    border-color: #e91e8c;
+    color: #fff;
+}
+
+[data-bs-theme="dark"] .btn-brand:hover {
+    background-color: #c2177b;
+    border-color: #c2177b;
+    color: #fff;
+}
+
+[data-bs-theme="dark"] .text-brand {
+    color: #f06dbc !important;
+}
+
+/* Escalado de fuente — todo lo rem-based de Bootstrap escala proporcional */
+html.htb-font-sm { font-size: 14px; }
+html.htb-font-md { font-size: 16px; }
+html.htb-font-lg { font-size: 18px; }
+
+/* Controles de accesibilidad en navbar */
+.htb-a11y-controls .btn {
+    padding: 0.2rem 0.45rem;
+    font-size: 0.72rem;
+    line-height: 1.4;
+}
