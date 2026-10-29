@@ -343,7 +343,7 @@ namespace HappyTimesBalloons.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> ActualizarEstado(int id, EstadoPedido estado)
         {
-            var resultado = await _pedidoServicio.ActualizarEstadoAsync(id, estado);
+            var resultado = await _pedidoServicio.ActualizarEstadoAsync(id, estado, User.Identity.GetUserId(), User.Identity.Name);
 
             if (!resultado.Exito)
             {
