@@ -55,31 +55,16 @@
                 @if (Request.IsAuthenticated &&
                     (User.IsInRole("Administrador") || User.IsInRole("Operador")))
                 {
+                    @* ── Operaciones ── *@
                     <li class="nav-item dropdown">
-
                         <a class="nav-link dropdown-toggle"
                            href="#"
                            role="button"
                            data-bs-toggle="dropdown"
                            aria-expanded="false">
-
-                            Administración
-
+                            Operaciones
                         </a>
-
                         <ul class="dropdown-menu">
-
-                            <li>
-                                @Html.ActionLink(
-                                    "Estadísticas",
-                                    "Index",
-                                    "Admin",
-                                    null,
-                                    new { @class = "dropdown-item" })
-                            </li>
-
-                            <li><hr class="dropdown-divider" /></li>
-
                             <li>
                                 @Html.ActionLink(
                                     "Pedidos",
@@ -88,7 +73,6 @@
                                     null,
                                     new { @class = "dropdown-item" })
                             </li>
-
                             <li>
                                 @Html.ActionLink(
                                     "Programación de Entregas",
@@ -97,9 +81,19 @@
                                     null,
                                     new { @class = "dropdown-item" })
                             </li>
+                        </ul>
+                    </li>
 
-                            <li><hr class="dropdown-divider" /></li>
-
+                    @* ── Tienda ── *@
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle"
+                           href="#"
+                           role="button"
+                           data-bs-toggle="dropdown"
+                           aria-expanded="false">
+                            Tienda
+                        </a>
+                        <ul class="dropdown-menu">
                             <li>
                                 @Html.ActionLink(
                                     "Categorías",
@@ -108,7 +102,6 @@
                                     null,
                                     new { @class = "dropdown-item" })
                             </li>
-
                             <li>
                                 @Html.ActionLink(
                                     "Productos",
@@ -117,7 +110,6 @@
                                     null,
                                     new { @class = "dropdown-item" })
                             </li>
-
                             <li>
                                 @Html.ActionLink(
                                     "Promociones",
@@ -126,9 +118,19 @@
                                     null,
                                     new { @class = "dropdown-item" })
                             </li>
+                        </ul>
+                    </li>
 
-                            <li><hr class="dropdown-divider" /></li>
-
+                    @* ── Inventario ── *@
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle"
+                           href="#"
+                           role="button"
+                           data-bs-toggle="dropdown"
+                           aria-expanded="false">
+                            Inventario
+                        </a>
+                        <ul class="dropdown-menu">
                             <li>
                                 @Html.ActionLink(
                                     "Inventario",
@@ -137,7 +139,6 @@
                                     null,
                                     new { @class = "dropdown-item" })
                             </li>
-
                             <li>
                                 @Html.ActionLink(
                                     "Predicción de Demanda",
@@ -146,11 +147,30 @@
                                     null,
                                     new { @class = "dropdown-item" })
                             </li>
+                        </ul>
+                    </li>
 
+                    @* ── Análisis ── *@
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle"
+                           href="#"
+                           role="button"
+                           data-bs-toggle="dropdown"
+                           aria-expanded="false">
+                            Análisis
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                @Html.ActionLink(
+                                    "Estadísticas",
+                                    "Index",
+                                    "Admin",
+                                    null,
+                                    new { @class = "dropdown-item" })
+                            </li>
                             @if (User.IsInRole("Administrador"))
                             {
                                 <li><hr class="dropdown-divider" /></li>
-
                                 <li>
                                     @Html.ActionLink(
                                         "Reporte de Ventas",
@@ -159,7 +179,6 @@
                                         null,
                                         new { @class = "dropdown-item" })
                                 </li>
-
                                 <li>
                                     @Html.ActionLink(
                                         "Reporte de Inventario",
@@ -168,7 +187,6 @@
                                         null,
                                         new { @class = "dropdown-item" })
                                 </li>
-
                                 <li>
                                     @Html.ActionLink(
                                         "Ranking Productos",
@@ -177,9 +195,22 @@
                                         null,
                                         new { @class = "dropdown-item" })
                                 </li>
+                            }
+                        </ul>
+                    </li>
 
-                                <li><hr class="dropdown-divider" /></li>
-
+                    @* ── Configuración (solo Admin) ── *@
+                    if (User.IsInRole("Administrador"))
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle"
+                               href="#"
+                               role="button"
+                               data-bs-toggle="dropdown"
+                               aria-expanded="false">
+                                Configuración
+                            </a>
+                            <ul class="dropdown-menu">
                                 <li>
                                     @Html.ActionLink(
                                         "Zonas de Entrega",
@@ -188,7 +219,6 @@
                                         null,
                                         new { @class = "dropdown-item" })
                                 </li>
-
                                 <li>
                                     @Html.ActionLink(
                                         "Roles",
@@ -197,7 +227,6 @@
                                         null,
                                         new { @class = "dropdown-item" })
                                 </li>
-
                                 <li>
                                     @Html.ActionLink(
                                         "Usuarios",
@@ -206,9 +235,7 @@
                                         null,
                                         new { @class = "dropdown-item" })
                                 </li>
-
                                 <li><hr class="dropdown-divider" /></li>
-
                                 <li>
                                     @Html.ActionLink(
                                         "Reglas Operativas",
@@ -217,10 +244,9 @@
                                         null,
                                         new { @class = "dropdown-item" })
                                 </li>
-                            }
-
-                        </ul>
-                    </li>
+                            </ul>
+                        </li>
+                    }
                 }
 
             </ul>
