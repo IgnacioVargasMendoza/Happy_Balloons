@@ -25,7 +25,7 @@
                 <i class="bi bi-graph-up-arrow me-2 text-primary"></i>@Model.Detalle.NombreProducto
             </h2>
             <p class="text-muted small mb-0">
-                <span class="badge bg-light text-dark border">@Model.Detalle.Categoria</span>
+                <span class="badge bg-secondary">@Model.Detalle.Categoria</span>
                 <span class="ms-2">Periodo: @Model.NombrePeriodo</span>
             </p>
         </div>
@@ -180,7 +180,7 @@
                         </tbody>
                         @if (Model.Detalle.DatosSuficientes)
                         {
-                            <tfoot class="table-light">
+                            <tfoot>
                                 <tr>
                                     <td class="fw-bold text-primary">
                                         <i class="bi bi-bullseye me-1"></i>Prediccion proximo periodo

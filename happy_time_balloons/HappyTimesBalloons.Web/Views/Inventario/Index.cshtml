@@ -111,7 +111,7 @@
         </li>
     </ul>
 
-    <div class="tab-content border border-top-0 rounded-bottom bg-white shadow-sm p-4 mb-4">
+    <div class="tab-content border border-top-0 rounded-bottom shadow-sm p-4 mb-4">
 
         @* ──────────────────────────────────── Tab Inventario ─── *@
         <div class="tab-pane fade show active" id="pane-inventario" role="tabpanel">
@@ -123,11 +123,11 @@
                     <div class="card-header bg-warning bg-opacity-10 d-flex align-items-center gap-2">
                         <i class="bi bi-bell-fill text-warning"></i>
                         <span class="fw-semibold">Alertas de reabastecimiento</span>
-                        <span class="badge bg-warning text-dark ms-auto">@Model.Kpis.AlertasReabastecimiento.Count</span>
+                        <span class="badge text-bg-warning ms-auto">@Model.Kpis.AlertasReabastecimiento.Count</span>
                     </div>
                     <div class="table-responsive">
                         <table class="table table-sm mb-0">
-                            <thead class="table-light">
+                            <thead>
                                 <tr>
                                     <th>Producto</th>
                                     <th>Categoría</th>
@@ -152,7 +152,7 @@
                                             }
                                             else
                                             {
-                                                <span class="badge bg-warning text-dark">Stock bajo</span>
+                                                <span class="badge text-bg-warning">Stock bajo</span>
                                             }
                                         </td>
                                         <td class="text-end">
@@ -220,7 +220,7 @@
 
             @* Tabla principal *@
             <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white d-flex align-items-center justify-content-between">
+                <div class="card-header d-flex align-items-center justify-content-between">
                     <span class="fw-semibold">
                         Productos en inventario
                         <span class="badge bg-secondary ms-2">@Model.Items.Count</span>
@@ -228,7 +228,7 @@
                 </div>
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light">
+                        <thead>
                             <tr>
                                 <th>Producto</th>
                                 <th>Categoría</th>
@@ -275,7 +275,7 @@
                                             }
                                             else if (item.EstadoStock == "bajo")
                                             {
-                                                <span class="badge bg-warning text-dark">Stock bajo</span>
+                                                <span class="badge text-bg-warning">Stock bajo</span>
                                             }
                                             else
                                             {
@@ -331,7 +331,7 @@
                 @* Donut — Estado de stock *@
                 <div class="col-md-4">
                     <div class="card border-0 shadow-sm h-100">
-                        <div class="card-header bg-white fw-semibold">
+                        <div class="card-header fw-semibold">
                             <i class="bi bi-pie-chart me-1 text-primary"></i>Estado de stock
                         </div>
                         <div class="card-body d-flex align-items-center justify-content-center">
@@ -342,7 +342,7 @@
                 @* Bar — Productos por categoría *@
                 <div class="col-md-8">
                     <div class="card border-0 shadow-sm h-100">
-                        <div class="card-header bg-white fw-semibold">
+                        <div class="card-header fw-semibold">
                             <i class="bi bi-bar-chart me-1 text-primary"></i>Productos por categoría
                         </div>
                         <div class="card-body">
@@ -354,7 +354,7 @@
 
             @* Horizontal bar — Productos más críticos *@
             <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white fw-semibold">
+                <div class="card-header fw-semibold">
                     <i class="bi bi-exclamation-triangle me-1 text-warning"></i>
                     Productos más críticos (stock actual vs. mínimo)
                 </div>
@@ -434,7 +434,7 @@
 
                     @* Producto + stock *@
                     <div class="rounded-3 border bg-light px-3 py-2 mb-4 d-flex align-items-center gap-3">
-                        <div class="rounded-3 p-2 bg-white border">
+                        <div class="rounded-3 p-2 border">
                             <i class="bi bi-box-seam fs-5 text-secondary"></i>
                         </div>
                         <div class="flex-grow-1">

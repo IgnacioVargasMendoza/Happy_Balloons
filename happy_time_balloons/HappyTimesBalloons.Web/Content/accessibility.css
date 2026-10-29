@@ -23,6 +23,18 @@ body {
     border-color: rgba(255, 255, 255, 0.1);
 }
 
+/* KPI stat cards — opacity-10 resulta saturada con los RGB de dark mode */
+[data-bs-theme="dark"] .bg-opacity-10 {
+    --bs-bg-opacity: 0.06;
+}
+
+/* table-light thead no adapta al dark mode */
+[data-bs-theme="dark"] .table-light {
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--bs-body-color);
+    --bs-table-border-color: var(--bs-border-color);
+}
+
 /* text-dark y bg-light no son theme-aware en Bootstrap — override global */
 [data-bs-theme="dark"] .text-dark {
     color: var(--bs-body-color) !important;
