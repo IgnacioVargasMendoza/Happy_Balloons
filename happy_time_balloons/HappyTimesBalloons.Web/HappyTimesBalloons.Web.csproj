@@ -214,6 +214,8 @@
     <Content Include="Views\PrediccionDemanda\Detalle.cshtml" />
     <Content Include="Views\ReglasOperativas\Editar.cshtml" />
     <Content Include="Scripts\ProgramacionEntrega\programar-entrega.js" />
+    <Content Include="Content\accessibility.css" />
+    <Content Include="Scripts\accessibility.js" />
     <Content Include="Content\Sinpe.css" />
     <Content Include="Scripts\Sinpe.js" />
     <Content Include="Scripts\Rol\rol-index.js" />
