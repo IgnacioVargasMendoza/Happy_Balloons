@@ -9,7 +9,7 @@
     }
     else if (Model.TieneDescuento)
     {
-        <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-2" style="z-index:1;">Oferta</span>
+        <span class="badge text-bg-warning position-absolute top-0 start-0 m-2" style="z-index:1;">Oferta</span>
     }
     @if (Model.Stock == 0)
     {
@@ -32,7 +32,7 @@
     <div class="card-body d-flex flex-column">
         @if (!string.IsNullOrEmpty(Model.CategoriaNombre))
         {
-            <span class="badge bg-light text-dark border small mb-1 align-self-start">@Model.CategoriaNombre</span>
+            <span class="badge bg-secondary small mb-1 align-self-start">@Model.CategoriaNombre</span>
         }
 
         <h6 class="fw-semibold mb-1">
