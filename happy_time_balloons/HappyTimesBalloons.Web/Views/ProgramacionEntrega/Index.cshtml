@@ -126,7 +126,8 @@
                                 <th>Horario</th>
                                 <th>Estado</th>
                                 <th>Programado por</th>
-                                <th class="pe-4">Notas</th>
+                                <th>Notas</th>
+                                <th class="text-center pe-4">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -140,13 +141,29 @@
                                         <span class="badge bg-success">@p.EstadoProgramacion</span>
                                     </td>
                                     <td class="small">@p.NombreUsuario</td>
-                                    <td class="pe-4">
+                                    <td>
                                         @if (!string.IsNullOrEmpty(p.Notas))
                                         {
                                             <span class="text-muted small" title="@p.Notas">
                                                 @(p.Notas.Length > 40 ? p.Notas.Substring(0, 40) + "…" : p.Notas)
                                             </span>
                                         }
+                                    </td>
+                                    <td class="text-center pe-4">
+                                        <form action="@Url.Action("MarcarEntregada", "ProgramacionEntrega")" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@p.Id" />
+                                            <button type="submit" class="btn btn-sm btn-primary" title="Marcar como entregada">
+                                                <i class="bi bi-check-circle"></i>
+                                            </button>
+                                        </form>
+                                        <form action="@Url.Action("Cancelar", "ProgramacionEntrega")" method="post" class="d-inline ms-1">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@p.Id" />
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Cancelar entrega">
+                                                <i class="bi bi-x-circle"></i>
+                                            </button>
+                                        </form>
                                     </td>
                                 </tr>
                             }
