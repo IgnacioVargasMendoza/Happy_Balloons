@@ -126,8 +126,7 @@
                                 <th>Horario</th>
                                 <th>Estado</th>
                                 <th>Programado por</th>
-                                <th>Notas</th>
-                                <th class="text-center pe-4">Acciones</th>
+                                <th class="pe-4">Notas</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -141,31 +140,13 @@
                                         <span class="badge bg-success">@p.EstadoProgramacion</span>
                                     </td>
                                     <td class="small">@p.NombreUsuario</td>
-                                    <td>
+                                    <td class="pe-4">
                                         @if (!string.IsNullOrEmpty(p.Notas))
                                         {
                                             <span class="text-muted small" title="@p.Notas">
                                                 @(p.Notas.Length > 40 ? p.Notas.Substring(0, 40) + "…" : p.Notas)
                                             </span>
                                         }
-                                    </td>
-                                    <td class="text-center pe-4">
-                                        <form action="@Url.Action("MarcarEntregada", "ProgramacionEntrega")" method="post" class="d-inline"
-                                              onsubmit="return confirm('¿Marcar esta entrega como completada?');">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="id" value="@p.Id" />
-                                            <button type="submit" class="btn btn-sm btn-success" title="Marcar como entregada">
-                                                <i class="bi bi-check-circle me-1"></i>Entregada
-                                            </button>
-                                        </form>
-                                        <form action="@Url.Action("Cancelar", "ProgramacionEntrega")" method="post" class="d-inline"
-                                              onsubmit="return confirm('¿Cancelar esta programación de entrega?');">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="id" value="@p.Id" />
-                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Cancelar entrega">
-                                                <i class="bi bi-x-circle me-1"></i>Cancelar
-                                            </button>
-                                        </form>
                                     </td>
                                 </tr>
                             }
