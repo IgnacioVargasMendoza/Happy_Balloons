@@ -23,6 +23,21 @@ body {
     border-color: rgba(255, 255, 255, 0.1);
 }
 
+/* text-dark y bg-light no son theme-aware en Bootstrap — override global */
+[data-bs-theme="dark"] .text-dark {
+    color: var(--bs-body-color) !important;
+}
+
+[data-bs-theme="dark"] .bg-light {
+    background-color: var(--bs-secondary-bg) !important;
+}
+
+/* Footer con bg-white hardcodeado */
+[data-bs-theme="dark"] footer {
+    background-color: var(--bs-body-tertiary-bg) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
 /* Colores de marca en modo oscuro */
 [data-bs-theme="dark"] .btn-brand {
     background-color: #e91e8c;
