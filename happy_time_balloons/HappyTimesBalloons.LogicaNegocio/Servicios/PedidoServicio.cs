@@ -14,15 +14,18 @@ namespace HappyTimesBalloons.LogicaNegocio.Servicios
         private readonly IPedidoRepositorio _pedidoRepo;
         private readonly IProductoRepositorio _productoRepo;
         private readonly IZonaEntregaRepositorio _zonaRepo;
+        private readonly IProgramacionEntregaRepositorio _programacionRepo;
 
         public PedidoServicio(
             IPedidoRepositorio pedidoRepo,
             IProductoRepositorio productoRepo,
-            IZonaEntregaRepositorio zonaRepo)
+            IZonaEntregaRepositorio zonaRepo,
+            IProgramacionEntregaRepositorio programacionRepo)
         {
             _pedidoRepo = pedidoRepo;
             _productoRepo = productoRepo;
             _zonaRepo = zonaRepo;
+            _programacionRepo = programacionRepo;
         }
 
         public async Task<ResultadoOperacionDTO<int>> CrearPedidoAsync(string userId, CheckoutDTO checkout)
@@ -101,7 +104,7 @@ namespace HappyTimesBalloons.LogicaNegocio.Servicios
         public Task<List<PedidoDTO>> ObtenerTodosAsync(EstadoPedido? filtroEstado = null, string busqueda = null)
             => _pedidoRepo.ObtenerTodosAsync(filtroEstado, busqueda);
 
-        public async Task<ResultadoOperacionDTO> ActualizarEstadoAsync(int id, EstadoPedido nuevoEstado)
+        public async Task<ResultadoOperacionDTO> ActualizarEstadoAsync(int id, EstadoPedido nuevoEstado, string usuarioId, string nombreUsuario)
         {
             var pedido = await _pedidoRepo.ObtenerPorIdAsync(id);
             if (pedido == null)
@@ -116,9 +119,22 @@ namespace HappyTimesBalloons.LogicaNegocio.Servicios
                     CodigoResultado.DatosInvalidos);
 
             var ok = await _pedidoRepo.ActualizarEstadoAsync(id, nuevoEstado);
-            return ok
-                ? ResultadoOperacionDTO.Ok("Estado del pedido actualizado.")
-                : ResultadoOperacionDTO.Fallo("No se pudo actualizar el estado.", CodigoResultado.Error);
+            if (!ok)
+                return ResultadoOperacionDTO.Fallo("No se pudo actualizar el estado.", CodigoResultado.Error);
+
+            if (nuevoEstado == EstadoPedido.Entregado || nuevoEstado == EstadoPedido.Cancelado)
+            {
+                var programacion = await _programacionRepo.ObtenerPorPedidoIdAsync(id);
+                if (programacion != null)
+                {
+                    if (nuevoEstado == EstadoPedido.Entregado)
+                        await _programacionRepo.MarcarEntregadaAsync(programacion.Id, usuarioId, nombreUsuario);
+                    else
+                        await _programacionRepo.CancelarAsync(programacion.Id, usuarioId, nombreUsuario);
+                }
+            }
+
+            return ResultadoOperacionDTO.Ok("Estado del pedido actualizado.");
         }
 
         public static bool TransicionValida(EstadoPedido actual, EstadoPedido nuevo)

@@ -11,7 +11,7 @@ namespace HappyTimesBalloons.Abstraccion.Interfaces.Servicios
         Task<PedidoDTO> ObtenerPorIdAsync(int id);
         Task<List<PedidoDTO>> ObtenerPorUsuarioAsync(string userId);
         Task<List<PedidoDTO>> ObtenerTodosAsync(EstadoPedido? filtroEstado = null, string busqueda = null);
-        Task<ResultadoOperacionDTO> ActualizarEstadoAsync(int id, EstadoPedido nuevoEstado);
+        Task<ResultadoOperacionDTO> ActualizarEstadoAsync(int id, EstadoPedido nuevoEstado, string usuarioId, string nombreUsuario);
         Task<PedidoEstadisticasDTO> ObtenerEstadisticasAsync();
         Task<List<VentaDiariaDTO>> ObtenerVentasPorDiaAsync(int dias);
         int AjustarCantidad(int cantidadSolicitada, int stockDisponible);
