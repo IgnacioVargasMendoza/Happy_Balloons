@@ -20,6 +20,7 @@
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
 
     <link href="@Url.Content("~/Content/accessibility.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/Content/feedback.css")" rel="stylesheet" />
 
     <style>
 
@@ -66,8 +67,17 @@
 
     @Html.Partial("_Footer")
 
+    @Html.Partial("_FeedbackModal")
+
+    <button type="button" class="htb-feedback-btn" data-bs-toggle="modal"
+            data-bs-target="#modalFeedback" title="Enviar feedback" aria-label="Enviar feedback">
+        <i class="bi bi-chat-dots-fill"></i>
+    </button>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script src="@Url.Content("~/Scripts/accessibility.js")"></script>
+    <script src="@Url.Content("~/Scripts/feedback.js")"></script>
 
     @RenderSection("scripts", required: false)
 </body>

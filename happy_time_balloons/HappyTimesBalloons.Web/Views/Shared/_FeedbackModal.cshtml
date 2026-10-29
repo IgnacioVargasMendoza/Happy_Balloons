@@ -1,0 +1,73 @@
+<div class="modal fade" id="modalFeedback" tabindex="-1"
+     aria-labelledby="modalFeedbackLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalFeedbackLabel">
+                    <i class="bi bi-chat-dots me-2 text-brand"></i>Feedback / Sugerencia
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+
+            <form id="formFeedback" novalidate>
+                @Html.AntiForgeryToken()
+
+                <div class="modal-body">
+                    <div id="htbFeedbackAlerta" class="mb-3"></div>
+
+                    <div class="mb-3">
+                        <label for="feedbackTipo" class="form-label fw-semibold">
+                            Tipo <span class="text-danger">*</span>
+                        </label>
+                        <select id="feedbackTipo" name="Tipo" class="form-select" required>
+                            <option value="">— Selecciona el tipo —</option>
+                            <option value="Bug">🐛 Bug — algo no funciona correctamente</option>
+                            <option value="Idea">💡 Idea — nueva funcionalidad</option>
+                            <option value="Mejora">✨ Mejora — algo existente podría ser mejor</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="feedbackTitulo" class="form-label fw-semibold">
+                            Título <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" id="feedbackTitulo" name="Titulo" class="form-control"
+                               placeholder="Resumen breve del feedback" maxlength="100" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="feedbackDescripcion" class="form-label fw-semibold">
+                            Descripción <span class="text-danger">*</span>
+                        </label>
+                        <textarea id="feedbackDescripcion" name="Descripcion" class="form-control"
+                                  rows="4" placeholder="Describe el problema, idea o mejora con el mayor detalle posible…"
+                                  required></textarea>
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="form-label fw-semibold">Captura de pantalla (opcional)</label>
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <button type="button" id="htbBtnCapturar"
+                                    class="btn btn-outline-secondary btn-sm">
+                                <i class="bi bi-camera me-1"></i>Capturar pantalla
+                            </button>
+                            <button type="button" id="htbBtnQuitar"
+                                    class="btn btn-link btn-sm text-danger p-0 d-none">
+                                <i class="bi bi-x-circle me-1"></i>Quitar captura
+                            </button>
+                        </div>
+                        <img id="htbScreenshotPreview" class="htb-screenshot-preview d-none" alt="Captura de pantalla" />
+                        <input type="hidden" id="htbScreenshotData" name="ScreenshotBase64" />
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" id="htbBtnEnviar" class="btn btn-brand">
+                        <i class="bi bi-send me-1"></i>Enviar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
