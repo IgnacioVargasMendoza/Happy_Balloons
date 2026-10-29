@@ -128,9 +128,22 @@
 
                     
                     <div class="mb-3" id="panelTarjeta" style="@(Model.MetodoPago != "Tarjeta" ? "display:none;" : "")">
+                        <div class="p-3 rounded mb-3 sinpe-info-panel">
+                            <div class="fw-semibold mb-2">
+                                <i class="bi bi-info-circle me-1"></i>Pago con datáfono al momento de la entrega
+                            </div>
+                            <div class="text-muted small mb-2">
+                                El cobro se realizará cuando el repartidor llegue con tu pedido. Ten tu tarjeta a la mano.
+                            </div>
+                            <div class="d-flex gap-2 align-items-center">
+                                <span class="badge bg-secondary">VISA</span>
+                                <span class="badge bg-secondary">Mastercard</span>
+                                <span class="badge bg-secondary">Débito</span>
+                            </div>
+                        </div>
                         <label class="form-label fw-semibold">Nombre en la tarjeta</label>
                         @Html.TextBoxFor(m => m.NumeroReferencia, new { @class = "form-control", placeholder = "Nombre completo tal como aparece en la tarjeta" })
-                        <div class="form-text">Tu pedido será procesado al momento de la entrega.</div>
+                        <div class="form-text">Este dato es solo de referencia para confirmar tu identidad al momento de la entrega.</div>
                     </div>
 
                     <div class="mb-0">
