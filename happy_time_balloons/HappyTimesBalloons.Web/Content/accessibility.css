@@ -1,0 +1,80 @@
+body {
+    background-color: var(--bs-body-bg);
+}
+
+/* Navbar adapta al tema automáticamente con bg-body-tertiary */
+
+/* Cards — fondo más claro + borde + sombra para distinguirlas del body (#212529) */
+[data-bs-theme="dark"] .card {
+    --bs-card-bg: #2d333d;
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+}
+
+/* Dropdowns y modales — misma elevación visual */
+[data-bs-theme="dark"] .dropdown-menu {
+    --bs-dropdown-bg: #2d333d;
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+[data-bs-theme="dark"] .modal-content {
+    background-color: #2d333d;
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* KPI stat cards — opacity-10 resulta saturada con los RGB de dark mode */
+[data-bs-theme="dark"] .bg-opacity-10 {
+    --bs-bg-opacity: 0.06;
+}
+
+/* table-light thead no adapta al dark mode */
+[data-bs-theme="dark"] .table-light {
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--bs-body-color);
+    --bs-table-border-color: var(--bs-border-color);
+}
+
+/* text-dark y bg-light no son theme-aware en Bootstrap — override global */
+[data-bs-theme="dark"] .text-dark {
+    color: var(--bs-body-color) !important;
+}
+
+[data-bs-theme="dark"] .bg-light {
+    background-color: var(--bs-secondary-bg) !important;
+}
+
+/* Footer con bg-white hardcodeado */
+[data-bs-theme="dark"] footer {
+    background-color: var(--bs-body-tertiary-bg) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Colores de marca en modo oscuro */
+[data-bs-theme="dark"] .btn-brand {
+    background-color: #e91e8c;
+    border-color: #e91e8c;
+    color: #fff;
+}
+
+[data-bs-theme="dark"] .btn-brand:hover {
+    background-color: #c2177b;
+    border-color: #c2177b;
+    color: #fff;
+}
+
+[data-bs-theme="dark"] .text-brand {
+    color: #f06dbc !important;
+}
+
+/* Escalado de fuente — todo lo rem-based de Bootstrap escala proporcional */
+html.htb-font-sm { font-size: 14px; }
+html.htb-font-md { font-size: 16px; }
+html.htb-font-lg { font-size: 18px; }
+
+/* Controles de accesibilidad en navbar */
+.htb-a11y-controls .btn {
+    padding: 0.2rem 0.45rem;
+    font-size: 0.72rem;
+    line-height: 1.4;
+}

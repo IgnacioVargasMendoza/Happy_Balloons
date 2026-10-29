@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-md navbar-light bg-white border-bottom shadow-sm sticky-top">
+<nav class="navbar navbar-expand-md bg-body-tertiary border-bottom shadow-sm sticky-top">
     <div class="container">
 
         <a class="navbar-brand d-flex align-items-center gap-2"
@@ -110,14 +110,17 @@
                                     null,
                                     new { @class = "dropdown-item" })
                             </li>
-                            <li>
-                                @Html.ActionLink(
-                                    "Promociones",
-                                    "Index",
-                                    "Promocion",
-                                    null,
-                                    new { @class = "dropdown-item" })
-                            </li>
+                            @if (User.IsInRole("Administrador"))
+                            {
+                                <li>
+                                    @Html.ActionLink(
+                                        "Promociones",
+                                        "Index",
+                                        "Promocion",
+                                        null,
+                                        new { @class = "dropdown-item" })
+                                </li>
+                            }
                         </ul>
                     </li>
 
@@ -253,6 +256,26 @@
 
             @* ── Menú derecho: carrito + cuenta ── *@
             <ul class="navbar-nav ms-auto align-items-center gap-1">
+
+                @* ── Controles de accesibilidad ── *@
+                <li class="nav-item htb-a11y-controls d-flex align-items-center gap-1 me-1">
+                    <div class="btn-group btn-group-sm" role="group" aria-label="Tamaño de letra">
+                        <button id="btn-font-sm" type="button"
+                                class="btn btn-outline-secondary"
+                                onclick="htbSetFont('sm')" title="Letra pequeña">A-</button>
+                        <button id="btn-font-md" type="button"
+                                class="btn btn-outline-secondary"
+                                onclick="htbSetFont('md')" title="Letra normal">A</button>
+                        <button id="btn-font-lg" type="button"
+                                class="btn btn-outline-secondary"
+                                onclick="htbSetFont('lg')" title="Letra grande">A+</button>
+                    </div>
+                    <button id="btn-theme-toggle" type="button"
+                            class="btn btn-outline-secondary btn-sm"
+                            onclick="htbToggleTheme()" title="Cambiar a modo oscuro">
+                        <i class="bi bi-moon-fill"></i>
+                    </button>
+                </li>
 
                 <li class="nav-item position-relative">
 

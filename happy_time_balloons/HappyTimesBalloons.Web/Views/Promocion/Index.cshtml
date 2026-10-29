@@ -19,7 +19,7 @@
     @* Formulario de nueva promoción *@
     <div class="col-lg-4">
         <div class="card shadow-sm border-0">
-            <div class="card-header bg-white fw-semibold border-bottom">
+            <div class="card-header fw-semibold border-bottom">
                 <i class="bi bi-tag me-2 text-brand"></i>Nueva promoción
             </div>
             <div class="card-body">
@@ -73,7 +73,7 @@
     @* Lista de promociones *@
     <div class="col-lg-8">
         <div class="card shadow-sm border-0">
-            <div class="card-header bg-white fw-semibold border-bottom d-flex align-items-center justify-content-between">
+            <div class="card-header fw-semibold border-bottom d-flex align-items-center justify-content-between">
                 <span><i class="bi bi-list-ul me-2 text-brand"></i>Promociones registradas</span>
                 <span class="badge bg-secondary">@Model.Promociones.Count</span>
             </div>
@@ -89,7 +89,7 @@
                 {
                     <div class="table-responsive">
                         <table class="table table-hover align-middle mb-0">
-                            <thead class="table-light">
+                            <thead>
                                 <tr>
                                     <th>Producto</th>
                                     <th class="text-center">Descuento</th>
@@ -121,7 +121,7 @@
                                             }
                                             else
                                             {
-                                                <span class="badge bg-warning text-dark">Próxima</span>
+                                                <span class="badge text-bg-warning">Próxima</span>
                                             }
                                         </td>
                                         <td class="text-end">
